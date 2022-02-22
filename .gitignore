@@ -1,0 +1,9 @@
+*.iml
+*.directory
+.ipynb_checkpoints/
+__pycache__/
+META-INF/
+.DS_STORE
+out/
+.idea/
+results/

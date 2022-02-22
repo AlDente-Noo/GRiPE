@@ -1,0 +1,99 @@
+#SIMULATION PARAMATERS
+
+#The length of the simulation (in seconds). If lower or equal to zero and there are target sites to be reached by TFs then the simulation will stop when all target sites are reached.
+STOP_TIME = 1000.0;
+
+#The number of independent replicate simulations to be performed.
+ENSAMBLE_SIZE = 100;
+
+#The seed of the random number generator. Use 0 to get a different behaviour each time or different number to get the same behaviour.
+RANDOM_SEED = 0;
+
+#The number of decimals when computing the TF affinity.
+COMPUTED_AFFINITY_PRECISION = 3;
+
+#The size of the DNA sector. Breaking the DNA into sectors increases the speed at which empty spots on the DNA are located. Put 0 for autoselect.
+DNA_SECTOR_SIZE = 0;
+
+#The event list is broken into sub-lists of the specified size.  This is highly recommended for Direct Method and should not be used for First reaction Method. Put 0 for autoselect.
+EVENT_LIST_SUBGROUP_SIZE = 0;
+
+#This is true if the 1D event list is implemented using the First Reaction method or false if the Dirtect Method is used (Gillespie 1977).
+EVENT_LIST_USES_FR = false;
+
+#The folder where the result files will be saved.
+#OUTPUT_FOLDER = "results_debug_no_thres_no_repression_100";
+OUTPUT_FOLDER = "results_test";
+
+#The filename where the output results will be saved. Extension will be automatically added at the end. If this is blank then a random unique name will be generated
+OUTPUT_FILENAME = "drosophila";
+
+#The time interval in seconds after which intermediary results will be printed. If zero is used then no intermediary results will be produced.
+PRINT_INTERMEDIARY_RESULTS_AFTER = 50.0;
+
+#This is true if the occupancy at the end of the simulation is printed and false otherwise.
+PRINT_FINAL_OCCUPANCY = true;
+
+#this is true if the simulation is in debug mode (prints all actions to the status file) and false otherwise
+DEBUG_MODE = true;
+
+#TF species of which dynamic behaviour is followed
+OUTPUT_TF = "Kr, gt";
+
+#The number of intermediary points at which the TF species dynamic behaviour is recorded.
+OUTPUT_TF_POINTS = 1;
+
+#This is true if the simulator will output the dynamic behaviour of the target site occupancy.
+FOLLOW_TS = true;
+
+#If this is true the simulator will output the affinity landscape at the end of the simulation
+OUTPUT_AFFINITY_LANDSCAPE = false;
+
+#If this is true the simulator will output the DNA binding energy instead of affinity at the end of the simulation
+OUTPUT_BINDING_ENERGY = false;
+
+#If this is true the simulator will output the DNA occupancy at the end of the simulation
+OUTPUT_DNA_OCCUPANCY = false;
+
+#If this is true a bound molecule will affect the DNA occupancy of the entire cover area of the DNA, while when is false only the first binding position of the molecule is considered when computing the DNA occupancy
+DNA_OCCUPANCY_FULL_MOLECULE_SIZE = false;
+
+#If this is true, the simulator will print all recorded sliding lengths.
+OUTPUT_SLIDING_LENGTHS = false;
+
+#The value of the step in a fixed step wig file, used for the occupancy output.
+WIG_STEP = 1;
+
+#This represents the threshold (as procentage of the highest peak) for discarding peaks in wig files. Use -1 for auto-select and 0 for no threshold.
+WIG_THRESHOLD = 0.0;
+
+
+
+#TF PARAMATERS
+
+#The csv file which stores the TF data.
+TF_FILE = "biodata/test/tf_1.csv";
+
+#The csv file which stores the TF cooperativity table data.
+TF_COOPERATIVITY_FILE = "";
+
+#A file containing the target sites.
+TS_FILE = "biodata/test/ts.txt";
+
+#This is true if  sliding and hopping affects the association rate between TF molecules and DNA.
+SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE = false;
+
+
+
+#DNA PARAMETERS
+
+#The fasta file which stores the DNA sequence.
+DNA_SEQUENCE_FILE = "biodata/test/seq.fasta";
+
+#The btrack file which stores experimentally found regions of open chromatin in the DNA sequence.
+DNA_AVAILABILITY_FILE = "";
+
+DNA_UNREPRESSION_RATE = 10.0;
+
+#boundary condition of the DNA (absorbing/reflexive/periodic).
+DNA_BOUNDARY_CONDITION = reflexive;
