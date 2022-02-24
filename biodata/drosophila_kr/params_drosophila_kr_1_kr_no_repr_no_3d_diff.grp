@@ -1,7 +1,7 @@
 #SIMULATION PARAMATERS
 
 #The length of the simulation (in seconds). If lower or equal to zero and there are target sites to be reached by TFs then the simulation will stop when all target sites are reached.
-STOP_TIME = 2000.0;
+STOP_TIME = 4000.0;
 
 #The number of independent replicate simulations to be performed.
 ENSAMBLE_SIZE = 100000;
@@ -46,10 +46,17 @@ OUTPUT_TF_POINTS = 0;
 FOLLOW_TS = false;
 
 #If this is true the simulator will output the affinity landscape at the end of the simulation
+<<<<<<< HEAD
 OUTPUT_AFFINITY_LANDSCAPE = false;
 
 #If this is true the simulator will output the DNA binding energy instead of affinity at the end of the simulation
 OUTPUT_BINDING_ENERGY = false;
+=======
+OUTPUT_AFFINITY_LANDSCAPE = true;
+
+#If this is true the simulator will output the DNA binding energy instead of affinity at the end of the simulation
+OUTPUT_BINDING_ENERGY = true;
+>>>>>>> aea202e (Figures for simulations without 1D (facilitated) and 3D diffusion)
 
 #If this is true the simulator will output the DNA occupancy at the end of the simulation
 OUTPUT_DNA_OCCUPANCY = true;
