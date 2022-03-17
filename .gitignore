@@ -7,3 +7,8 @@ META-INF/
 out/
 .idea/
 results/
+figures/
+.vscode/
+biodata
+params
+*.ipynb
