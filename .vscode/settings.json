@@ -1,9 +1,0 @@
-{
-    "jupyter.jupyterServerType": "local",
-    "python.autoComplete.extraPaths": [
-        "./dataproc/"
-    ],
-    "python.analysis.extraPaths": [
-        "./dataproc/"
-    ]
-}
