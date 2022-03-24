@@ -12,3 +12,6 @@ figures/
 biodata/
 dataproc/
 *.ipynb
+*.bkp
+backup*
+tmp*
