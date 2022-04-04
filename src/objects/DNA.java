@@ -1360,22 +1360,24 @@ public class DNA  implements Serializable{
 		start = Math.max(0,start);
 		end = Math.min(end, strand.length-1);
 		int pos;
-		boolean bpIsOpen = true;
-		for (pos = end; pos >= start && bpIsOpen; pos--) {
-			 bpIsOpen = closed[pos] == Constants.BP_IS_OPEN;
+		for (pos = end; pos >= start; pos--) {
+			 if (closed[pos] != Constants.BP_IS_OPEN) {
+			 	return pos;
+			 }
 		}
-		return pos + 1 >= start ? pos + 1 : Constants.NONE;
+		return Constants.NONE;
 	}
 
 	public int findFirstClosedBP(int start, int end) {
 		start = Math.max(0,start);
 		end = Math.min(end, strand.length-1);
 		int pos;
-		boolean bpIsOpen = true;
-		for (pos = start; pos <= end && bpIsOpen; pos++) {
-			bpIsOpen = closed[pos] == Constants.BP_IS_OPEN;
+		for (pos = start; pos <= end; pos++) {
+			if (closed[pos] != Constants.BP_IS_OPEN) {
+				return pos;
+			}
 		}
-		return pos - 1 <= end ? pos - 1 : Constants.NONE;
+		return Constants.NONE;
 	}
 	
 	/**
