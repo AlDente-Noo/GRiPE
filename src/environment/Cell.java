@@ -8,12 +8,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.StringTokenizer;
+import java.util.*;
 //import java.util.HashMap;
 //import java.util.PriorityQueue;
-import java.util.Random;
 
 import agents.Remodeller;
 import event.Event;
@@ -59,7 +56,7 @@ public class Cell implements Serializable {
 	public Random randomGenerator;
 	public DNA dna;
 	public TFspecies[] TFspecies;
-	public int maxRepressionLeftSize, maxRepressionRightOrTFSize;
+	public int maxRepressionLeftSize, maxRepressionRightOrTFSize, maxTFSize;
 	public TargetSitesAndGroups tsg;
 	public DBP[] dbp; //DNA binding proteins
 	public Remodeller remodeller;
@@ -429,6 +426,7 @@ public class Cell implements Serializable {
 		moleculesCopyNumber = 0;
 		maxRepressionRightOrTFSize = 0;
 		maxRepressionLeftSize = 0;
+		maxTFSize = 0;
 	
 		// load TFs from file
 		TFfileParser TFparser = new TFfileParser(this, this.ip.TF_FILE.value, Utils.generateNextInteger(randomGenerator, this.ip.TF_COPY_NUMBER_MIN.value, this.ip.TF_COPY_NUMBER_MAX.value), this.ip.TF_ES.value, this.ip.TF_SIZE_LEFT.value, this.ip.TF_SIZE_RIGHT.value, this.ip.TF_ASSOC_RATE.value, this.dna.strand.length, this.ip.TF_UNBINDING_PROBABILITY.value, this.ip.TF_SLIDE_LEFT_PROBABILITY.value, this.ip.TF_SLIDE_RIGHT_PROBABILITY.value, this.ip.TF_JUMPING_PROBABILITY.value,
@@ -448,6 +446,9 @@ public class Cell implements Serializable {
 					int maxRightSize = Math.max(TFspecies[i].repressionRightSize, TFspecies[i].sizeTotal);
 					if (maxRepressionRightOrTFSize < maxRightSize) {
 						maxRepressionRightOrTFSize = maxRightSize;
+					}
+					if (maxTFSize < TFspecies[i].sizeTotal) {
+						maxTFSize = TFspecies[i].sizeTotal;
 					}
 				}
 			}
@@ -1117,13 +1118,16 @@ public class Cell implements Serializable {
 		
 		
 		//if no TF binding event is scheduled then schedule one
-		if(eventQueue.TFBindingEventQueue.isEmpty() && this.freeTFmoleculesTotal > 0 ){
+		if(eventQueue.TFBindingEventQueue.isEmpty() && this.freeTFmoleculesTotal > 0 ) {
 			eventQueue.scheduleNextTFBindingEvent(this, this.cellTime);
 		}
-
 			
 		e=null;
 		e=eventQueue.getNextEvent();
+
+		if (e.time > 18.){
+			System.out.println("debug here");
+		}
 
 		if(e != null){
 			
@@ -1169,6 +1173,29 @@ public class Cell implements Serializable {
 				printDebugInfo("hm... no more events at time "+(this.cellTime+this.totalSimulatedTime)+"!");
 				result=false;
 			} 
+		}
+
+		if (this.isInDebugMode()) {
+			String arrayPos      = "position: ";
+			String arrayClosed   = "closed:   ";
+			String arrayOccupied = "occupied: ";
+			String arrayTFavail  = "effAv:   ";
+			for (int i = 0; i < this.dna.closed.length; i++) {
+				arrayPos += String.format("%2d,", i);
+				arrayClosed += String.format("%2d,", this.dna.closed[i]);
+				arrayOccupied += String.format("%2d,", this.dna.occupied[i]);
+				//arrayTFavail += String.format("%2d,", (this.dna.effectiveTFavailability[0][i] ? 1 : 0));
+			}
+			printDebugInfo(arrayPos);
+			printDebugInfo(arrayClosed);
+			printDebugInfo(arrayOccupied);
+			for (int i_tf = 0; i_tf < this.dna.effectiveTFavailability.length; i_tf++) {
+				arrayTFavail  = "effAv " + this.TFspecies[i_tf].name + ": ";
+				for (int i = 0; i < this.dna.closed.length; i++) {
+					arrayTFavail += String.format("%2d,", (this.dna.effectiveTFavailability[0][i] ? 1 : 0));
+				}
+			}
+			printDebugInfo(arrayTFavail);
 		}
 		
 		return result;
