@@ -524,7 +524,7 @@ public class DNA  implements Serializable{
 					}
 				}
 
-				// FG: recompute affinity landscape due to the closed regions
+				// FG: recompute affinity landscape due to the closed regions (here, from btrack file)
 				recomputeTFaffinityLandscapeForClosedRegions(n, 0, strand.length, i);
 				
 				//System.out.println("waiting time computed/loaded");
@@ -1081,10 +1081,6 @@ public class DNA  implements Serializable{
 		for(int speciesID=0; speciesID < TFsize.length; speciesID++){
 			closeRegionInAffinityLandscape(boundaryLeft, boundaryRight+1, speciesID);
 		}
-	}
-
-	private void recomputeTFAffinityLandscapeOnClosing(Cell n, int boundaryLeft, int boundaryRight) {
-		recomputeTFAffinityLandscapeOnRepression(n, boundaryLeft, boundaryRight);
 	}
 
 	/**

@@ -168,6 +168,7 @@ public class EventList  implements Serializable{
 			
 			if(nextTFspecies>Constants.NONE && nextTFspecies<n.TFspecies.length){
 				int TFID = n.getFreeTFmolecule(nextTFspecies);
+				assert(TFID != Constants.NONE);
 				if(TFID != Constants.NONE){
 					int position =  Constants.NONE;// Gillespie.getNextReaction(n.randomGenerator.nextDouble()*n.dna.effectiveTFAffinitiesSum[nextTFspecies], n.dna.effectiveTFaffinities[nextTFspecies]); 
 					this.TFBindingEventQueue.add(new ProteinEvent(time+nextTime, TFID, position, true, Constants.EVENT_TF_BINDING, false, propensity));

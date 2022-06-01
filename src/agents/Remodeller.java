@@ -38,8 +38,12 @@ public class Remodeller implements Serializable {
             }
         } else {
             assert (re.nextAction == Constants.EVENT_TF_UNREPRESSION);
+            // change repression status if only this unrepression event is for the nearby region
+            // this prevents changing repression status if this unrepression event was scheduled at the last unbinding
+            if ((re.boundaryLeft + n.TFspecies[speciesID].repressionLeftSize) == n.dbp[re.proteinID].position) {
+                n.dbp[re.proteinID].repressesDNA = false;
+            }
             // FG: update repression rate
-            n.dbp[re.proteinID].repressesDNA = false;
             n.dbp[re.proteinID].updateRepressionRate(n);
 
             n.dna.unrepress(n, re.boundaryLeft, re.boundaryRight);
