@@ -309,12 +309,32 @@ public class DNA  implements Serializable{
 		boolean stop = false;
 		int start = startPos, end = startPos;
 		while (!stop) {
-			while (start < endPos && closed[start] == Constants.BP_IS_OPEN) {
+			while (start < endPos && closed[start] != Constants.BP_IS_CLOSED) {
 				start++;
 			}
 			if (start < endPos) {
 				end = start + 1;
 				while (end < endPos && closed[end] == Constants.BP_IS_CLOSED) {
+					end++;
+				}
+				closeRegionInAffinityLandscape(start, end, speciesID);
+				start = end;
+			} else {
+				stop = true;
+			}
+		}
+	}
+
+	private void recomputeTFaffinityLandscapeForRepressedRegions(int startPos, int endPos, int speciesID) {
+		boolean stop = false;
+		int start = startPos, end = startPos;
+		while (!stop) {
+			while (start < endPos && closed[start] != Constants.BP_IS_REPRESSED) {
+				start++;
+			}
+			if (start < endPos) {
+				end = start + 1;
+				while (end < endPos && closed[end] == Constants.BP_IS_REPRESSED) {
 					end++;
 				}
 				closeRegionInAffinityLandscape(start, end, speciesID);
@@ -1086,43 +1106,48 @@ public class DNA  implements Serializable{
 	/**
 	 * 	recomputes the TF affinity landscape when the DNA region is unrepressed
 	 */
-	private void recomputeTFAffinityLandscapeOnUnrepression(Cell n, int boundaryLeft, int boundaryRight){
+	private void recomputeTFAffinityLandscapeOnUnrepression(Cell n, int boundaryLeft, int boundaryRight, int proteinID){
 		int start, end, boundMoleculeID;
 
 		//recompute affinity landscape for each TF species
-		for(int i=0; i<TFsize.length; i++){
-
-			start = Math.max(0, boundaryLeft-TFsize[i]+1);
-			end = Math.min(this.strand.length - TFsize[i] + 1, boundaryRight+1);
-
-			for(int j=start; j<end;j++){
-				if(!effectiveTFavailability[i][j] && closed[j] == Constants.BP_IS_OPEN){
-					this.effectiveTFsectorsAvailabilitySum[i][this.sectorID[j]]++;
-					this.effectiveTFavailabilitySum[i]++;
-					effectiveTFavailability[i][j]=true;
+		for(int specieId=0; specieId<TFsize.length; specieId++) {
+			start = Math.max(0, boundaryLeft - TFsize[specieId] + 1);
+			end = Math.min(this.strand.length - TFsize[specieId] + 1, boundaryRight + 1);
+			for (int bpIdx = start; bpIdx < end; bpIdx++) {
+				if (!effectiveTFavailability[specieId][bpIdx] && closed[bpIdx] == Constants.BP_IS_OPEN) {
+					this.effectiveTFsectorsAvailabilitySum[specieId][this.sectorID[bpIdx]]++;
+					this.effectiveTFavailabilitySum[specieId]++;
+					effectiveTFavailability[specieId][bpIdx] = true;
 				}
 			}
-			recomputeTFaffinityLandscapeForClosedRegions(n, start, end, i);
+			recomputeTFaffinityLandscapeForClosedRegions(n, start, end + TFsize[specieId] - 1, specieId);
+		}
 
-			start = updateLeftBoundary(start - n.maxRepressionLeftSize);
-			end = updateRightBoundary(end-1 + n.maxRepressionRightOrTFSize);
-			for(int j=start; j<=end; j++){
-				boundMoleculeID = getBoundMolecule(j);
-				if(boundMoleculeID != Constants.NONE){
-					int size = n.dbp[boundMoleculeID].size;
-					//recomputeTFAffinityLandscapeOnBinding(n, j, size);
-					closeRegionInAffinityLandscape(j, j+size, i);
-					if (n.dbp[boundMoleculeID].isRepressingDNA()) {
-						int speciesID = n.dbp[boundMoleculeID].speciesID;
-						int boundaryLeft_ = j - n.TFspecies[speciesID].repressionLeftSize;
-						int boundaryRight_ = j + size + n.TFspecies[speciesID].repressionRightSize;
-						boundaryLeft_ = updateLeftBoundary(boundaryLeft_);
-						boundaryRight_ = updateRightBoundary(boundaryRight_);
-						closeRegionInAffinityLandscape(boundaryLeft_, boundaryRight_, i);
-					}
+		// find all repressors in the repressed region and close chromatin in their repression regions
+		start = updateLeftBoundary(boundaryLeft - n.maxRepressionLeftSize - n.maxTFSize);
+		end = updateRightBoundary(boundaryRight + n.maxRepressionRightOrTFSize);
+		for(int bpIdx=start; bpIdx<=end; bpIdx++){
+			boundMoleculeID = getBoundMolecule(bpIdx);
+			if(boundMoleculeID != Constants.NONE) {
+				int size = n.dbp[boundMoleculeID].size;
+				for(int specieID=0; specieID<TFsize.length; specieID++) {
+					closeRegionInAffinityLandscape(bpIdx, bpIdx + size, specieID);
 				}
+				if (n.dbp[boundMoleculeID].isRepressingDNA() && boundMoleculeID != proteinID) {
+					int speciesID = n.dbp[boundMoleculeID].speciesID;
+					int boundaryLeft_ = bpIdx - n.TFspecies[speciesID].repressionLeftSize;
+					int boundaryRight_ = bpIdx + size + n.TFspecies[speciesID].repressionRightSize;
+					boundaryLeft_ = updateLeftBoundary(boundaryLeft_);
+					boundaryRight_ = updateRightBoundary(boundaryRight_);
+					for(int specieID=0; specieID<TFsize.length; specieID++) {
+						closeRegionInAffinityLandscape(boundaryLeft_, boundaryRight_, specieID);
+					}
+					this.repressDNA(n, boundaryLeft_, boundaryRight_-1);
+				}
+				bpIdx += size-1;
 			}
 		}
+
 
 	}
 	
@@ -1172,8 +1197,8 @@ public class DNA  implements Serializable{
 					//	n.printDebugInfo("species "+i+" can bind at position "+j);
 					//}
 				}
-								
 			}
+			recomputeTFaffinityLandscapeForRepressedRegions(start, end+TFsize[i], i);
 		}	
 	}
 
@@ -1206,7 +1231,7 @@ public class DNA  implements Serializable{
 		return Math.min(this.strand.length - 1, right);
 	}
 
-	public void unrepress(Cell n, int boundaryLeft, int boundaryRight) {
+	public void unrepress(Cell n, int boundaryLeft, int boundaryRight, int proteinID) {
 		//boundaryLeft = updateLeftBoundary(boundaryLeft);
 		//boundaryRight = updateRightBoundary(boundaryRight);
 		for (int bpIdx = boundaryLeft; bpIdx <= boundaryRight; bpIdx++) {
@@ -1214,7 +1239,7 @@ public class DNA  implements Serializable{
 				this.closed[bpIdx] = Constants.BP_IS_OPEN;
 			}
 		}
-		this.recomputeTFAffinityLandscapeOnUnrepression(n, boundaryLeft, boundaryRight);
+		this.recomputeTFAffinityLandscapeOnUnrepression(n, boundaryLeft, boundaryRight, proteinID);
 	}
 	
 	/**

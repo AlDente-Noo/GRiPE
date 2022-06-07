@@ -105,15 +105,15 @@ public class EventList  implements Serializable{
 	 * @return
 	 */
 	public Event getNextEvent(){
-		Event e=null;
+		Event e = null;
 		int nextEventType = getNextEventType();
 
 		switch(nextEventType){
 			case Constants.NEXT_EVENT_IS_NONE: break; 
-			case Constants.NEXT_EVENT_IS_TF_BINDING: e =this.popNextTFBindingEvent(); break;
-			case Constants.NEXT_EVENT_IS_TF_RANDOM_WALK: e =this.popNextTFRandomWalkEvent(); break;
-			case Constants.NEXT_EVENT_IS_TF_REPRESSION: e =this.popNextTFRepressionEvent(); break;
-			default: e=null;
+			case Constants.NEXT_EVENT_IS_TF_BINDING: e = this.popNextTFBindingEvent(); break;
+			case Constants.NEXT_EVENT_IS_TF_RANDOM_WALK: e = this.popNextTFRandomWalkEvent(); break;
+			case Constants.NEXT_EVENT_IS_TF_REPRESSION: e = this.popNextTFRepressionEvent(); break;
+			default: e = null;
 		}
 		
 		return e;
@@ -195,9 +195,6 @@ public class EventList  implements Serializable{
 					re.time = time + nextTime;
 					TFRepressionEventQueue.scheduleNextEvent(n, moleculeID, re);
 				}
-				//if (time >= 1.54742475190775) {
-				//	n.printDebugInfo("reached bad time");
-				//}
 			}
 		}
 	}

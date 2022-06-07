@@ -26,6 +26,11 @@ public class Remodeller implements Serializable {
         this.unrepressionRate = unrepressionRate;
     }
 
+    public boolean unrepressionIsInTheRegionOfMolecule(Cell n, RepressionEvent re) {
+        int speciesID = n.dbp[re.proteinID].speciesID;
+        return (re.boundaryLeft + n.TFspecies[speciesID].repressionLeftSize) == n.dbp[re.proteinID].position;
+    }
+
     /**
      * performs DNA closing (repression) or opening ('unrepression')
      *
@@ -42,12 +47,12 @@ public class Remodeller implements Serializable {
                 // update repression state
                 n.dbp[re.proteinID].repressesDNA = true;
                 n.dbp[re.proteinID].updateRepressionRate(n);
-                n.eventQueue.TFBindingEventQueue.updateProteinBindingPropensities(Constants.NONE, n);
-                n.TFspecies[speciesID].countTFRepressionEvents++;
                 if (n.isInDebugMode()) {
                     n.printDebugInfo(re.time + ": TF " + re.proteinID + " of type " + n.TFspecies[speciesID].name +
                             " started repression from position " + re.boundaryLeft + " to " + re.boundaryRight);
                 }
+                n.eventQueue.TFBindingEventQueue.updateProteinBindingPropensities(Constants.NONE, n);
+                n.TFspecies[speciesID].countTFRepressionEvents++;
             } else if (n.isInDebugMode()) {
                 n.printDebugInfo(re.time + ": TF " + re.proteinID + " of type " + n.TFspecies[speciesID].name + " at " +
                         "position " + n.dbp[re.proteinID].getPosition() + " attempted to start repression but is " +
@@ -55,42 +60,43 @@ public class Remodeller implements Serializable {
             }
         } else {
             assert (re.nextAction == Constants.EVENT_TF_UNREPRESSION);
-            // change repression status if only this unrepression event is for the nearby region
+            // FG: change repression status if only this unrepression event is for the nearby region
             // this prevents changing repression status if this unrepression event was scheduled at the last unbinding
-            if ((re.boundaryLeft + n.TFspecies[speciesID].repressionLeftSize) == n.dbp[re.proteinID].position) {
+            if (unrepressionIsInTheRegionOfMolecule(n, re)) {
                 n.dbp[re.proteinID].repressesDNA = false;
             }
             // FG: update repression rate
             n.dbp[re.proteinID].updateRepressionRate(n);
 
-            n.dna.unrepress(n, re.boundaryLeft, re.boundaryRight);
+            n.dna.unrepress(n, re.boundaryLeft, re.boundaryRight, re.proteinID);
             n.TFspecies[speciesID].countTFUnrepressionEvents++;
 
             // find all repressors in the repressed region and close chromatin in their repression regions
-            int boundMoleculeID, boundSpeciesID;
-            int size, boundaryLeft, boundaryRight;
-            int bpStart = n.dna.updateLeftBoundary(re.boundaryLeft - n.maxRepressionLeftSize - n.maxTFSize);
-            int bpEnd = n.dna.updateRightBoundary(re.boundaryRight + n.maxRepressionRightOrTFSize);
-            for (int bpIdx = bpStart; bpIdx <= bpEnd; bpIdx++) {
-                boundMoleculeID = n.dna.getBoundMolecule(bpIdx);
-                if (boundMoleculeID != Constants.NONE) {
-                    if (n.dbp[boundMoleculeID].isRepressingDNA() && boundMoleculeID != re.proteinID) {
-                        boundSpeciesID = n.dbp[boundMoleculeID].speciesID;
-                        size = n.TFspecies[boundSpeciesID].sizeTotal;
-                        boundaryLeft = n.dna.updateLeftBoundary(bpIdx - n.TFspecies[boundSpeciesID].repressionLeftSize);
-                        boundaryRight =
-                                n.dna.updateRightBoundary(bpIdx + size - 1 + n.TFspecies[boundSpeciesID].repressionRightSize);
-                        n.dna.repressDNA(n, boundaryLeft, boundaryRight);
-                    }
-                }
-            }
-
-            n.eventQueue.TFBindingEventQueue.updateProteinBindingPropensities(Constants.NONE, n);
+//            int boundMoleculeID, boundSpeciesID;
+//            int size, boundaryLeft, boundaryRight;
+//            int bpStart = n.dna.updateLeftBoundary(re.boundaryLeft - n.maxRepressionLeftSize - n.maxTFSize);
+//            int bpEnd = n.dna.updateRightBoundary(re.boundaryRight + n.maxRepressionRightOrTFSize);
+//            for (int bpIdx = bpStart; bpIdx <= bpEnd; bpIdx++) {
+//                boundMoleculeID = n.dna.getBoundMolecule(bpIdx);
+//                if (boundMoleculeID != Constants.NONE) {
+//                    size = n.dbp[boundMoleculeID].size;
+//                    if (n.dbp[boundMoleculeID].isRepressingDNA() && boundMoleculeID != re.proteinID) {
+//                        boundSpeciesID = n.dbp[boundMoleculeID].speciesID;
+//                        boundaryLeft = n.dna.updateLeftBoundary(bpIdx - n.TFspecies[boundSpeciesID].repressionLeftSize);
+//                        boundaryRight =
+//                                n.dna.updateRightBoundary(bpIdx + size - 1 + n.TFspecies[boundSpeciesID].repressionRightSize);
+//                        n.dna.repressDNA(n, boundaryLeft, boundaryRight);
+//                    }
+//                    bpIdx += size-1;
+//                }
+//            }
 
             if (n.isInDebugMode()) {
                 n.printDebugInfo(re.time + ": TF " + re.proteinID + " of type " + n.TFspecies[speciesID].name + " " +
                         "ended repression from position " + re.boundaryLeft + " to " + re.boundaryRight);
             }
+
+            n.eventQueue.TFBindingEventQueue.updateProteinBindingPropensities(Constants.NONE, n);
         }
     }
 }

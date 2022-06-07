@@ -142,6 +142,7 @@ public class TF extends DBP implements Serializable {
                 }
             } else if (pe.nextAction == Constants.EVENT_TF_RANDOM_WALK_SLIDE_RIGHT) {
                 // similar to the slide left
+                assert(this.position != Constants.NONE);
                 if (this.isRepressingDNA() || this.isRepressed(n)) {
                     if (n.isInDebugMode()) {
                         n.printDebugInfo(pe.time + ": attempted to slide right TF " + this.ID + " of type " +

@@ -628,7 +628,7 @@ public class Cell implements Serializable {
 	
 	/**
 	 * attempts to bind a TF to the DNA 
-	 * @param moleculeID the ID of the species of the molecule that binds
+	 * @param speciesID the ID of the species of the molecule that binds
 	 * @param time the time
 	 */
 	public int bindTFMolecule(int speciesID, double time){
@@ -650,7 +650,7 @@ public class Cell implements Serializable {
 	
 	/**
 	 * attempts to bind a TF to a specific position on the DNA  
-	 * @param moleculeID the ID of the species of the molecule that binds
+	 * @param speciesID the ID of the species of the molecule that binds
 	 * @param time the time
 	 */
 	public int bindTFMoleculeToPosition(int speciesID, double time, int newPosition, int direction){
@@ -928,8 +928,6 @@ public class Cell implements Serializable {
 	
 	/**
 	 * prints to the debug file or screen the debug message
-	 * @param str
-	 * @param append
 	 */
 	private void printTargetSiteToFollowInfo(){
 		
@@ -987,7 +985,6 @@ public class Cell implements Serializable {
 	
 	/**
 	 * run the simulations for a number of time steps
-	 * @param STOP_TIME the end time of the simulations.
 	 */
 	public double run() throws FileNotFoundException{
 
@@ -1058,7 +1055,7 @@ public class Cell implements Serializable {
 	
 	/**
 	 * performs the actions after each sample finished
-	 * @param elapsedTimeSec
+	 * @param curTime
 	 */
 	private void performEndSampleActions(double curTime){
 		//update the number of simulated samples
@@ -1114,51 +1111,38 @@ public class Cell implements Serializable {
 		Event e;
 		boolean result=true;
 		int proteinID;
-
-		
 		
 		//if no TF binding event is scheduled then schedule one
 		if(eventQueue.TFBindingEventQueue.isEmpty() && this.freeTFmoleculesTotal > 0 ) {
 			eventQueue.scheduleNextTFBindingEvent(this, this.cellTime);
 		}
-			
-		e=null;
-		e=eventQueue.getNextEvent();
 
-		if (e.time > 18.){
-			System.out.println("debug here");
+		e = eventQueue.getNextEvent();
+
+		if (e.time >= 13.923819945246525){
+		//	System.out.println("debug here");
 		}
 
 		if(e != null){
-			
 			eventsCount++;
 			// there is at least one event in the queue
 			if(e instanceof ProteinEvent){
-				// next event is a ribosome event
-				
-				//System.out.println(fixStopTime+" : "+e.time +" : "+this.totalStopTime+" : "+(!fixStopTime || e.time <= this.totalStopTime)+" : "+(fixStopTime && e.time > this.totalStopTime));
+				// next event is a random walk event
 				ProteinEvent pe = (ProteinEvent)e;
-				proteinID = pe.proteinID;			
+				proteinID = pe.proteinID;
 
-				
 				if(!fixStopTime || e.time <= this.totalStopTime){
 					this.dbp[proteinID].act(this, pe);							
 					this.cellTime=e.time;
-				} else if(fixStopTime && e.time > this.totalStopTime){				
-					//System.out.println(fixStopTime+" : "+e.time +" : "+this.totalStopTime);
+				} else if(fixStopTime && e.time > this.totalStopTime){
 					this.cellTime= this.totalStopTime;
 					//printDebugInfo(e.time+" : action was not performed anymore and time was set to "+this.totalStopTime+" for molecule "+this.dbp[proteinID].toString());
 					//printDebugInfo(cellTime+" : "+ this.ip.STOP_TIME.value +" : "+result+" : "+(this.ip.STOP_TIME.value -cellTime >Constants.DOUBLE_ZERO));
-					
 				}
-
-				//if(!this.TFspecies[this.dbp[pe.proteinID].speciesID].isImmobile){
-				//	this.eventQueue.scheduleNextTFRandomWalkEvent(this, proteinID, e.time);
-				//}
-				//this.eventQueue.scheduleNextTFRepressionEvent(this, proteinID, e.time);
 				this.eventQueue.scheduleNextTFOnDNAEvent(this, pe.proteinID, e.time);
 
 			} else if (e instanceof RepressionEvent) {
+				// an event caused by a repressor
 				RepressionEvent re = (RepressionEvent) e;
 				if(!fixStopTime || e.time <= this.totalStopTime){
 					this.remodeller.act(this, re);
@@ -1166,7 +1150,10 @@ public class Cell implements Serializable {
 				} else if(fixStopTime && e.time > this.totalStopTime){
 					this.cellTime= this.totalStopTime;
 				}
-				this.eventQueue.scheduleNextTFOnDNAEvent(this, re.proteinID, e.time);
+				// prevent scheduling event if this is unrepression event scheduled due to repressor unbinding
+				if (this.remodeller.unrepressionIsInTheRegionOfMolecule(this, re)) {
+					this.eventQueue.scheduleNextTFOnDNAEvent(this, re.proteinID, e.time);
+				}
 			}
 		} else{
 			if(!canTFMoleculeBind()){
@@ -1175,27 +1162,29 @@ public class Cell implements Serializable {
 			} 
 		}
 
-		if (this.isInDebugMode()) {
-			String arrayPos      = "position: ";
-			String arrayClosed   = "closed:   ";
-			String arrayOccupied = "occupied: ";
-			String arrayTFavail  = "effAv:   ";
-			for (int i = 0; i < this.dna.closed.length; i++) {
-				arrayPos += String.format("%2d,", i);
-				arrayClosed += String.format("%2d,", this.dna.closed[i]);
-				arrayOccupied += String.format("%2d,", this.dna.occupied[i]);
-				//arrayTFavail += String.format("%2d,", (this.dna.effectiveTFavailability[0][i] ? 1 : 0));
+		// FG: print the key arrays, which describe DNA-TFs state, if they are not too big
+		int strandLength = this.dna.strand.length;
+		if (this.isInDebugMode() && strandLength < 50) {
+			StringBuilder arrayPos      = new StringBuilder("position: ");
+			StringBuilder arrayClosed   = new StringBuilder("closed:   ");
+			StringBuilder arrayOccupied = new StringBuilder("occupied: ");
+			StringBuilder arrayTFavail;
+			for (int i = 0; i < strandLength; i++) {
+				arrayPos.append(String.format("%2d,", i));
+				arrayClosed.append(String.format("%2d,", this.dna.closed[i]));
+				arrayOccupied.append(String.format("%2d,", this.dna.occupied[i]));
 			}
-			printDebugInfo(arrayPos);
-			printDebugInfo(arrayClosed);
-			printDebugInfo(arrayOccupied);
-			for (int i_tf = 0; i_tf < this.dna.effectiveTFavailability.length; i_tf++) {
-				arrayTFavail  = "effAv " + this.TFspecies[i_tf].name + ": ";
-				for (int i = 0; i < this.dna.closed.length; i++) {
-					arrayTFavail += String.format("%2d,", (this.dna.effectiveTFavailability[0][i] ? 1 : 0));
+			printDebugInfo(arrayPos.toString());
+			printDebugInfo(arrayClosed.toString());
+			printDebugInfo(arrayOccupied.toString());
+			int numTF = this.TFspecies.length;
+			for (int i_tf = 0; i_tf < numTF; i_tf++) {
+				arrayTFavail = new StringBuilder("effAv " + this.TFspecies[i_tf].name + ": ");
+				for (int i = 0; i < strandLength; i++) {
+					arrayTFavail.append(String.format("%2d,", (this.dna.effectiveTFavailability[i_tf][i] ? 1 : 0)));
 				}
+				printDebugInfo(arrayTFavail.toString());
 			}
-			printDebugInfo(arrayTFavail);
 		}
 		
 		return result;
@@ -1204,7 +1193,6 @@ public class Cell implements Serializable {
 	
 	/**
 	 * run the simulations  until the target sites are reached
-	 * @param STOP_TIME the end time of the simulations.
 	 */
 	public double runUntilTSReached() throws FileNotFoundException{
 
@@ -1221,7 +1209,6 @@ public class Cell implements Serializable {
 					printTFtoFollowInformation(cellTime);
 					nextPointTFstoFollow+=stepPointTFstoFollow;
 				}
-	
 				
 				// print intermediary simulation time points
 				if(nextTimeStep <  this.cellTime){
@@ -1290,8 +1277,8 @@ public class Cell implements Serializable {
 				if(this.ip.OUTPUT_AFFINITY_LANDSCAPE.value){
 					dna.printAffinities(this.outputPath, this.outputAffinityLandscapeFile,start, end, this.TFreadingDirection, this.TFspecies, this.ip.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.value, this.ip.WIG_STEP.value, this.ip.WIG_THRESHOLD.value,this.ip.OUTPUT_BINDING_ENERGY.value);
 				}
-				
-				printTFspecies(0,true,this.outputTFFile);				
+
+				printTFspecies(0,true,this.outputTFFile);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -1459,7 +1446,7 @@ public class Cell implements Serializable {
 	
 	/**
 	 * prints final informations 
-	 * @param curTime
+	 * @param elapsedTimeSec
 	 */
 	private void printFinalInfo(double elapsedTimeSec){
 		
