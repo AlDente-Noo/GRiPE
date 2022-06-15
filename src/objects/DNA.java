@@ -309,12 +309,12 @@ public class DNA  implements Serializable{
 		boolean stop = false;
 		int start = startPos, end = startPos;
 		while (!stop) {
-			while (start < endPos && closed[start] != Constants.BP_IS_CLOSED) {
+			while (start < endPos && closed[start] == Constants.BP_IS_OPEN) {
 				start++;
 			}
 			if (start < endPos) {
 				end = start + 1;
-				while (end < endPos && closed[end] == Constants.BP_IS_CLOSED) {
+				while (end < endPos && closed[end] != Constants.BP_IS_OPEN) {
 					end++;
 				}
 				closeRegionInAffinityLandscape(start, end, speciesID);
@@ -1125,7 +1125,7 @@ public class DNA  implements Serializable{
 
 		// find all repressors in the repressed region and close chromatin in their repression regions
 		start = updateLeftBoundary(boundaryLeft - n.maxRepressionLeftSize - n.maxTFSize);
-		end = updateRightBoundary(boundaryRight + n.maxRepressionRightOrTFSize);
+		end = updateRightBoundary(boundaryRight + n.maxRepressionRightSize + n.maxTFSize);
 		for(int bpIdx=start; bpIdx<=end; bpIdx++){
 			boundMoleculeID = getBoundMolecule(bpIdx);
 			if(boundMoleculeID != Constants.NONE) {
@@ -1147,6 +1147,20 @@ public class DNA  implements Serializable{
 				bpIdx += size-1;
 			}
 		}
+		// A region can be repressed by already unbound repressor and therefore getBoundMolecule() from the above
+		// piece of code will not return it. To tackle that issue the region to the right from boundaryRight is checked.
+//		for(int specieID=0; specieID<TFsize.length; specieID++) {
+//			int pos = this.findFirstClosedBP(boundaryRight+1, Math.min(boundaryRight+TFsize[specieID], strand.length-1));
+//			if (pos != Constants.NONE) {
+//				for (int j = pos - TFsize[specieID] + 1; j < pos; j++) {
+//					if (effectiveTFavailability[specieID][j]) {
+//						effectiveTFavailability[specieID][j] = false;
+//						this.effectiveTFsectorsAvailabilitySum[specieID][this.sectorID[j]]--;
+//						this.effectiveTFavailabilitySum[specieID]--;
+//					}
+//				}
+//			}
+//		}
 
 
 	}
@@ -1181,7 +1195,7 @@ public class DNA  implements Serializable{
 				if(buffer[0]!=Constants.NONE){
 					end = buffer[1]-TFsize[i];
 				}
-				pos = this.findFirstClosedBP(end, Math.min(end+TFsize[i]-1, strand.length-1));
+				pos = this.findFirstClosedBP(position+size, Math.min(end+TFsize[i]-1, strand.length-1));
 				if (pos != Constants.NONE) {
 					end = Math.min(pos - TFsize[i] + 1, end);
 				}
@@ -1198,7 +1212,7 @@ public class DNA  implements Serializable{
 					//}
 				}
 			}
-			recomputeTFaffinityLandscapeForRepressedRegions(start, end+TFsize[i], i);
+			recomputeTFaffinityLandscapeForRepressedRegions(start, end+TFsize[i]-1, i);
 		}	
 	}
 
@@ -1275,7 +1289,10 @@ public class DNA  implements Serializable{
 				if(buffer[0]!=Constants.NONE){
 					end = buffer[1]-TFsize[i];
 				}
-				pos = this.findFirstClosedBP(end, Math.min(end+TFsize[i], strand.length));
+				//if (n.cellTime >= 79.70188591106398) {
+					//System.out.println("debug");
+				//}
+				pos = this.findFirstClosedBP(position+moleculeSize, Math.min(end+TFsize[i], strand.length));
 				if (pos != Constants.NONE) {
 					end = Math.min(pos - TFsize[i] + 1, end);
 				}

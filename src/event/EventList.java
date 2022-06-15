@@ -1,6 +1,7 @@
 package event;
 
 import java.io.Serializable;
+import java.util.Iterator;
 
 import utils.Constants;
 import utils.Gillespie;
@@ -169,10 +170,8 @@ public class EventList  implements Serializable{
 			if(nextTFspecies>Constants.NONE && nextTFspecies<n.TFspecies.length){
 				int TFID = n.getFreeTFmolecule(nextTFspecies);
 				assert(TFID != Constants.NONE);
-				if(TFID != Constants.NONE){
-					int position =  Constants.NONE;// Gillespie.getNextReaction(n.randomGenerator.nextDouble()*n.dna.effectiveTFAffinitiesSum[nextTFspecies], n.dna.effectiveTFaffinities[nextTFspecies]); 
-					this.TFBindingEventQueue.add(new ProteinEvent(time+nextTime, TFID, position, true, Constants.EVENT_TF_BINDING, false, propensity));
-				}
+				int position = Constants.NONE;// Gillespie.getNextReaction(n.randomGenerator.nextDouble()*n.dna.effectiveTFAffinitiesSum[nextTFspecies], n.dna.effectiveTFaffinities[nextTFspecies]);
+				this.TFBindingEventQueue.add(new ProteinEvent(time+nextTime, TFID, position, true, Constants.EVENT_TF_BINDING, false, propensity));
 			}
 		}
 	}
@@ -182,6 +181,16 @@ public class EventList  implements Serializable{
 	 */
 	public void scheduleNextTFOnDNAEvent(Cell n, int moleculeID, double time) {
 		double propensitySum, nextTime;
+		// debug: check that there is no event for this molecule in the queue
+		if (n.isInDebugMode() && TFRandomWalkEventQueue instanceof TFRandomWalkEventQueueFR) {
+			for (ProteinEvent proteinEvent : ((TFRandomWalkEventQueueFR) this.TFRandomWalkEventQueue).randomWalkEvents) {
+				if (proteinEvent.proteinID == moleculeID) {
+					n.printDebugInfo("Error: attempted to schedule the event for the protein " + moleculeID
+							+ " of type " + n.TFspecies[n.dbp[moleculeID].speciesID].name + ", but it is already scheduled.");
+					System.exit(1);
+				}
+			}
+		}
 		if(!n.TFspecies[n.dbp[moleculeID].speciesID].isImmobile) {
 			ProteinEvent    pe =    (ProteinEvent) TFRandomWalkEventQueue.createNextEvent(n, moleculeID, time);
 			RepressionEvent re = (RepressionEvent) TFRepressionEventQueue.createNextEvent(n, moleculeID, time);
@@ -198,43 +207,13 @@ public class EventList  implements Serializable{
 			}
 		}
 	}
-	/*public void scheduleNextTFOnDNAEvent(Cell n, int moleculeID, double time) {
-		if(!n.TFspecies[n.dbp[moleculeID].speciesID].isImmobile) {
-			// FG: identify whether the next repression-type event is repression or unrepression
-			double moveRate = n.dbp[moleculeID].getMoveRate();
-			double reprRate = n.TFspecies[n.dbp[moleculeID].speciesID].repressionRate;
-			int nextRepressionEvent = Constants.EVENT_TF_REPRESSION;
-			if (((TF) n.dbp[moleculeID]).repression) {
-				reprRate = n.TFspecies[n.dbp[moleculeID].speciesID].unrepressionRate;
-				nextRepressionEvent = Constants.EVENT_TF_UNREPRESSION;
-			}
-			// FG: choose between the repression and random walk events
-			double r = n.randomGenerator.nextDouble();
-			if (r < moveRate / (moveRate + reprRate)) {
-				this.TFRandomWalkEventQueue.scheduleNextEvent(n, moleculeID, time);
-			}
-			else {
-				this.scheduleNextTFRepressionEvent(n, moleculeID, time, reprRate, nextRepressionEvent);
-			}
-		}
-	}*/
-
-	/*public void scheduleNextTFRepressionEvent(Cell n, int moleculeID, double time, double propensity, int nextEvent){
-		assert n.TFspecies[n.dbp[moleculeID].speciesID].repressionRate > 0.0;
-		double nextTime = Gillespie.computeNextReactionTime(propensity, n.randomGenerator);
-		int position = n.dbp[moleculeID].getPosition();
-		int size = n.TFspecies[n.dbp[moleculeID].speciesID].sizeTotal;
-		int sizeLeft = n.TFspecies[n.dbp[moleculeID].speciesID].repressionLeftSize;
-		int sizeRight = n.TFspecies[n.dbp[moleculeID].speciesID].repressionRightSize;
-		this.TFRepressionEventQueue.add(new RepressionEvent(time+nextTime, nextEvent, moleculeID,
-				position - sizeLeft, position + size + sizeRight));
-	}*/
 
 	/** FG
 	 * schedules the next TF repression event
 	 */
-	public void scheduleNextTFRepressionEvent(Cell n, int moleculeID, double time) {
+	public void scheduleNextTFRepressionEvent(Cell n, int moleculeID, double time, boolean scheduleNextEvent) {
 		RepressionEvent re = (RepressionEvent) TFRepressionEventQueue.createNextEvent(n, moleculeID, time);
+		re.scheduleNextEvent = scheduleNextEvent;
 		TFRepressionEventQueue.scheduleNextEvent(n, moleculeID, re);
 	}
 

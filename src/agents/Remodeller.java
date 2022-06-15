@@ -62,7 +62,7 @@ public class Remodeller implements Serializable {
             assert (re.nextAction == Constants.EVENT_TF_UNREPRESSION);
             // FG: change repression status if only this unrepression event is for the nearby region
             // this prevents changing repression status if this unrepression event was scheduled at the last unbinding
-            if (unrepressionIsInTheRegionOfMolecule(n, re)) {
+            if (re.scheduleNextEvent) {
                 n.dbp[re.proteinID].repressesDNA = false;
             }
             // FG: update repression rate

@@ -60,7 +60,7 @@ public class TFRepressionEventQueueFR extends TFEventQueue {
         else {
             nextAction = Constants.EVENT_TF_REPRESSION;
         }
-        return new RepressionEvent(time + nextTime, nextAction, moleculeID, boundaryLeft, boundaryRight, propensity);
+        return new RepressionEvent(time + nextTime, nextAction, moleculeID, boundaryLeft, boundaryRight, propensity, true);
     }
 
     public void scheduleNextEvent(Cell n, int moleculeID, Event e) {
@@ -76,7 +76,7 @@ public class TFRepressionEventQueueFR extends TFEventQueue {
     public void updateNextEvent(Cell n, int moleculeID, double time) {
         boolean removed = this.events.remove(n.dbp[moleculeID].re);
         if(removed){
-            RepressionEvent re = this.createNextEvent(n, moleculeID, time);
+            RepressionEvent re = (RepressionEvent) this.createNextEvent(n, moleculeID, time);
             this.scheduleNextEvent(n, moleculeID, re);
         }
     }

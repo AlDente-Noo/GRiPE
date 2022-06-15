@@ -7,6 +7,7 @@ public class RepressionEvent extends Event
     public int proteinID;
     public int boundaryLeft, boundaryRight;
     public double propensity;
+    public boolean scheduleNextEvent;
 
     public RepressionEvent() {
         super(Double.MAX_VALUE, Constants.NONE);
@@ -14,6 +15,7 @@ public class RepressionEvent extends Event
         boundaryRight = Constants.NONE;
         boundaryLeft = Constants.NONE;
         propensity = 0.0;
+        scheduleNextEvent = false;
     }
 
     /**
@@ -30,12 +32,14 @@ public class RepressionEvent extends Event
 //        this.propensity = propensity;
 //    }
 
-    public RepressionEvent(double time, int nextAction, int proteinID, int boundaryLeft, int boundaryRight, double propensity) {
+    public RepressionEvent(double time, int nextAction, int proteinID, int boundaryLeft, int boundaryRight,
+                           double propensity, boolean scheduleNextEvent) {
         super(time, nextAction);
         this.proteinID = proteinID;
         this.boundaryLeft = boundaryLeft;
         this.boundaryRight = boundaryRight;
         this.propensity = propensity;
+        this.scheduleNextEvent = scheduleNextEvent;
     }
 
     public String toString() {

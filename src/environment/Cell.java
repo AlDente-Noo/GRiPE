@@ -56,7 +56,7 @@ public class Cell implements Serializable {
 	public Random randomGenerator;
 	public DNA dna;
 	public TFspecies[] TFspecies;
-	public int maxRepressionLeftSize, maxRepressionRightOrTFSize, maxTFSize;
+	public int maxRepressionLeftSize, maxRepressionRightSize, maxTFSize;
 	public TargetSitesAndGroups tsg;
 	public DBP[] dbp; //DNA binding proteins
 	public Remodeller remodeller;
@@ -424,7 +424,7 @@ public class Cell implements Serializable {
 	 */
 	private void createTFSpecies(){
 		moleculesCopyNumber = 0;
-		maxRepressionRightOrTFSize = 0;
+		maxRepressionRightSize = 0;
 		maxRepressionLeftSize = 0;
 		maxTFSize = 0;
 	
@@ -443,9 +443,8 @@ public class Cell implements Serializable {
 					if (maxRepressionLeftSize < TFspecies[i].repressionLeftSize) {
 						maxRepressionLeftSize = TFspecies[i].repressionLeftSize;
 					}
-					int maxRightSize = Math.max(TFspecies[i].repressionRightSize, TFspecies[i].sizeTotal);
-					if (maxRepressionRightOrTFSize < maxRightSize) {
-						maxRepressionRightOrTFSize = maxRightSize;
+					if (maxRepressionRightSize < TFspecies[i].repressionRightSize) {
+						maxRepressionRightSize = TFspecies[i].repressionRightSize;
 					}
 					if (maxTFSize < TFspecies[i].sizeTotal) {
 						maxTFSize = TFspecies[i].sizeTotal;
@@ -997,16 +996,11 @@ public class Cell implements Serializable {
 	
 		while ( (this.ip.STOP_TIME.value-cellTime >= doubleZero) && hasNextEvent){
 
-//			if (cellTime > 962) {
-//				System.out.println("Here");
-//			}
-
 			//if no TF binding event is scheduled then schedule one
 			if(eventQueue.TFBindingEventQueue.isEmpty() && this.freeTFmoleculesTotal > 0 ){
 				eventQueue.scheduleNextTFBindingEvent(this, this.cellTime);
 			}
 
-				
 			hasNextEvent = executeNextEvent(true);
 
 			if(this.areTFstoFollow && this.nextPointTFstoFollow <=cellTime){
@@ -1119,9 +1113,9 @@ public class Cell implements Serializable {
 
 		e = eventQueue.getNextEvent();
 
-		if (e.time >= 13.923819945246525){
-		//	System.out.println("debug here");
-		}
+		//if (cellTime >= 573762.9145780302) {
+			//System.out.println("Here");
+		//}
 
 		if(e != null){
 			eventsCount++;
@@ -1151,7 +1145,7 @@ public class Cell implements Serializable {
 					this.cellTime= this.totalStopTime;
 				}
 				// prevent scheduling event if this is unrepression event scheduled due to repressor unbinding
-				if (this.remodeller.unrepressionIsInTheRegionOfMolecule(this, re)) {
+				if (re.scheduleNextEvent) {
 					this.eventQueue.scheduleNextTFOnDNAEvent(this, re.proteinID, e.time);
 				}
 			}

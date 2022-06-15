@@ -454,7 +454,7 @@ public class TF extends DBP implements Serializable {
         // FG: schedule unrepression event if the unbound molecule is repressing the DNA region
         if (n.dbp[this.ID].repressesDNA) {
             n.dbp[this.ID].repressionRate = n.remodeller.unrepressionRate;
-            n.eventQueue.scheduleNextTFRepressionEvent(n, this.ID, time);
+            n.eventQueue.scheduleNextTFRepressionEvent(n, this.ID, time, false);
             n.dbp[this.ID].repressesDNA = false;
         }
 
@@ -861,14 +861,13 @@ public class TF extends DBP implements Serializable {
         }
 
 
-        //if in debug mode print status
-        if (n.isInDebugMode()) {
-            if (bound != ID) {
-                n.printDebugInfo(time + ": failed attempted to bind TF " + this.ID + " of type " + n.TFspecies[speciesID].name + " at position " + this.position + " in direction " + this.directionToString());
-            } else {
-                n.printDebugInfo(time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name + " bound at " +
-                        "position " + this.position + " in direction " + this.directionToString());
-            }
+        //print status
+        if (bound != ID) {
+            n.printDebugInfo(time + ": error, failed attempted to bind TF " + this.ID + " of type " + n.TFspecies[speciesID].name + " at position " + this.position + " in direction " + this.directionToString());
+            System.exit(1);
+        } else if (n.isInDebugMode()) {
+            n.printDebugInfo(time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name + " bound at " +
+                "position " + this.position + " in direction " + this.directionToString());
         }
 
         return bound;
@@ -932,9 +931,11 @@ public class TF extends DBP implements Serializable {
         if (n.isInDebugMode()) {
             if (bound != ID) {
                 n.printDebugInfo(time + ": failed attempted to bind TF " + this.ID + " of type " + n.TFspecies[speciesID].name + " at position " + this.position + " in direction " + this.directionToString());
+                System.exit(1);
             } else {
                 n.printDebugInfo(time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name + " bound at " +
 						"position " + this.position + " in direction " + this.directionToString());
+
             }
         }
 
