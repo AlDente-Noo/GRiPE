@@ -64,7 +64,7 @@ public class TFspecies  implements Serializable {
 	public int stepLeftSize;
 	public int stepRightSize;
 	public int uncorrelatedDisplacementSize;
-	public boolean stallsHoppingIfBlocked;
+	public boolean stallsIfBlocked;
 	public double collisionUnbindingProbability;	
 	public double affinityLandscapeRoughness;
 	public double repressionRate;
@@ -170,7 +170,7 @@ public class TFspecies  implements Serializable {
 		this.stepLeftSize=stepLeftSize;
 		this.stepRightSize=stepRightSize;
 		this.uncorrelatedDisplacementSize=uncorrelatedDisplacementSize;
-		this.stallsHoppingIfBlocked=stallsIfBlocked;
+		this.stallsIfBlocked =stallsIfBlocked;
 		this.collisionUnbindingProbability=collisionUnbindingProbability;	
 		this.affinityLandscapeRoughness = affinityLandscapeRoughness;
 		this.preboundProportion = preboundProportion;
@@ -275,7 +275,7 @@ public class TFspecies  implements Serializable {
 		this.stepLeftSize=stepLeftSize;
 		this.stepRightSize=stepRightSize;
 		this.uncorrelatedDisplacementSize=uncorrelatedDisplacementSize;
-		this.stallsHoppingIfBlocked=stallsIfBlocked;
+		this.stallsIfBlocked =stallsIfBlocked;
 		this.collisionUnbindingProbability=collisionUnbindingProbability;	
 		this.affinityLandscapeRoughness = affinityLandscapeRoughness;
 		this.preboundProportion = preboundProportion;
@@ -497,7 +497,7 @@ public class TFspecies  implements Serializable {
 		}
 		
 		//\"ES\", \"COPYNUMBER\", \"SIZELEFT\", \"SIZERIGHT\", \"ASSOCRATE\", \"INITIALDROP\", \"UNBINDINGPROBABILITY\", \"SLIDELEFTPROBABILITY\", \"SLIDERIGHTPROBABILITY\", \"JUMPINGPROBABILITY\", \"HOPSTDDISPLACEMENT\", \"SPECIFICWAITINGTIME\", \"STEPLEFTSIZE\", \"STEPRIGHTSIZE\", \"UNCORRELATEDDISPLACEMENTSIZE\", \"STALLSIFBLOCKED\", \"COLLISIONUNBINDPROBABILITY\", \"AFFINITYLANDSCAPEROUGHNESS\", \"PREBOUNDPROPORTION\", \"PREBOUNDTOHIGHESTAFFINITY\"
-		str+="\","+es+", "+copyNumber+", "+this.sizeLeft+", "+this.sizeRight+", "+this.assocRate+", \""+this.initialDrop+"\"" + ", " +    unBindingProbability + ", " +    slideLeftProbability + ", " +    slideRightProbability + ", " +    jumpingProbability + ", " +    hopSTDdisplacement + ", " +    specificWaitingTime + ", " +    stepLeftSize + ", " +    stepRightSize + ", " +    uncorrelatedDisplacementSize + ", " +    stallsHoppingIfBlocked + ", " +    collisionUnbindingProbability+ ", " +     affinityLandscapeRoughness+", "+preboundProportion+ ", "+preboundToHighestAffinity+ ", "+isImmobile;
+		str+="\","+es+", "+copyNumber+", "+this.sizeLeft+", "+this.sizeRight+", "+this.assocRate+", \""+this.initialDrop+"\"" + ", " +    unBindingProbability + ", " +    slideLeftProbability + ", " +    slideRightProbability + ", " +    jumpingProbability + ", " +    hopSTDdisplacement + ", " +    specificWaitingTime + ", " +    stepLeftSize + ", " +    stepRightSize + ", " +    uncorrelatedDisplacementSize + ", " + stallsIfBlocked + ", " +    collisionUnbindingProbability+ ", " +     affinityLandscapeRoughness+", "+preboundProportion+ ", "+preboundToHighestAffinity+ ", "+isImmobile;
 		
 		//"ISBIASEDRANDOMWALK\", \"ISTWOSTATERANDOMWALK\",
 		str+= ", "+this.isBiasedRandomWalk +", "+ this.isTwoStateRandomWalk;

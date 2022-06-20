@@ -75,7 +75,7 @@ public class TF extends DBP implements Serializable {
                 unbindMolecule(n, pe.time);
             } else {
                 if (this.isRepressed(n)) {
-                    if (n.TFspecies[speciesID].stallsHoppingIfBlocked) {
+                    if (!n.TFspecies[speciesID].stallsIfBlocked) {
                         if (n.isInDebugMode()) {
                             n.printDebugInfo(pe.time + ": attempted to move (via sliding or hop) TF " + this.ID + " of type " +
                                     n.TFspecies[speciesID].name + " from position " + position + " to " + pe.position +
@@ -549,7 +549,7 @@ public class TF extends DBP implements Serializable {
                 }
             }
 
-            if (!n.TFspecies[speciesID].stallsHoppingIfBlocked && !isReflected) {
+            if (!n.TFspecies[speciesID].stallsIfBlocked && !isReflected) {
                 // FG: attempt to slide in the opposite direction
                 bound = slideLeftMolecule(n, time, position - n.TFspecies[speciesID].stepLeftSize, isHopEvent, true);
                 // FG: unbind if failed
@@ -657,7 +657,7 @@ public class TF extends DBP implements Serializable {
                 }
             }
 
-            if (!n.TFspecies[speciesID].stallsHoppingIfBlocked && !isReflected) {
+            if (!n.TFspecies[speciesID].stallsIfBlocked && !isReflected) {
                 // FG: attempt to slide in the opposite direction
                 bound = slideRightMolecule(n, time, position + n.TFspecies[speciesID].stepRightSize, isHopEvent, true);
                 // FG: unbind if failed
@@ -757,7 +757,7 @@ public class TF extends DBP implements Serializable {
         boolean canBind = n.dna.effectiveTFavailability[this.speciesID][newPosition];
 
         // if it can rebind or it doesn't matter if it can rebind => unbinds the TF
-        if (canBind || !n.TFspecies[speciesID].stallsHoppingIfBlocked) {
+        if (canBind || !n.TFspecies[speciesID].stallsIfBlocked) {
             if (n.ip.OUTPUT_SLIDING_LENGTHS.value) {
                 leftExtreme = this.observedLeftMostPosition;
                 rightExtreme = this.observedRightMostPosition;
