@@ -2,6 +2,7 @@ package objects;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import environment.Cell;
 import utils.CellUtils;
@@ -44,9 +45,7 @@ public class PFM  implements Serializable{
         ArrayList<Double> bufferPFM;
         isCorrect = true;
         nucleotidePosition = new int[CellUtils.bps.numberOfBP];
-        for(int i=0;i<nucleotidePosition.length;i++){
-            nucleotidePosition[i]=Constants.NONE;
-        }
+        Arrays.fill(nucleotidePosition, Constants.NONE);
 
         if(str.contains(Constants.PFM_NUCLEOTIDE_SEPARATOR)){
             String[] bufferNucleotide, bufferNucleotideContainer;
@@ -136,9 +135,9 @@ public class PFM  implements Serializable{
      */
     public double getMaxScorePFM(int position){
         double max = 0;
-        for (int i = 0; i < this.nucleotidePosition.length; i++) {
-            if (normPFM.get(this.nucleotidePosition[i]).get(position) > max){
-                max = normPFM.get(this.nucleotidePosition[i]).get(position);
+        for (int value : this.nucleotidePosition) {
+            if (normPFM.get(value).get(position) > max) {
+                max = normPFM.get(value).get(position);
             }
         }
         return max;

@@ -79,12 +79,12 @@ public class InputParameters  implements Serializable{
 	public Parameter<Integer> TF_REPR_LEN_RIGHT;
 	//public Parameter<Double> TF_REPR_PWM_THESH;
 	public Parameter<Double> TF_REPRESSION_RATE;
-	public Parameter<Double> TF_UNREPRESSION_RATE;
+	public Parameter<Double> TF_DEREPRESSION_RATE;
 
 	//DNA PARAMETERS
 	public Parameter<String> DNA_SEQUENCE_FILE;
 	public Parameter<String> DNA_AVAILABILITY_FILE;
-	public Parameter<Double> DNA_UNREPRESSION_RATE;
+	public Parameter<Double> DNA_DEREPRESSION_RATE;
 
 	//DNA_RANDOM PARAMETERS
 	public Parameter<Integer> DNA_LENGTH;
@@ -220,12 +220,12 @@ public class InputParameters  implements Serializable{
 		this.TF_REPR_LEN_RIGHT = new Parameter<Integer>("", "", "", "", 0);
 		//this.TF_PWM_REPR_THRESH = new Parameter<>();
 		this.TF_REPRESSION_RATE = new Parameter<Double>("", "", "", "", 0.0);
-		this.TF_UNREPRESSION_RATE = new Parameter<Double>("", "", "", "", 0.0);
+		this.TF_DEREPRESSION_RATE = new Parameter<Double>("", "", "", "", 0.0);
 		
 		//DNA PARAMETERS
 		this.DNA_SEQUENCE_FILE= new Parameter<String>("", "", "", "", "");
 		this.DNA_AVAILABILITY_FILE = new Parameter<String>("", "", "", "", ""); // FG: btrack file with 0 and 1 for covered and open bps
-		this.DNA_UNREPRESSION_RATE = new Parameter<Double>("", "", "", "", 0.0); // FG: if repressor unbound, DNA will be opened at this rate
+		this.DNA_DEREPRESSION_RATE = new Parameter<Double>("", "", "", "", 0.0); // FG: if repressor unbound, DNA will be opened at this rate
 
 		//DNA_RANDOM PARAMETERS
 		this.DNA_LENGTH = new Parameter<Integer>("", "", "", "", 0);
@@ -510,8 +510,8 @@ public class InputParameters  implements Serializable{
 				out.write("DNA_SEQUENCE_FILE = \""+this.DNA_SEQUENCE_FILE.value+"\";\n\n");
 				out.write("#"+this.DNA_AVAILABILITY_FILE.description+"\n");
 				out.write("DNA_AVAILABILITY_FILE = \""+this.DNA_AVAILABILITY_FILE.value+"\";\n\n");
-				out.write("#"+this.DNA_UNREPRESSION_RATE.description+"\n");
-				out.write("DNA_UNREPRESSION_RATE = "+this.DNA_UNREPRESSION_RATE.value+";\n\n");
+				out.write("#"+this.DNA_DEREPRESSION_RATE.description+"\n");
+				out.write("DNA_DEREPRESSION_RATE = "+this.DNA_DEREPRESSION_RATE.value+";\n\n");
 
 				//DNA_RANDOM PARAMETERS
 				out.write("\n#DNA_RANDOM PARAMETERS\n\n");
@@ -914,11 +914,11 @@ public class InputParameters  implements Serializable{
 			if(!description.isEmpty()){this.DNA_AVAILABILITY_FILE.description = description;}
 			if(!category.isEmpty()){this.DNA_AVAILABILITY_FILE.category = category;}
 			found = true;
-		} else if(name.equals("DNA_UNREPRESSION_RATE")){
-			this.DNA_UNREPRESSION_RATE.value = Utils.parseDouble(value, Constants.NONE);
-			if(!label.isEmpty()){this.DNA_UNREPRESSION_RATE.label = label;}
-			if(!description.isEmpty()){this.DNA_UNREPRESSION_RATE.description = description;}
-			if(!category.isEmpty()){this.DNA_UNREPRESSION_RATE.category = category;}
+		} else if(name.equals("DNA_DEREPRESSION_RATE")){
+			this.DNA_DEREPRESSION_RATE.value = Utils.parseDouble(value, Constants.NONE);
+			if(!label.isEmpty()){this.DNA_DEREPRESSION_RATE.label = label;}
+			if(!description.isEmpty()){this.DNA_DEREPRESSION_RATE.description = description;}
+			if(!category.isEmpty()){this.DNA_DEREPRESSION_RATE.category = category;}
 			found = true;
 		} else if(name.equals("DNA_BOUNDARY_CONDITION")){
 			this.DNA_BOUNDARY_CONDITION.value = value;

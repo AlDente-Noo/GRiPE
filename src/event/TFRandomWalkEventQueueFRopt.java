@@ -61,7 +61,7 @@ public class TFRandomWalkEventQueueFRopt extends TFEventQueue {
 	
 	/**
 	 * adds a new event to the list
-	 * @param re the new event
+	 * @param e the new event
 	 */
 	public void add(Event e){
 		ProteinEvent oldEvent = null;
@@ -219,7 +219,8 @@ public class TFRandomWalkEventQueueFRopt extends TFEventQueue {
 	}
 	
 	/**
-	 * updates the event of a bound molecule. Because the DM implementation always checks for the latest move rate and updates it in the list and then redraws a new event we can just schedule the event list
+	 * updates the event of a bound molecule.
+	 * Because the DM implementation always checks for the latest move rate and updates it in the list and then redraws a new event we can just schedule the event list
 	 */
 	public void updateNextEvent(Cell n, int moleculeID, double time){
 		boolean removed = this.randomWalkEvents.remove(n.dbp[moleculeID].pe);
@@ -227,13 +228,6 @@ public class TFRandomWalkEventQueueFRopt extends TFEventQueue {
 			ProteinEvent pe = this.createNextEvent(n, moleculeID, time);
 			this.scheduleNextEvent(n, moleculeID, pe);
 		}
-	}
-
-	/**
-	 * returns the time of the next event for a species 
-	 */
-	public double getNextEventTime(int moleculeID){
-		return -1;
 	}
 	
 }

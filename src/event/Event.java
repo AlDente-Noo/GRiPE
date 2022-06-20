@@ -3,24 +3,18 @@ package event;
 import java.io.Serializable;
 
 /**
- * generic class for event. contains only the execution time of the event
+ * Generic class for event. It contains only the event execution time
  * @author n.r.zabet@gen.cam.ac.uk
  *
  */
 public class Event implements Comparable<Event>,  Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 394823679537690993L;
 
+	private static final long serialVersionUID = 394823679537690993L;
 	public double time;
-	
 	public int nextAction;
 
 	/**
 	 * class constructor
-	 * @param time
-	 * @param nextAction
 	 */
 	public Event(double time, int  nextAction){
 		this.time=time;

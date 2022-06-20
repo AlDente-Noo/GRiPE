@@ -68,7 +68,7 @@ public class TFspecies  implements Serializable {
 	public double collisionUnbindingProbability;	
 	public double affinityLandscapeRoughness;
 	public double repressionRate;
-	public double unrepressionRate;
+	public double derepressionRate;
 	public int repressionLeftSize;
 	public int repressionRightSize;
 	
@@ -86,7 +86,7 @@ public class TFspecies  implements Serializable {
 	public long countTFSlideRightEvents;
 	public long countTFHoppingEvents;
 	public long countTFRepressionEvents;
-	public long countTFUnrepressionEvents;
+	public long countTFDerepressionEvents;
 
 	public long countTFforcedJumpsEvents;
 	public long countTFHopsOutside;
@@ -128,7 +128,7 @@ public class TFspecies  implements Serializable {
 	 * @param ens
 	 * @param es
 	 */
-	public TFspecies(int id, byte[] DNAstrand, int pos, int dbdLength, int copyNumber, double es, DNAregion dnaRegion, int sizeLeft, int sizeRight, double assocRate, DNAregion initialDrop, boolean isCognate, double unBindingProbability, double slideLeftProbability, double slideRightProbability, double jumpingProbability, double hopSTDdisplacement, double specificWaitingTime, int stepLeftSize, int stepRightSize, int uncorrelatedDisplacementSize, boolean stallsIfBlocked, double collisionUnbindingProbability, double affinityLandscapeRoughness, double preboundProportion, boolean preboundToHighestAffinity, boolean isImmobile, int TFdirections, boolean isBiasedRandomWalk, boolean isTwoStateRandomWalk, double repressionRate, double unrepressionRate, int repressionLenLeft, int repressionLenRight){
+	public TFspecies(int id, byte[] DNAstrand, int pos, int dbdLength, int copyNumber, double es, DNAregion dnaRegion, int sizeLeft, int sizeRight, double assocRate, DNAregion initialDrop, boolean isCognate, double unBindingProbability, double slideLeftProbability, double slideRightProbability, double jumpingProbability, double hopSTDdisplacement, double specificWaitingTime, int stepLeftSize, int stepRightSize, int uncorrelatedDisplacementSize, boolean stallsIfBlocked, double collisionUnbindingProbability, double affinityLandscapeRoughness, double preboundProportion, boolean preboundToHighestAffinity, boolean isImmobile, int TFdirections, boolean isBiasedRandomWalk, boolean isTwoStateRandomWalk, double repressionRate, double derepressionRate, int repressionLenLeft, int repressionLenRight){
 		this.id = id;
 		name="TF"+id;
 		this.es = es;
@@ -162,7 +162,7 @@ public class TFspecies  implements Serializable {
 		this.slideRightProbability=slideRightProbability;
 		this.jumpingProbability=jumpingProbability;
 		this.repressionRate = repressionRate;
-		this.unrepressionRate = unrepressionRate;
+		this.derepressionRate = derepressionRate;
 		this.repressionLeftSize=repressionLenLeft;
 		this.repressionRightSize=repressionLenRight;
 		this.hopSTDdisplacement=hopSTDdisplacement;
@@ -220,7 +220,7 @@ public class TFspecies  implements Serializable {
 	 * @param es the specific energy
 	 * @param ts the list of target sites
 	 */
-	public TFspecies(DNAregion dnaRegion, int id, String name, String dbd, int copyNumber, double es, int sizeLeft, int sizeRight, double assocRate, DNAregion initialDrop, boolean isCognate, double unBindingProbability, double slideLeftProbability, double slideRightProbability, double jumpingProbability, double hopSTDdisplacement, double specificWaitingTime, int stepLeftSize, int stepRightSize, int uncorrelatedDisplacementSize, boolean stallsIfBlocked, double collisionUnbindingProbability, double affinityLandscapeRoughness, double preboundProportion, boolean preboundToHighestAffinity, boolean isImmobile, boolean isBiasedRandomWalk, boolean isTwoStateRandomWalk, double repressionRate, double unrepressionRate, int repressionLenLeft, int repressionLenRight, Cell n){
+	public TFspecies(DNAregion dnaRegion, int id, String name, String dbd, int copyNumber, double es, int sizeLeft, int sizeRight, double assocRate, DNAregion initialDrop, boolean isCognate, double unBindingProbability, double slideLeftProbability, double slideRightProbability, double jumpingProbability, double hopSTDdisplacement, double specificWaitingTime, int stepLeftSize, int stepRightSize, int uncorrelatedDisplacementSize, boolean stallsIfBlocked, double collisionUnbindingProbability, double affinityLandscapeRoughness, double preboundProportion, boolean preboundToHighestAffinity, boolean isImmobile, boolean isBiasedRandomWalk, boolean isTwoStateRandomWalk, double repressionRate, double derepressionRate, int repressionLenLeft, int repressionLenRight, Cell n){
 		this.id = id; 
 		this.name=name; 
 		this.isCognate = false;
@@ -267,7 +267,7 @@ public class TFspecies  implements Serializable {
 		this.slideRightProbability=slideRightProbability;
 		this.jumpingProbability=jumpingProbability;
 		this.repressionRate = repressionRate;
-		this.unrepressionRate = unrepressionRate;
+		this.derepressionRate = derepressionRate;
 		this.repressionLeftSize=repressionLenLeft;
 		this.repressionRightSize=repressionLenRight;
 		this.hopSTDdisplacement=hopSTDdisplacement;
@@ -502,8 +502,8 @@ public class TFspecies  implements Serializable {
 		//"ISBIASEDRANDOMWALK\", \"ISTWOSTATERANDOMWALK\",
 		str+= ", "+this.isBiasedRandomWalk +", "+ this.isTwoStateRandomWalk;
 
-		//"REPRESSIONRATE", "UNREPRESSIONRATE", "REPRLENLEFT", "REPRLENRIGHT"
-		str += ", " + this.repressionRate + ", " + this.unrepressionRate + ", " + this.repressionLeftSize + ", " + this.repressionRightSize;
+		//"REPRESSIONRATE", "DEREPRESSIONRATE", "REPRLENLEFT", "REPRLENRIGHT"
+		str += ", " + this.repressionRate + ", " + this.derepressionRate + ", " + this.repressionLeftSize + ", " + this.repressionRightSize;
 
 		if(!reduced){
 			//"eventsBindingTotal\", \"eventsUnbindingTotal\", \"eventsSlideLeftTotal\", \"eventsSlideRightTotal\", \"eventsSlideTotal\", \"eventsHoppingTotal\", \"eventsForcedJumps\", \"eventsHopOutsideDNA\", \"collisionsCount\",		
@@ -522,7 +522,7 @@ public class TFspecies  implements Serializable {
 			}	
 			str+=", \""+this.getCoopString()+"\"";
 
-			str += ", " + this.countTFRepressionEvents + ", " + this.countTFUnrepressionEvents;
+			str += ", " + this.countTFRepressionEvents + ", " + this.countTFDerepressionEvents;
 		}
 		return str;
 	}
@@ -535,10 +535,10 @@ public class TFspecies  implements Serializable {
 	//}
 	
 	public String headerToString(boolean reduced){
-		String str = "\"name\", \"DBD\", \"ES\", \"COPYNUMBER\", \"SIZELEFT\", \"SIZERIGHT\", \"ASSOCRATE\", \"INITIALDROP\", \"UNBINDINGPROBABILITY\", \"SLIDELEFTPROBABILITY\", \"SLIDERIGHTPROBABILITY\", \"JUMPINGPROBABILITY\", \"HOPSTDDISPLACEMENT\", \"SPECIFICWAITINGTIME\", \"STEPLEFTSIZE\", \"STEPRIGHTSIZE\", \"UNCORRELATEDDISPLACEMENTSIZE\", \"STALLSIFBLOCKED\", \"COLLISIONUNBINDPROBABILITY\", \"AFFINITYLANDSCAPEROUGHNESS\", \"PREBOUNDPROPORTION\", \"PREBOUNDTOHIGHESTAFFINITY\", \"TFISIMMOBILE\", \"ISBIASEDRANDOMWALK\", \"ISTWOSTATERANDOMWALK\", \"REPRESSIONRATE\", \"UNREPRESSIONRATE\", \"REPRLENLEFT\", \"REPRLENRIGHT\"";
+		String str = "\"name\", \"DBD\", \"ES\", \"COPYNUMBER\", \"SIZELEFT\", \"SIZERIGHT\", \"ASSOCRATE\", \"INITIALDROP\", \"UNBINDINGPROBABILITY\", \"SLIDELEFTPROBABILITY\", \"SLIDERIGHTPROBABILITY\", \"JUMPINGPROBABILITY\", \"HOPSTDDISPLACEMENT\", \"SPECIFICWAITINGTIME\", \"STEPLEFTSIZE\", \"STEPRIGHTSIZE\", \"UNCORRELATEDDISPLACEMENTSIZE\", \"STALLSIFBLOCKED\", \"COLLISIONUNBINDPROBABILITY\", \"AFFINITYLANDSCAPEROUGHNESS\", \"PREBOUNDPROPORTION\", \"PREBOUNDTOHIGHESTAFFINITY\", \"TFISIMMOBILE\", \"ISBIASEDRANDOMWALK\", \"ISTWOSTATERANDOMWALK\", \"REPRESSIONRATE\", \"DEREPRESSIONRATE\", \"REPRLENLEFT\", \"REPRLENRIGHT\"";
 		if(!reduced){
 			str+= ", \"eventsBindingTotal\", \"eventsUnbindingTotal\", \"eventsSlideLeftTotal\", \"eventsSlideRightTotal\", \"eventsSlideTotal\", \"eventsHoppingTotal\", \"eventsForcedJumps\", \"eventsHopOutsideDNA\", \"collisionsCount\", \"sizeTotal\", \"isCognate\", \"timeBoundAvg\", \"residenceTimePerBinding\", \"slidingEventsPerBinding\", \"slidingLengthPerBinding\", \"observedSlidingLengthPerBinding\", \"cooperativity\"";
-			str+= ", \"eventsRepression\", \"eventsUnrepression\"";
+			str+= ", \"eventsRepression\", \"eventsDerepression\"";
 		}
 		return str;
 	}

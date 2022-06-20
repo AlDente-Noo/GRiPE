@@ -5,13 +5,12 @@ import java.util.PriorityQueue;
 import environment.Cell;
 import utils.Constants;
 import utils.Gillespie;
-import utils.Utils;
 
 public class TFRepressionEventQueueFR extends TFEventQueue {
 
     private PriorityQueue<RepressionEvent> events;
 
-    public TFRepressionEventQueueFR(Cell n) {
+    public TFRepressionEventQueueFR() {
         events = new PriorityQueue<RepressionEvent>();
     }
 
@@ -55,7 +54,7 @@ public class TFRepressionEventQueueFR extends TFEventQueue {
         double nextTime = Gillespie.computeNextReactionTime(propensity, n.randomGenerator);
         int nextAction;
         if (n.dbp[moleculeID].isRepressingDNA()) {
-            nextAction = Constants.EVENT_TF_UNREPRESSION;
+            nextAction = Constants.EVENT_TF_DEREPRESSION;
         }
         else {
             nextAction = Constants.EVENT_TF_REPRESSION;
@@ -76,11 +75,9 @@ public class TFRepressionEventQueueFR extends TFEventQueue {
     public void updateNextEvent(Cell n, int moleculeID, double time) {
         boolean removed = this.events.remove(n.dbp[moleculeID].re);
         if(removed){
-            RepressionEvent re = (RepressionEvent) this.createNextEvent(n, moleculeID, time);
+            RepressionEvent re = this.createNextEvent(n, moleculeID, time);
             this.scheduleNextEvent(n, moleculeID, re);
         }
     }
-
-    //public double getNextEventTime(int moleculeID);
     
 }

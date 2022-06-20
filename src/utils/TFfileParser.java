@@ -22,7 +22,7 @@ public class TFfileParser {
 	
 	
 	
-	public TFfileParser(Cell n, String filename, int defaultCopyNumber, double defaultEs, int defaultSizeLeft, int defaultSizeRight, double defaultAssocRate, int DNAsize, double defaultUnBindingProbability,  double defaultSlideLeftProbability, double defaultSlideRightProbability, double defaultJumpingProbability, double defaultHopSTDdisplacement, double defaultSpecificWaitingTime, int defaultStepLeftSize, int defaultStepRightSize, int defaultUncorrelatedDisplacementSize, boolean defaultStallsIfBlocked, double defaultCollisionUnbindingProbability, double defaultAffinityLandscapeRoughness, double defaultPreboundProportion, boolean defaultPreboundToHighestAffinity, boolean defaultIsImmobile, DNAregion dnaRegion, boolean deafultIsBiasedRandomWalk, boolean defaultIsTwoStateRandomWalk, double defaultRepressionRate, double defaultUnrepressionRate, int defaultReprLenLeft, int defaultReprLenRight){
+	public TFfileParser(Cell n, String filename, int defaultCopyNumber, double defaultEs, int defaultSizeLeft, int defaultSizeRight, double defaultAssocRate, int DNAsize, double defaultUnBindingProbability,  double defaultSlideLeftProbability, double defaultSlideRightProbability, double defaultJumpingProbability, double defaultHopSTDdisplacement, double defaultSpecificWaitingTime, int defaultStepLeftSize, int defaultStepRightSize, int defaultUncorrelatedDisplacementSize, boolean defaultStallsIfBlocked, double defaultCollisionUnbindingProbability, double defaultAffinityLandscapeRoughness, double defaultPreboundProportion, boolean defaultPreboundToHighestAffinity, boolean defaultIsImmobile, DNAregion dnaRegion, boolean deafultIsBiasedRandomWalk, boolean defaultIsTwoStateRandomWalk, double defaultRepressionRate, double defaultDerepressionRate, int defaultReprLenLeft, int defaultReprLenRight){
 		parsed = false;
 		data = new  ArrayList<TFspecies>();
 		
@@ -86,7 +86,7 @@ public class TFfileParser {
 				boolean isTwoStateRandomWalk;
 
 				double repressionRate;
-				double unrepressionRate;
+				double derepressionRate;
 				int reprLenLeft;
 				int reprLenRight;
 
@@ -119,7 +119,7 @@ public class TFfileParser {
 					isBiasedRandomWalk = deafultIsBiasedRandomWalk;
 					isTwoStateRandomWalk = defaultIsTwoStateRandomWalk;
 					repressionRate = defaultRepressionRate;
-					unrepressionRate = defaultUnrepressionRate;
+					derepressionRate = defaultDerepressionRate;
 					reprLenLeft = defaultReprLenLeft;
 					reprLenRight = defaultReprLenRight;
 					
@@ -342,9 +342,9 @@ public class TFfileParser {
 					}
 					if(csv.header.containsKey(Constants.PARSER_TF_CSV_FILE_HEADER[26])){
 						cellContent = buffer.get(csv.header.get(Constants.PARSER_TF_CSV_FILE_HEADER[26]));
-						unrepressionRate = Utils.parseDouble(cellContent, unrepressionRate);
+						derepressionRate = Utils.parseDouble(cellContent, derepressionRate);
 					} else{
-						n.printDebugInfo("TF file "+filename+" misses TF unrepression rate at line: "+buffer);
+						n.printDebugInfo("TF file "+filename+" misses TF derepression rate at line: "+buffer);
 					}
 					if(csv.header.containsKey(Constants.PARSER_TF_CSV_FILE_HEADER[27])){
 						cellContent = buffer.get(csv.header.get(Constants.PARSER_TF_CSV_FILE_HEADER[27]));
@@ -360,7 +360,7 @@ public class TFfileParser {
 					}
 
 					if(copyNumber>0){
-						data.add(new TFspecies(dnaRegion, id, name,  bufferDBD, copyNumber, es, sizeLeft, sizeRight, assocRate,bufferDNAregion,isCognate,  unBindingProbability,  slideLeftProbability,  slideRightProbability,  jumpingProbability,  hopSTDdisplacement, specificWaitingTime,  stepLeftSize,  stepRightSize,  uncorrelatedDisplacementSize,  stallsIfBlocked,  collisionUnbindingProbability, affinityLandscapeRoughness, preboundProportion, preboundToHighestAffinity, isImmobile, isBiasedRandomWalk, isTwoStateRandomWalk, repressionRate, unrepressionRate, reprLenLeft, reprLenRight, n));
+						data.add(new TFspecies(dnaRegion, id, name,  bufferDBD, copyNumber, es, sizeLeft, sizeRight, assocRate,bufferDNAregion,isCognate,  unBindingProbability,  slideLeftProbability,  slideRightProbability,  jumpingProbability,  hopSTDdisplacement, specificWaitingTime,  stepLeftSize,  stepRightSize,  uncorrelatedDisplacementSize,  stallsIfBlocked,  collisionUnbindingProbability, affinityLandscapeRoughness, preboundProportion, preboundToHighestAffinity, isImmobile, isBiasedRandomWalk, isTwoStateRandomWalk, repressionRate, derepressionRate, reprLenLeft, reprLenRight, n));
 						id++;
 					}
 				

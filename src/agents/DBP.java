@@ -18,7 +18,6 @@ public abstract class DBP implements Serializable {
     private static final long serialVersionUID = 121399550800359214L;
     public int ID;  // the ID of the TF
     public int size; // = sizeTotal from TFSpecies
-    //public int state;
     public int speciesID; //the ID of the species to which this TF belongs
     public boolean hasDNAbasedCooperativity;
     public boolean hasDirectCooperativity;
@@ -269,7 +268,7 @@ public abstract class DBP implements Serializable {
 
     /**
      * returns repressionRate, which is either rate of repression event if TF is not repressing DNA
-     * or rate of 'unrepression' event if TF is repressing DNA
+     * or rate of 'derepression' event if TF is repressing DNA
      */
     public double getRepressionRate() {
         return this.repressionRate;
@@ -282,7 +281,7 @@ public abstract class DBP implements Serializable {
         if (this.position == Constants.NONE) {
             repressionRate = 0.0;
         } else if (this.repressesDNA) {
-            repressionRate = n.TFspecies[speciesID].unrepressionRate;
+            repressionRate = n.TFspecies[speciesID].derepressionRate;
         } else {
             repressionRate = n.TFspecies[speciesID].repressionRate;
         }
@@ -407,9 +406,9 @@ public abstract class DBP implements Serializable {
 
     public abstract int hopMolecule(Cell n, double time, int newPosition);
 
-    public abstract int slideLeftMolecule(Cell n, double time, int newPosition, boolean isHopEvent);
+    public abstract int slideLeftMolecule(Cell n, double time, int newPosition, boolean isHopEvent, boolean isReflected);
 
-    public abstract int slideRightMolecule(Cell n, double time, int newPosition, boolean isHopEvent);
+    public abstract int slideRightMolecule(Cell n, double time, int newPosition, boolean isHopEvent, boolean isReflected);
 
     /**
      * changes the current direction (changes DNA strand)

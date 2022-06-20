@@ -75,7 +75,7 @@ public class TF extends DBP implements Serializable {
                 unbindMolecule(n, pe.time);
             } else {
                 if (this.isRepressed(n)) {
-                    if (!n.TFspecies[speciesID].stallsHoppingIfBlocked) {
+                    if (n.TFspecies[speciesID].stallsHoppingIfBlocked) {
                         if (n.isInDebugMode()) {
                             n.printDebugInfo(pe.time + ": attempted to move (via sliding or hop) TF " + this.ID + " of type " +
                                     n.TFspecies[speciesID].name + " from position " + position + " to " + pe.position +
@@ -125,7 +125,7 @@ public class TF extends DBP implements Serializable {
                     } else {
                         if (pe.position >= 0) {
                             // slide molecule is possible
-                            slideLeftMolecule(n, pe.time, pe.position, pe.isHoppingEvent);
+                            slideLeftMolecule(n, pe.time, pe.position, pe.isHoppingEvent, false);
                         } else {
                             // reflective b.c. prevent movement of the molecule outside of DNA
                             if (n.isInDebugMode()) {
@@ -158,7 +158,7 @@ public class TF extends DBP implements Serializable {
                         hopMolecule(n, pe.time, 0);
                     } else {
                         if (pe.position < (n.dna.strand.length - this.size)) {
-                            slideRightMolecule(n, pe.time, pe.position, pe.isHoppingEvent);
+                            slideRightMolecule(n, pe.time, pe.position, pe.isHoppingEvent, false);
                         } else {
                             if (n.isInDebugMode()) {
                                 n.printDebugInfo(pe.time + ": attempted to slide right TF " + this.ID +
@@ -448,9 +448,9 @@ public class TF extends DBP implements Serializable {
         boolean unbound = false;
         int pos = this.position;
 
-        // FG: schedule unrepression event if the unbound molecule is repressing the DNA region
+        // FG: schedule derepression event if the unbound molecule is repressing the DNA region
         if (n.dbp[this.ID].repressesDNA) {
-            n.dbp[this.ID].repressionRate = n.remodeller.unrepressionRate;
+            n.dbp[this.ID].repressionRate = n.remodeller.derepressionRate;
             n.eventQueue.scheduleNextTFRepressionEvent(n, this.ID, time, false);
             n.dbp[this.ID].repressesDNA = false;
         }
@@ -497,7 +497,7 @@ public class TF extends DBP implements Serializable {
             //update the list of free TFs and the binding event
             n.freeTFmoleculesTotal++;
             n.freeTFmolecules.get(speciesID).add(this.ID);
-            n.eventQueue.TFBindingEventQueue.updateProteinBindingPropensities(speciesID, n);
+            n.eventQueue.TFBindingEventQueue.updateProteinBindingPropensities(n);
             // FG: update repression rate
             this.updateRepressionRate(n);
         }
@@ -507,18 +507,11 @@ public class TF extends DBP implements Serializable {
 
 
     /**
-     * attempts to slide to right on the DNA a TF molecule
-     *
-     * @param moleculeID the ID of the TF that slides left
-     * @param time       the time
+     * attempts to slide a TF molecule to the right
      */
-    public int slideRightMolecule(Cell n, double time, int newPosition, boolean isHopEvent) {
+    public int slideRightMolecule(Cell n, double time, int newPosition, boolean isHopEvent, boolean isReflected) {
 
         int bound = Constants.NONE;
-
-        //if(n.isInDebugMode()){
-        //	n.printDebugInfo("attempted to slide right where there is a molecule "+this.leftNeighbour);
-        //}
 
         //attempt to slide right the molecule on the DNA
         if (this.rightNeighbour != Constants.NONE) {
@@ -545,7 +538,6 @@ public class TF extends DBP implements Serializable {
             if (bound != Constants.NONE) {
                 n.dna.collisionsCount[newPosition]++;
             }
-            //bound = Constants.NONE;
 
             //couldn't slide but there is a chance it will release due to the collision
             if (n.TFspecies[speciesID].collisionUnbindingProbability > 0.0 && n.randomGenerator.nextDouble() < n.TFspecies[speciesID].collisionUnbindingProbability) {
@@ -557,9 +549,9 @@ public class TF extends DBP implements Serializable {
                 }
             }
 
-            if (!n.TFspecies[speciesID].stallsHoppingIfBlocked) {
+            if (!n.TFspecies[speciesID].stallsHoppingIfBlocked && !isReflected) {
                 // FG: attempt to slide in the opposite direction
-                bound = slideLeftMolecule(n, time, position - n.TFspecies[speciesID].stepLeftSize, isHopEvent);
+                bound = slideLeftMolecule(n, time, position - n.TFspecies[speciesID].stepLeftSize, isHopEvent, true);
                 // FG: unbind if failed
                 if (bound != ID) {
                     if (n.isInDebugMode()) {
@@ -607,7 +599,7 @@ public class TF extends DBP implements Serializable {
             }
 
             if (n.ip.SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE.value) {
-                n.eventQueue.TFBindingEventQueue.updateProteinBindingPropensities(speciesID, n);
+                n.eventQueue.TFBindingEventQueue.updateProteinBindingPropensities(n);
             }
 
             if (isHopEvent) {
@@ -624,18 +616,15 @@ public class TF extends DBP implements Serializable {
 
 
     /**
-     * attempts to slide to left on the DNA a TF molecule
-     *
-     * @param moleculeID the ID of the TF that slides left
-     * @param time       the time
+     * attempts to slide the TF to the left
      */
-    public int slideLeftMolecule(Cell n, double time, int newPosition, boolean isHopEvent) {
+    public int slideLeftMolecule(Cell n, double time, int newPosition, boolean isHopEvent, boolean isReflected) {
         int bound = Constants.NONE;
 
         if (this.leftNeighbour != Constants.NONE) { // FG: unnecessary check (legacy)
             bound = this.leftNeighbour;
         } else {
-            bound = n.dna.slideLeft(n, this.ID, position, size, position - newPosition,
+            bound = n.dna.slideLeft(this.ID, position, size, position - newPosition,
                     n.ip.CHECK_OCCUPANCY_ON_SLIDING.value);
         }
 
@@ -657,7 +646,6 @@ public class TF extends DBP implements Serializable {
             if (bound != Constants.NONE) {
                 n.dna.collisionsCount[newPosition]++;
             }
-            //bound = Constants.NONE;
 
             //couldn't slide but there is a chance it will release due to the collision
             if (n.TFspecies[speciesID].collisionUnbindingProbability > 0.0 && n.randomGenerator.nextDouble() < n.TFspecies[speciesID].collisionUnbindingProbability) {
@@ -669,9 +657,9 @@ public class TF extends DBP implements Serializable {
                 }
             }
 
-            if (!n.TFspecies[speciesID].stallsHoppingIfBlocked) {
+            if (!n.TFspecies[speciesID].stallsHoppingIfBlocked && !isReflected) {
                 // FG: attempt to slide in the opposite direction
-                bound = slideRightMolecule(n, time, position + n.TFspecies[speciesID].stepRightSize, isHopEvent);
+                bound = slideRightMolecule(n, time, position + n.TFspecies[speciesID].stepRightSize, isHopEvent, true);
                 // FG: unbind if failed
                 if (bound != ID) {
                     if (n.isInDebugMode()) {
@@ -720,7 +708,7 @@ public class TF extends DBP implements Serializable {
             }
 
             if (n.ip.SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE.value) {
-                n.eventQueue.TFBindingEventQueue.updateProteinBindingPropensities(speciesID, n);
+                n.eventQueue.TFBindingEventQueue.updateProteinBindingPropensities(n);
             }
             if (isHopEvent) {
                 n.TFspecies[speciesID].countTFHoppingEvents++;
@@ -752,20 +740,17 @@ public class TF extends DBP implements Serializable {
     }
 
     /**
-     * attempts to rebind a TF to the DNA
-     *
-     * @param moleculeID the ID of the TF that binds
-     * @param time       the time
+     * performs hop: unbinds TF and attempt to rebind it to the DNA
      */
     public int hopMolecule(Cell n, double time, int newPosition) {
         int bound = Constants.NONE, leftExtreme = Constants.NONE, rightExtreme = Constants.NONE;
 
         // use slide functions for hops by the distance less than molecule size, otherwise canBind will be false
         if (position < newPosition && newPosition < position + size) {
-            return slideRightMolecule(n, time, newPosition, true);
+            return slideRightMolecule(n, time, newPosition, true, false);
         }
         if (position - size < newPosition && newPosition < position) {
-            return slideLeftMolecule(n, time, newPosition, true);
+            return slideLeftMolecule(n, time, newPosition, true, false);
         }
 
         //check if the TF can rebind
@@ -829,9 +814,6 @@ public class TF extends DBP implements Serializable {
 
     /**
      * attempts to bind a TF to the DNA
-     *
-     * @param moleculeID the ID of the species of the molecule that binds
-     * @param time       the time
      */
     public int bindMolecule(Cell n, double time, int newPosition) {
         int bound = Constants.NONE;
@@ -874,7 +856,7 @@ public class TF extends DBP implements Serializable {
             n.freeTFmolecules.get(speciesID).remove(n.freeTFmolecules.get(speciesID).size() - 1);
 
             //update propensities
-            n.eventQueue.TFBindingEventQueue.updateProteinBindingPropensities(speciesID, n);
+            n.eventQueue.TFBindingEventQueue.updateProteinBindingPropensities(n);
             // FG: update repression rate
             this.updateRepressionRate(n);
         }
@@ -896,9 +878,6 @@ public class TF extends DBP implements Serializable {
 
     /**
      * attempts to bind a TF to the DNA
-     *
-     * @param moleculeID the ID of the species of the molecule that binds
-     * @param time       the time
      */
     public int bindMolecule(Cell n, double time, int newPosition, int direction) {
         int bound = Constants.NONE;
@@ -940,7 +919,7 @@ public class TF extends DBP implements Serializable {
             n.freeTFmolecules.get(speciesID).remove(n.freeTFmolecules.get(speciesID).size() - 1);
 
             //update propensities
-            n.eventQueue.TFBindingEventQueue.updateProteinBindingPropensities(speciesID, n);
+            n.eventQueue.TFBindingEventQueue.updateProteinBindingPropensities(n);
             // FG: update repression rate and repression propensity
             this.updateRepressionRate(n);
         }

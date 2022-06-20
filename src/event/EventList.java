@@ -1,7 +1,6 @@
 package event;
 
 import java.io.Serializable;
-import java.util.Iterator;
 
 import utils.Constants;
 import utils.Gillespie;
@@ -10,58 +9,46 @@ import environment.Cell;
 /**
  * class that contains the event list
  * @author n.r.zabet@gen.cam.ac.uk
- *
+ * @author fedor.garbuzov@mail.ioffe.ru
  */
 public class EventList  implements Serializable{
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 8623732338279526421L;
-	/**
-	 * 
-	 */
 	public TFBindingEventQueue TFBindingEventQueue;
 	public TFEventQueue TFRandomWalkEventQueue;
 	public TFEventQueue TFRepressionEventQueue;
 
 	
 	public EventList(Cell n){
-		
 
-		TFBindingEventQueue = new TFBindingEventQueueDNAOccupancy(n);
+		TFBindingEventQueue = new TFBindingEventQueue(n);
 		
 		// TF random walk event list 1D diffusion
 		if(n.ip.EVENT_LIST_USES_FR.value){
-			//if(n.ip.EVENT_LIST_SUBGROUP_SIZE.value >=0 && n.ip.EVENT_LIST_SUBGROUP_SIZE.value<n.dbp.length){
-			//	TFRandomWalkEventQueue =  new TFRandomWalkEventQueueFRopt(n);
-			//} else{
+			if(n.ip.EVENT_LIST_SUBGROUP_SIZE.value >=0 && n.ip.EVENT_LIST_SUBGROUP_SIZE.value<n.dbp.length){
+				//TFRandomWalkEventQueue =  new TFRandomWalkEventQueueFRopt(n);
+				n.printDebugInfo("Warning: Optimal First Reaction method is not implemented, " +
+						"switching to simple First Reaction");
+			} //else{
 				TFRandomWalkEventQueue = new TFRandomWalkEventQueueFR(n);
-				TFRepressionEventQueue = new TFRepressionEventQueueFR(n);
+				TFRepressionEventQueue = new TFRepressionEventQueueFR();
 			//}
 		} else{
 			n.printDebugInfo("Warning: Direct Method is not implemented, switching to First Reaction");
 			TFRandomWalkEventQueue = new TFRandomWalkEventQueueFR(n);
-			TFRepressionEventQueue = new TFRepressionEventQueueFR(n);
-			//TFRandomWalkEventQueue =  new TFRandomWalkEventQueueDM(n);
+			TFRepressionEventQueue = new TFRepressionEventQueueFR();
 		}
 	}
 	
-	
-	
 	/**
 	 * returns the next TF binding event and removes it from the list
-	 * @return
 	 */
 	public ProteinEvent popNextTFBindingEvent(){
 		return TFBindingEventQueue.pop();
 	}
 
-	
-	
-	
 	/**
 	 * returns the next TF random walk event and removes it from the list
-	 * @return
 	 */
 	public ProteinEvent popNextTFRandomWalkEvent(){
 		return (ProteinEvent) TFRandomWalkEventQueue.pop();
@@ -69,7 +56,6 @@ public class EventList  implements Serializable{
 
 	/** FG
 	 * returns the next TF repression event and removes it from the list
-	 * @return
 	 */
 	public RepressionEvent popNextTFRepressionEvent(){
 		return (RepressionEvent) TFRepressionEventQueue.pop();
@@ -77,7 +63,6 @@ public class EventList  implements Serializable{
 	
 	/**
 	 * returns a number which encodes whether the next event is TF binding ...?
-	 * @return
 	 */
 	public int getNextEventType(){
 		int result = Constants.NEXT_EVENT_IS_NONE;
@@ -94,7 +79,7 @@ public class EventList  implements Serializable{
 		}
 
 		if(!TFRepressionEventQueue.isEmpty() && nextEventTime > TFRepressionEventQueue.peek().time){
-			nextEventTime = TFRepressionEventQueue.peek().time;
+			//nextEventTime = TFRepressionEventQueue.peek().time;
 			result = Constants.NEXT_EVENT_IS_TF_REPRESSION;
 		}
 				
@@ -103,7 +88,6 @@ public class EventList  implements Serializable{
 	
 	/**
 	 * returns the soonest event
-	 * @return
 	 */
 	public Event getNextEvent(){
 		Event e = null;
@@ -111,9 +95,9 @@ public class EventList  implements Serializable{
 
 		switch(nextEventType){
 			case Constants.NEXT_EVENT_IS_NONE: break; 
-			case Constants.NEXT_EVENT_IS_TF_BINDING: e = this.popNextTFBindingEvent(); break;
+			case Constants.NEXT_EVENT_IS_TF_BINDING: 	 e = this.popNextTFBindingEvent(); break;
 			case Constants.NEXT_EVENT_IS_TF_RANDOM_WALK: e = this.popNextTFRandomWalkEvent(); break;
-			case Constants.NEXT_EVENT_IS_TF_REPRESSION: e = this.popNextTFRepressionEvent(); break;
+			case Constants.NEXT_EVENT_IS_TF_REPRESSION:  e = this.popNextTFRepressionEvent(); break;
 			default: e = null;
 		}
 		
@@ -122,34 +106,24 @@ public class EventList  implements Serializable{
 	
 	/**
 	 * checks whether there is any event left in the entire list
-	 * @return
 	 */
 	public boolean isEmpty(){
-		if((TFBindingEventQueue==null || TFBindingEventQueue.isEmpty())
-				&& (TFRandomWalkEventQueue ==null || TFRandomWalkEventQueue.isEmpty())
-				&& (TFRepressionEventQueue ==null || TFRepressionEventQueue.isEmpty())){
-			return true;
-		}
-		return false;
+		return (TFBindingEventQueue == null || TFBindingEventQueue.isEmpty())
+				&& (TFRandomWalkEventQueue == null || TFRandomWalkEventQueue.isEmpty())
+				&& (TFRepressionEventQueue == null || TFRepressionEventQueue.isEmpty());
 	}
-	
-	
+
 	/**
 	 * computes the total number of events in the lists
-	 * @return
 	 */
 	public int size(){
 		int result=0;
-
-
 		if(TFBindingEventQueue!=null && !TFBindingEventQueue.isEmpty()){
 			result++;
 		}
-		
 		if(TFRandomWalkEventQueue !=null){
 			result+= TFRandomWalkEventQueue.size();
 		}
-			
 		return result;
 	}
 	
@@ -177,7 +151,7 @@ public class EventList  implements Serializable{
 	}
 
 	/**
-	 * schedules the next TF random walk or repression or unrepression event
+	 * schedules the next TF random walk or repression or derepression event
 	 */
 	public void scheduleNextTFOnDNAEvent(Cell n, int moleculeID, double time) {
 		double propensitySum, nextTime;
@@ -216,7 +190,6 @@ public class EventList  implements Serializable{
 		re.scheduleNextEvent = scheduleNextEvent;
 		TFRepressionEventQueue.scheduleNextEvent(n, moleculeID, re);
 	}
-
 
 	/**
 	 * schedules the next TF random walk event

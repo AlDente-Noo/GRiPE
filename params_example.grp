@@ -95,8 +95,8 @@ DNA_SEQUENCE_FILE = "params_example/Kr_sequence.fasta";
 #The btrack file which stores experimentally found regions of open chromatin in the DNA sequence.
 DNA_AVAILABILITY_FILE = "params_example/Kr.btrack";
 
-#unrepression when repressor is unbound
-DNA_UNREPRESSION_RATE = 10.0;
+#derepression when repressor is unbound
+DNA_DEREPRESSION_RATE = 10.0;
 
 #boundary condition of the DNA (absorbing/reflexive/periodic).
 DNA_BOUNDARY_CONDITION = reflexive;
