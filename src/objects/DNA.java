@@ -1463,7 +1463,7 @@ public class DNA  implements Serializable{
 		//the DNA is already occupied
 		if(canSlide==proteinID && checkOccupancy){
 			canSlide=getBoundProtein(position+proteinSize,stepSize);
-			int bpStatus = checkAvailability(position,proteinSize+stepSize);
+			int bpStatus = checkAvailability(position+proteinSize,stepSize);
 			if(canSlide==Constants.NONE && bpStatus==Constants.BP_IS_OPEN){
 				canSlide =  proteinID;
 			} 
@@ -1502,9 +1502,7 @@ public class DNA  implements Serializable{
 		//the DNA is already occupied
 		if(canSlide==proteinID && checkOccupancy){
 			canSlide=getBoundProtein(position-stepSize,stepSize);
-			// FG: chechAvailability from the new position to the end of the protein is aimed at checking not only
-			// whether the new position is not closed or repressed but also whether the protein itself is not repressed
-			int bpStatus = checkAvailability(position-stepSize,proteinSize+stepSize);
+			int bpStatus = checkAvailability(position-stepSize,stepSize);
 			if(canSlide==Constants.NONE && bpStatus==Constants.BP_IS_OPEN){
 				canSlide =  proteinID;
 			}
@@ -1512,7 +1510,7 @@ public class DNA  implements Serializable{
 		
 		//bind the protein
 		if(canSlide==proteinID){
-			occupyDNA(n, proteinID,position-stepSize,stepSize);			
+			occupyDNA(n, proteinID,position-stepSize,stepSize);
 			freeDNA(n, position+proteinSize-stepSize,stepSize);
 			this.recomputeTFAffinityLandscapeOnTFSlideLeft(n, position, proteinSize, stepSize);
 		}

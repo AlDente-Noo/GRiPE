@@ -62,6 +62,8 @@ public class TF extends DBP implements Serializable {
         double previousTimeOfLastPositionChange = this.timeOfLastPositionChange;
         int oldDirection = this.direction;
 
+        assert !isRepressingDNA() || isRepressed(n);
+
         if (pe.nextAction == Constants.EVENT_TF_BINDING) {
             // binding event
             assert this.position == Constants.NONE;
@@ -71,50 +73,50 @@ public class TF extends DBP implements Serializable {
             if (pe.nextAction == Constants.EVENT_TF_RANDOM_WALK_JUMP) {
                 //the TF unbinds
                 unbindMolecule(n, pe.time);
-            } else if (pe.nextAction == Constants.EVENT_TF_RANDOM_WALK_HOP) {
-				assert pe.isHoppingEvent; // FG: seems like if the event is hop then isHoppingEvent is always true
-                // FG: prevent hopping of the repressed molecule
-                if (this.isRepressingDNA() || this.isRepressed(n)) {
-                    if (n.isInDebugMode()) {
-                        n.printDebugInfo(pe.time + ": attempted to hop TF " + this.ID + " of type " +
-								n.TFspecies[speciesID].name + " from position " + position + " to " + pe.position +
-								", but the TF is repressing or repressed");
+            } else {
+                if (this.isRepressed(n)) {
+                    if (!n.TFspecies[speciesID].stallsHoppingIfBlocked) {
+                        if (n.isInDebugMode()) {
+                            n.printDebugInfo(pe.time + ": attempted to move (via sliding or hop) TF " + this.ID + " of type " +
+                                    n.TFspecies[speciesID].name + " from position " + position + " to " + pe.position +
+                                    ", but the TF is repressing or repressed, therefore the TF is released in the cytoplasm.");
+                        }
+                        unbindMolecule(n, pe.time);
+                    } else {
+                        if (n.isInDebugMode()) {
+                            n.printDebugInfo(pe.time + ": attempted to move (via sliding or hop) TF " + this.ID + " of type " +
+                                    n.TFspecies[speciesID].name + " from position " + position + " to " + pe.position +
+                                    ", but the TF is repressing or repressed, the TF is stalled.");
+                        }
                     }
-                } else {
+                } else { if (pe.nextAction == Constants.EVENT_TF_RANDOM_WALK_HOP) {
+                    assert pe.isHoppingEvent; // FG: seems like if the event is hop then isHoppingEvent is always true
+                    // FG: prevent hopping of the repressed molecule
                     if (pe.position < 0 || pe.position > n.dna.strand.length - this.size) {
-						// hop outside of DNA results in unbinding
+                        // hop outside of DNA results in unbinding
                         unbindMolecule(n, pe.time);
                         n.TFspecies[speciesID].countTFHopsOutside++;
                     } else if (Math.abs(pe.position - this.position) > n.TFspecies[speciesID].uncorrelatedDisplacementSize) {
-                    	// too big hop results in unbinding
+                        // too big hop results in unbinding
                         unbindMolecule(n, pe.time);
                         n.TFspecies[speciesID].countTFforcedJumpsEvents++;
                     } else if (pe.position == this.position) {
-						//the TF hops and rebinds at the same position
+                        //the TF hops and rebinds at the same position
                         hopMoleculeSamePos(n, pe.time, this.position);
                     } else {
-                    	//the TF hops and rebinds at a different position
+                        //the TF hops and rebinds at a different position
                         hopMolecule(n, pe.time, pe.position);
                     }
-                }
-            } else if (pe.nextAction == Constants.EVENT_TF_RANDOM_WALK_SLIDE_LEFT) {
-                // FG: prevent sliding of the repressed molecule
-                if (this.isRepressingDNA() || this.isRepressed(n)) {
-                    if (n.isInDebugMode()) {
-                        n.printDebugInfo(pe.time + ": attempted to slide left TF " + this.ID + " of type " +
-								n.TFspecies[speciesID].name + " from position " + position + " to " + pe.position +
-								", but the TF is repressing or repressed");
-                    }
-                } else {
+                } else if (pe.nextAction == Constants.EVENT_TF_RANDOM_WALK_SLIDE_LEFT) {
                     if (n.dna.isAbsorbing && pe.position < 0) {
-                    	// absorbing boundary conditions cause unbinding when DNA end is reached
-						if (n.isInDebugMode()) {
-							n.printDebugInfo(pe.time + " TF " + this.ID + " reached left limit and, due to absorbing " +
-									"boundary condition, it will unbind!");
-						}
+                        // absorbing boundary conditions cause unbinding when DNA end is reached
+                        if (n.isInDebugMode()) {
+                            n.printDebugInfo(pe.time + " TF " + this.ID + " reached left limit and, due to absorbing " +
+                                    "boundary condition, it will unbind!");
+                        }
                         unbindMolecule(n, pe.time);
                     } else if (n.dna.isPeriodic && pe.position < 0) {
-                    	// periodic b.c. cause the movement of the molecule to the opposite end of DNA when a DNA end is reached
+                        // periodic b.c. cause the movement of the molecule to the opposite end of DNA when a DNA end is reached
                         if (n.isInDebugMode()) {
                             n.printDebugInfo(pe.time + " TF " + this.ID + " reached left limit and, due to periodic " +
                                     "boundary condition, it will attempt to bind at the end!");
@@ -122,34 +124,26 @@ public class TF extends DBP implements Serializable {
                         hopMolecule(n, pe.time, n.dna.strand.length - this.size - 1);
                     } else {
                         if (pe.position >= 0) {
-                        	// slide molecule is possible
+                            // slide molecule is possible
                             slideLeftMolecule(n, pe.time, pe.position, pe.isHoppingEvent);
                         } else {
-                        	// reflective b.c. prevent movement of the molecule outside of DNA
+                            // reflective b.c. prevent movement of the molecule outside of DNA
                             if (n.isInDebugMode()) {
                                 n.printDebugInfo(pe.time + ": attempted to slide left TF " + this.ID +
-										" of type " + n.TFspecies[speciesID].name + " from position " + position +
-										", but the left border is reached");
+                                        " of type " + n.TFspecies[speciesID].name + " from position " + position +
+                                        ", but the left border is reached");
                             }
                             resetPosition(pe.time);
                         }
                         if (pe.isHoppingEvent) {
-                        	// sliding event can be invoked by hopping event with small distance (less than slide length)
-							// in that case TF unbinds from DNA and can rebind to another strand
+                            // sliding event can be invoked by hopping event with small distance (less than slide length)
+                            // in that case TF unbinds from DNA and can rebind to another strand
                             this.changeDirection(n);
                         }
                     }
-                }
-            } else if (pe.nextAction == Constants.EVENT_TF_RANDOM_WALK_SLIDE_RIGHT) {
-                // similar to the slide left
-                assert(this.position != Constants.NONE);
-                if (this.isRepressingDNA() || this.isRepressed(n)) {
-                    if (n.isInDebugMode()) {
-                        n.printDebugInfo(pe.time + ": attempted to slide right TF " + this.ID + " of type " +
-								n.TFspecies[speciesID].name + " from position " + position + " to " + pe.position +
-								", but the TF is repressing or repressed");
-                    }
-                } else {
+                } else if (pe.nextAction == Constants.EVENT_TF_RANDOM_WALK_SLIDE_RIGHT) {
+                    // similar to the slide left
+                    assert (this.position != Constants.NONE);
                     if (n.dna.isAbsorbing && pe.position >= (n.dna.strand.length - this.size)) {
                         if (n.isInDebugMode()) {
                             n.printDebugInfo(pe.time + " TF " + this.ID + " reached right limit and, due to absorbing" +
@@ -168,8 +162,8 @@ public class TF extends DBP implements Serializable {
                         } else {
                             if (n.isInDebugMode()) {
                                 n.printDebugInfo(pe.time + ": attempted to slide right TF " + this.ID +
-										" of type " + n.TFspecies[speciesID].name + " from position " + position +
-										", but the right border is reached");
+                                        " of type " + n.TFspecies[speciesID].name + " from position " + position +
+                                        ", but the right border is reached");
                             }
                             resetPosition(pe.time);
                         }
@@ -178,8 +172,11 @@ public class TF extends DBP implements Serializable {
                         }
                     }
                 }
+                }
             }
         }
+
+        assert !isRepressed(n) || position == Constants.NONE;
 
         double timeBound = 0;
         // update bound time
@@ -190,7 +187,7 @@ public class TF extends DBP implements Serializable {
 
         // update target sited statistics
 		// if random walk or binding or unbinding was performed (which could be prevented by repression)
-        if (!this.isRepressed(n) && (!this.isRepressingDNA() || this.position == Constants.NONE)) {
+        //if (!this.isRepressed(n) && (!this.isRepressingDNA() || this.position == Constants.NONE)) {
             if (this.position != Constants.NONE && n.dna.isTargetSite[this.speciesID][this.position][this.direction] != Constants.NONE) {
                 n.updateTargetSiteStatistics(n.dna.isTargetSite[this.speciesID][this.position][this.direction],
                         this.timeOfLastPositionChange, true, timeBound);
@@ -201,7 +198,7 @@ public class TF extends DBP implements Serializable {
                 n.updateTargetSiteStatistics(n.dna.isTargetSite[this.speciesID][this.lastPosition][oldDirection],
                         this.timeOfLastPositionChange, false, timeBound);
             }
-        }
+        //}
     }
 
     /**
@@ -548,7 +545,7 @@ public class TF extends DBP implements Serializable {
             if (bound != Constants.NONE) {
                 n.dna.collisionsCount[newPosition]++;
             }
-            bound = Constants.NONE;
+            //bound = Constants.NONE;
 
             //couldn't slide but there is a chance it will release due to the collision
             if (n.TFspecies[speciesID].collisionUnbindingProbability > 0.0 && n.randomGenerator.nextDouble() < n.TFspecies[speciesID].collisionUnbindingProbability) {
@@ -557,6 +554,19 @@ public class TF extends DBP implements Serializable {
                 this.resetPosition(time);
                 if (isHopEvent) {
                     n.TFspecies[speciesID].countTFHoppingEvents++;
+                }
+            }
+
+            if (!n.TFspecies[speciesID].stallsHoppingIfBlocked) {
+                // FG: attempt to slide in the opposite direction
+                bound = slideLeftMolecule(n, time, position - n.TFspecies[speciesID].stepLeftSize, isHopEvent);
+                // FG: unbind if failed
+                if (bound != ID) {
+                    if (n.isInDebugMode()) {
+                        n.printDebugInfo(time + ": failed to slide (or hop) in both directions, the TF is released.");
+                    }
+                    this.unbindMolecule(n, time);
+                    return bound;
                 }
             }
 
@@ -622,11 +632,7 @@ public class TF extends DBP implements Serializable {
     public int slideLeftMolecule(Cell n, double time, int newPosition, boolean isHopEvent) {
         int bound = Constants.NONE;
 
-        //if(n.isInDebugMode()){
-        //	n.printDebugInfo("attempted to slide left where there is a molecule "+this.leftNeighbour);
-        //}
-
-        if (this.leftNeighbour != Constants.NONE) {
+        if (this.leftNeighbour != Constants.NONE) { // FG: unnecessary check (legacy)
             bound = this.leftNeighbour;
         } else {
             bound = n.dna.slideLeft(n, this.ID, position, size, position - newPosition,
@@ -651,7 +657,7 @@ public class TF extends DBP implements Serializable {
             if (bound != Constants.NONE) {
                 n.dna.collisionsCount[newPosition]++;
             }
-            bound = Constants.NONE;
+            //bound = Constants.NONE;
 
             //couldn't slide but there is a chance it will release due to the collision
             if (n.TFspecies[speciesID].collisionUnbindingProbability > 0.0 && n.randomGenerator.nextDouble() < n.TFspecies[speciesID].collisionUnbindingProbability) {
@@ -660,6 +666,19 @@ public class TF extends DBP implements Serializable {
                 this.resetPosition(time);
                 if (isHopEvent) {
                     n.TFspecies[speciesID].countTFHoppingEvents++;
+                }
+            }
+
+            if (!n.TFspecies[speciesID].stallsHoppingIfBlocked) {
+                // FG: attempt to slide in the opposite direction
+                bound = slideRightMolecule(n, time, position + n.TFspecies[speciesID].stepRightSize, isHopEvent);
+                // FG: unbind if failed
+                if (bound != ID) {
+                    if (n.isInDebugMode()) {
+                        n.printDebugInfo(time + ": failed to slide (or hop) in both directions, the TF is released.");
+                    }
+                    this.unbindMolecule(n, time);
+                    return bound;
                 }
             }
 

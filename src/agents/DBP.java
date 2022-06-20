@@ -132,13 +132,13 @@ public abstract class DBP implements Serializable {
         if (this.position == Constants.NONE) {
             return false;
         }
-        // it is assumed that TF is repressed only if the whole TF is under repression
+        // it is assumed that TF is repressed if at least one of the bps of TF site is under repression
         for (int i = 0; i < this.size; i++) {
-            if (n.dna.closed[this.position + i] != Constants.BP_IS_REPRESSED) {
-                return false;
+            if (n.dna.closed[this.position + i] == Constants.BP_IS_REPRESSED) {
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     public abstract void setPosition(int newPosition, double timeOfLastPositionChange);
