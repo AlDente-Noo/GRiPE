@@ -4,7 +4,7 @@
 STOP_TIME = 1000.0;
 
 #The number of independent replicate simulations to be performed.
-ENSAMBLE_SIZE = 1;
+ENSEMBLE_SIZE = 1;
 
 #The seed of the random number generator. Use 0 to get a different behaviour each time or different number to get the same behaviour.
 RANDOM_SEED = 0;

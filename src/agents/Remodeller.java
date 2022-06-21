@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 /**
  * This class specifies Remodeller which closes or opens chromatin (DNA).
- * Closing and opening of DNA (repression or derepression) is invoked by repressor TFs.
+ * Closing and opening of DNA (repression or derepression) is invoked by repressors (TFs).
  *
  * @author fedor.garbuzov@mail.ioffe.ru
  */
@@ -34,7 +34,7 @@ public class Remodeller implements Serializable {
     /**
      * performs DNA closing (repression) or opening (derepression)
      *
-     * @param n  pointer to the environment
+     * @param n  the environment
      * @param re repression or derepression event
      */
     public void act(Cell n, RepressionEvent re) {
@@ -70,26 +70,6 @@ public class Remodeller implements Serializable {
 
             n.dna.derepress(n, re.boundaryLeft, re.boundaryRight, re.proteinID);
             n.TFspecies[speciesID].countTFDerepressionEvents++;
-
-            // find all repressors in the repressed region and close chromatin in their repression regions
-//            int boundMoleculeID, boundSpeciesID;
-//            int size, boundaryLeft, boundaryRight;
-//            int bpStart = n.dna.updateLeftBoundary(re.boundaryLeft - n.maxRepressionLeftSize - n.maxTFSize);
-//            int bpEnd = n.dna.updateRightBoundary(re.boundaryRight + n.maxRepressionRightOrTFSize);
-//            for (int bpIdx = bpStart; bpIdx <= bpEnd; bpIdx++) {
-//                boundMoleculeID = n.dna.getBoundMolecule(bpIdx);
-//                if (boundMoleculeID != Constants.NONE) {
-//                    size = n.dbp[boundMoleculeID].size;
-//                    if (n.dbp[boundMoleculeID].isRepressingDNA() && boundMoleculeID != re.proteinID) {
-//                        boundSpeciesID = n.dbp[boundMoleculeID].speciesID;
-//                        boundaryLeft = n.dna.updateLeftBoundary(bpIdx - n.TFspecies[boundSpeciesID].repressionLeftSize);
-//                        boundaryRight =
-//                                n.dna.updateRightBoundary(bpIdx + size - 1 + n.TFspecies[boundSpeciesID].repressionRightSize);
-//                        n.dna.repressDNA(n, boundaryLeft, boundaryRight);
-//                    }
-//                    bpIdx += size-1;
-//                }
-//            }
 
             if (n.isInDebugMode()) {
                 n.printDebugInfo(re.time + ": TF " + re.proteinID + " of type " + n.TFspecies[speciesID].name + " " +

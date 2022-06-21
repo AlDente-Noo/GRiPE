@@ -42,7 +42,7 @@ public class TFRepressionEventQueueFR extends TFEventQueue {
     }
 
     public RepressionEvent createNextEvent(Cell n, int moleculeID, double time) {
-        if (n.dbp[moleculeID].getRepressionRate() < Constants.DOUBLE_ZERO) {
+        if (n.dbp[moleculeID].getRepressionEventRate() < Constants.DOUBLE_ZERO) {
             return new RepressionEvent();
         }
         int speciesID = n.dbp[moleculeID].speciesID;
@@ -50,7 +50,7 @@ public class TFRepressionEventQueueFR extends TFEventQueue {
         assert position != Constants.NONE;
         int boundaryLeft  = n.dna.updateLeftBoundary(position - n.TFspecies[speciesID].repressionLeftSize);
         int boundaryRight = n.dna.updateRightBoundary(position + n.TFspecies[speciesID].sizeTotal - 1 + n.TFspecies[speciesID].repressionRightSize);
-        double propensity = n.dbp[moleculeID].getRepressionRate();
+        double propensity = n.dbp[moleculeID].getRepressionEventRate();
         double nextTime = Gillespie.computeNextReactionTime(propensity, n.randomGenerator);
         int nextAction;
         if (n.dbp[moleculeID].isRepressingDNA()) {

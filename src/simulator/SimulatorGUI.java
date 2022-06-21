@@ -498,7 +498,7 @@ public class SimulatorGUI {
 	private void getInputParameters(){
 		//SIMULATION PARAMATERS
 		ip.STOP_TIME.value= simulationParamaters.STOP_TIME.getValue();	
-		ip.ENSEMBLE_SIZE.value= simulationParamaters.ENSAMBLE_SIZE.getValue();	
+		ip.ENSEMBLE_SIZE.value= simulationParamaters.ENSEMBLE_SIZE.getValue();
 		ip.RANDOM_SEED.value= simulationParamaters.RANDOM_SEED.getValue();	
 		ip.COMPUTED_AFFINITY_PRECISION.value= simulationParamaters.COMPUTED_AFFINITY_PRECISION.getValue();	
 		ip.DNA_SECTOR_SIZE.value= simulationParamaters.DNA_SECTOR_SIZE.getValue();	
@@ -589,7 +589,7 @@ public class SimulatorGUI {
 		
 		//SIMULATION PARAMATERS
 		simulationParamaters.STOP_TIME.setValue(ip.STOP_TIME.value);
-		simulationParamaters.ENSAMBLE_SIZE.setValue(ip.ENSEMBLE_SIZE.value);
+		simulationParamaters.ENSEMBLE_SIZE.setValue(ip.ENSEMBLE_SIZE.value);
 		simulationParamaters.RANDOM_SEED.setValue(ip.RANDOM_SEED.value);
 		simulationParamaters.COMPUTED_AFFINITY_PRECISION.setValue(ip.COMPUTED_AFFINITY_PRECISION.value);
 		simulationParamaters.DNA_SECTOR_SIZE.setValue(ip.DNA_SECTOR_SIZE.value);
@@ -807,9 +807,9 @@ public class SimulatorGUI {
 	  * @param elapsedTime
 	  * @param estimatedTime
 	  */
-	 public void updateProgress(int i, double elapsedTime, double estimatedTime, int ensamble){
+	 public void updateProgress(int i, double elapsedTime, double estimatedTime, int ensemble){
 		 
-		 	double value = Utils.roundTwoDecimals((double)(i*GUIconstants.SIMULATION_PROGRESS_MAX)/(this.steps*ensamble));
+		 	double value = Utils.roundTwoDecimals((double)(i*GUIconstants.SIMULATION_PROGRESS_MAX)/(this.steps*ensemble));
 		 
 			simulationsProgress.setString(value+" %");
 		 

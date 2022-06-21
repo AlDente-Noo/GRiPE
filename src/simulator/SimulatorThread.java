@@ -22,7 +22,7 @@ public class SimulatorThread extends Thread{
 	private boolean isPaused;
 	private int index;
 	private String currentFile;
-	private int ensambleSteps;
+	private int ensembleSteps;
 	
 	public SimulatorThread(String currentFile, SimulatorGUI gui, int steps){
 		super();
@@ -52,7 +52,7 @@ public class SimulatorThread extends Thread{
 		time = 0;
 		elapsedTime = 0;
 		estimatedTime = 0;
-		this.ensambleSteps = steps*cell.ip.ENSEMBLE_SIZE.value;
+		this.ensembleSteps = steps*cell.ip.ENSEMBLE_SIZE.value;
 
 		
 	}
@@ -99,23 +99,23 @@ public class SimulatorThread extends Thread{
 
     	
     		if(cell.totalStopTime>0){
-    			int ensamble;
-			while(index<ensambleSteps && cell.cellTime<cell.totalStopTime && cell.ensemble < cell.ip.ENSEMBLE_SIZE.value){
-				ensamble = cell.ensemble;
+    			int ensemble;
+			while(index<ensembleSteps && cell.cellTime<cell.totalStopTime && cell.ensemble < cell.ip.ENSEMBLE_SIZE.value){
+				ensemble = cell.ensemble;
 					time+=timeStep;
 					try {
 						elapsedTime += cell.runInterval(time,elapsedTime);
 					} catch (FileNotFoundException e) {
 						
 					}
-					if(ensamble!=cell.ensemble){
+					if(ensemble!=cell.ensemble){
 						time=0;
 					}
 					estimatedTime = steps*elapsedTime/(index+1) *cell.ip.ENSEMBLE_SIZE.value;
 					index++;
 					gui.updateProgress(index,elapsedTime,estimatedTime, cell.ip.ENSEMBLE_SIZE.value);
 	
-					if(index == ensambleSteps || cell.cellTime>=cell.totalStopTime && cell.ensemble >= cell.ip.ENSEMBLE_SIZE.value){
+					if(index == ensembleSteps || cell.cellTime>=cell.totalStopTime && cell.ensemble >= cell.ip.ENSEMBLE_SIZE.value){
 						gui.finishedSimulations();
 					}
 					

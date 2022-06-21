@@ -22,7 +22,7 @@ public class SimulationParameters extends JPanel{
 	
 	//SIMULATION PARAMATERS
 	public LabelledDouble STOP_TIME;
-	public LabelledInteger ENSAMBLE_SIZE;
+	public LabelledInteger ENSEMBLE_SIZE;
 	public LabelledInteger RANDOM_SEED;
 	public LabelledInteger COMPUTED_AFFINITY_PRECISION;
 	public LabelledInteger DNA_SECTOR_SIZE;
@@ -51,7 +51,7 @@ public class SimulationParameters extends JPanel{
 
 		//simulation params
 		STOP_TIME = new LabelledDouble(ip.STOP_TIME.label,GUIconstants.TEXTAREA_WIDTH,ip.STOP_TIME.description,ip.STOP_TIME.value);	
-		ENSAMBLE_SIZE = new LabelledInteger(ip.ENSEMBLE_SIZE.label,GUIconstants.TEXTAREA_WIDTH,ip.ENSEMBLE_SIZE.description,ip.ENSEMBLE_SIZE.value.intValue());
+		ENSEMBLE_SIZE = new LabelledInteger(ip.ENSEMBLE_SIZE.label,GUIconstants.TEXTAREA_WIDTH,ip.ENSEMBLE_SIZE.description,ip.ENSEMBLE_SIZE.value.intValue());
 		RANDOM_SEED = new LabelledInteger(ip.RANDOM_SEED.label,GUIconstants.TEXTAREA_WIDTH,ip.RANDOM_SEED.description,ip.RANDOM_SEED.value.intValue());
 		COMPUTED_AFFINITY_PRECISION = new LabelledInteger(ip.COMPUTED_AFFINITY_PRECISION.label,GUIconstants.TEXTAREA_WIDTH,ip.COMPUTED_AFFINITY_PRECISION.description,ip.COMPUTED_AFFINITY_PRECISION.value.intValue());
 		DNA_SECTOR_SIZE = new LabelledInteger(ip.DNA_SECTOR_SIZE.label,GUIconstants.TEXTAREA_WIDTH,ip.DNA_SECTOR_SIZE.description,ip.DNA_SECTOR_SIZE.value.intValue());
@@ -64,7 +64,7 @@ public class SimulationParameters extends JPanel{
 		
 		//simulation params
 		componentsStack.add(STOP_TIME);
-		componentsStack.add(ENSAMBLE_SIZE);
+		componentsStack.add(ENSEMBLE_SIZE);
 		componentsStack.add(RANDOM_SEED);
 		componentsStack.add(COMPUTED_AFFINITY_PRECISION);
 		componentsStack.add(DNA_SECTOR_SIZE);
@@ -90,8 +90,8 @@ public class SimulationParameters extends JPanel{
 			max = RANDOM_SEED.getLabelWidth();
 		}
 		
-		if(ENSAMBLE_SIZE.getLabelWidth() > max){
-			max = ENSAMBLE_SIZE.getLabelWidth();
+		if(ENSEMBLE_SIZE.getLabelWidth() > max){
+			max = ENSEMBLE_SIZE.getLabelWidth();
 		}	
 		
 	
@@ -117,7 +117,7 @@ public class SimulationParameters extends JPanel{
 		
 		//SIMULATION PARAMATERS
 		STOP_TIME.setLabelWidth(max);
-		ENSAMBLE_SIZE.setLabelWidth(max);	
+		ENSEMBLE_SIZE.setLabelWidth(max);
 		RANDOM_SEED.setLabelWidth(max);	
 		COMPUTED_AFFINITY_PRECISION.setLabelWidth(max);	
 		DNA_SECTOR_SIZE.setLabelWidth(max);	

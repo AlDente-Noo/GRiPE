@@ -1,19 +1,10 @@
 package objects;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import utils.Constants;
 import utils.Utils;
+
+import java.io.*;
+import java.util.ArrayList;
 
 /**
  * class that contains all the parameters that are read from parameter files
@@ -21,9 +12,7 @@ import utils.Utils;
  *
  */
 public class InputParameters  implements Serializable{
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = -2308322873169482087L;
 
 	public String outputDirectory;
@@ -77,9 +66,8 @@ public class InputParameters  implements Serializable{
 	// TF REPRESSION
 	public Parameter<Integer> TF_REPR_LEN_LEFT;
 	public Parameter<Integer> TF_REPR_LEN_RIGHT;
-	//public Parameter<Double> TF_REPR_PWM_THESH;
 	public Parameter<Double> TF_REPRESSION_RATE;
-	public Parameter<Double> TF_DEREPRESSION_RATE;
+	public Parameter<Double> TF_DEREPRESSION_ATTENUATION_FACTOR;
 
 	//DNA PARAMETERS
 	public Parameter<String> DNA_SEQUENCE_FILE;
@@ -133,18 +121,14 @@ public class InputParameters  implements Serializable{
 			if(!defaultFile.exists()){
 				in = this.getClass().getClassLoader().getResourceAsStream(default_filename);
 				assert in != null;
-				//System.out.println("from resources");
-				//System.out.println(in.available());
 				if(in.available() > 0){
 					is = new InputStreamReader(in);
 					br = new BufferedReader(is);
 					loadInitialInputParameters(br);
 				} else{
-					default_filename = "";
 					default_filename = Constants.DEFAULT_PARAMS_FILE_EMPTY;
 					defaultFile = new File(default_filename);
 					if(!defaultFile.exists()){
-						default_filename = "";
 						System.err.println("system_empty.ini file is missing from the current directory!");
 						System.exit(0);
 					} else{
@@ -161,12 +145,10 @@ public class InputParameters  implements Serializable{
 				loadParameters(br); // load parameters from input file
 			}
 	    } catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
-	
+
 	
 	private void initialiseInputParameters(){
 		//SIMULATION PARAMETERS
@@ -220,7 +202,7 @@ public class InputParameters  implements Serializable{
 		this.TF_REPR_LEN_RIGHT = new Parameter<Integer>("", "", "", "", 0);
 		//this.TF_PWM_REPR_THRESH = new Parameter<>();
 		this.TF_REPRESSION_RATE = new Parameter<Double>("", "", "", "", 0.0);
-		this.TF_DEREPRESSION_RATE = new Parameter<Double>("", "", "", "", 0.0);
+		this.TF_DEREPRESSION_ATTENUATION_FACTOR = new Parameter<Double>("", "", "", "", 0.0);
 		
 		//DNA PARAMETERS
 		this.DNA_SEQUENCE_FILE= new Parameter<String>("", "", "", "", "");
@@ -260,46 +242,42 @@ public class InputParameters  implements Serializable{
 	 * sets the default values for the parameters provided from outside 
 	 */
 	private void loadInitialInputParameters(BufferedReader br){
-		
-		ArrayList<ArrayList<String>> params = getParamArray(br, Constants.PARAMS_FILE_COMMENT_CHAR, Constants.PARAMS_FILE_LINE_ENDING, Constants.PARAMS_FILE_ASSIGNMENT_CHAR);
-		String name = "", label = "", description = "", category = "", value = "";
-		
-		
-		String lastLoadParam = "";
-		for(int i=0; i< params.size();i++){
-			if(params.get(i).get(0).equals("name")){
-				if(!name.isEmpty()){
-					setParameter(name, label, description, category, value);
-					lastLoadParam = name;
-				}
-				name = params.get(i).get(1);
-			} else if(params.get(i).get(0).equals("label")){
-				label = params.get(i).get(1);
-			} else if(params.get(i).get(0).equals("description")){
-				description = params.get(i).get(1);
-			} else if(params.get(i).get(0).equals("category")){
-				category = params.get(i).get(1);
-			} else if(params.get(i).get(0).equals("value")){
-				value = params.get(i).get(1);
-			} 
 
+		ArrayList<ArrayList<String>> params = getParamArray(br, Constants.PARAMS_FILE_COMMENT_CHAR,
+				Constants.PARAMS_FILE_LINE_ENDING, Constants.PARAMS_FILE_ASSIGNMENT_CHAR);
+		String name = "", label = "", description = "", category = "", value = "";
+
+		String lastLoadParam = "";
+		for (ArrayList<String> param : params) {
+			switch (param.get(0)) {
+				case "name" -> {
+					if (!name.isEmpty()) {
+						setParameter(name, label, description, category, value);
+						lastLoadParam = name;
+					}
+					name = param.get(1);
+				}
+				case "label" -> label = param.get(1);
+				case "description" -> description = param.get(1);
+				case "category" -> category = param.get(1);
+				case "value" -> value = param.get(1);
+			}
 		}
 		
 		// load the last one
 		if(!name.isEmpty() && !lastLoadParam.equals(name)){
 			setParameter(name, label, description, category, value);
 		}
-
-		
 	}
 	
 	/**
 	 * loads parameter values from a file
-	 * @param br - filename
+	 * @param br filename
 	 */
 	public void loadParameters(BufferedReader br){
-		
-		ArrayList<ArrayList<String>> params = getParamArray(br, Constants.PARAMS_FILE_COMMENT_CHAR, Constants.PARAMS_FILE_LINE_ENDING, Constants.PARAMS_FILE_ASSIGNMENT_CHAR);
+
+		ArrayList<ArrayList<String>> params = getParamArray(br, Constants.PARAMS_FILE_COMMENT_CHAR,
+				Constants.PARAMS_FILE_LINE_ENDING, Constants.PARAMS_FILE_ASSIGNMENT_CHAR);
 		String name = "", value = "";
 
 		for (ArrayList<String> strings : params) {
@@ -311,29 +289,21 @@ public class InputParameters  implements Serializable{
 
 		}
 	}
-	
-
-	
-
 
 	
 	/**
 	 * copies the parameter file to a new file
-	 * @param parameterFilename
 	 */
 	public File exportParameterFile(String parameterFilename){
 		File result=null;
 		String filename="params_";
 		boolean fileCreated=false;
-		
-		
+
 		File directory;
-		
-		
+
 		directory= new File(".");
 		this.outputDirectory = directory.getPath()+File.separator;
 
-		
 		//if directory doesn't exists then create it.
 		if(!this.OUTPUT_FOLDER.value.trim().isEmpty()){
 			directory = new File(this.OUTPUT_FOLDER.value.trim());
@@ -343,239 +313,223 @@ public class InputParameters  implements Serializable{
 				}
 			}
 			this.outputDirectory = directory.getPath()+File.separator;
-
 		}
-		
-		
-		
-		    try {
-		    	
-		    	if(!parameterFilename.equals("")){
-		    		filename = parameterFilename;
-		    		result = new File(filename);
-		    		fileCreated = true;
-		    	} else if( !this.OUTPUT_FILENAME.value.trim().isEmpty()){
-		    		if(this.OUTPUT_FILENAME.value.endsWith(Constants.PARAMETR_FILE_EXTENSION)){
-		    			filename= this.OUTPUT_FILENAME.value.replaceAll(Constants.PARAMETR_FILE_EXTENSION, "_params_");
-		    		} else{
-		    			filename= this.OUTPUT_FILENAME.value + "_params_";
-		    		}
-		    		//result = new File(this.OUTPUT_FOLDER.value, filename);
-		    		
-		    		if(this.OUTPUT_FOLDER.value.isEmpty()){
-		    			directory = new File(".");
-		    		} else{
-			    	  	directory = new File(this.OUTPUT_FOLDER.value);
-		    		}
+
+		try {
+			if(!parameterFilename.equals("")){
+				filename = parameterFilename;
+				result = new File(filename);
+				fileCreated = true;
+			} else if( !this.OUTPUT_FILENAME.value.trim().isEmpty()){
+				if(this.OUTPUT_FILENAME.value.endsWith(Constants.PARAMETR_FILE_EXTENSION)){
+					filename= this.OUTPUT_FILENAME.value.replaceAll(Constants.PARAMETR_FILE_EXTENSION, "_params_");
+				} else{
+					filename= this.OUTPUT_FILENAME.value + "_params_";
+				}
+
+				if(this.OUTPUT_FOLDER.value.isEmpty()){
+					directory = new File(".");
+				} else{
+					directory = new File(this.OUTPUT_FOLDER.value);
+				}
 				this.outputDirectory = directory.getPath()+File.separator;
 
-		    	  	
-			    	result = File.createTempFile(filename, Constants.PARAMETR_FILE_EXTENSION,directory);
-			    	filename = result.getName();
+				result = File.createTempFile(filename, Constants.PARAMETR_FILE_EXTENSION,directory);
+				filename = result.getName();
 
-					// FG: output id of the files to stdout
-					printOutputFilesParameters(filename, result.getParent());
+				// FG: output id of the files to stdout
+				printOutputFilesParameters(filename, result.getParent());
+
+				fileCreated = true;
+			}
+
+			if(!fileCreated){
+				// Create temporary file.
+				if(this.OUTPUT_FOLDER.value.isEmpty()){
+					directory = new File(".");
+				} else{
+					directory = new File(this.OUTPUT_FOLDER.value);
+				}
+
+				this.outputDirectory = directory.getPath()+File.separator;
+
+				result = File.createTempFile(filename, Constants.PARAMETR_FILE_EXTENSION,directory);
+				filename = result.getName();
+
+				// FG: output id of the files to stdout
+				printOutputFilesParameters(filename, result.getParent());
+			}
+
+			// Write to temp file
+			BufferedWriter out = new BufferedWriter(new FileWriter(result));
 
 
-		    		fileCreated = true;
-		    		
-		    		/*if(result.exists()){
-		    			fileCreated=false;
-		    			filename = this.OUTPUT_FILENAME.value + "_params_";
-		    		}*/
-		    	}
-		    	
-		    	if(!fileCreated){
-		    		  // Create temporary file.
-		    		if(this.OUTPUT_FOLDER.value.isEmpty()){
-		    			directory = new File(".");
-		    		} else{
-			    	  	directory = new File(this.OUTPUT_FOLDER.value);
-		    		}
-				
-		    		this.outputDirectory = directory.getPath()+File.separator;
+			//SIMULATION PARAMETERS
+			out.write("#SIMULATION PARAMETERS\n\n");
+			out.write("#"+this.STOP_TIME.description+"\n");
+			out.write("STOP_TIME = "+this.STOP_TIME.value+";\n\n");
+			out.write("#"+this.ENSEMBLE_SIZE.description+"\n");
+			out.write("ENSEMBLE_SIZE = "+this.ENSEMBLE_SIZE.value+";\n\n");
+			out.write("#"+this.RANDOM_SEED.description+"\n");
+			out.write("RANDOM_SEED = "+this.RANDOM_SEED.value+";\n\n");
+			out.write("#"+this.OUTPUT_FOLDER.description+"\n");
+			out.write("#"+this.COMPUTED_AFFINITY_PRECISION.description+"\n");
+			out.write("COMPUTED_AFFINITY_PRECISION = "+this.COMPUTED_AFFINITY_PRECISION.value+";\n\n");
+			out.write("#"+this.DNA_SECTOR_SIZE.description+"\n");
+			out.write("DNA_SECTOR_SIZE = "+this.DNA_SECTOR_SIZE.value+";\n\n");
+			out.write("#"+this.EVENT_LIST_SUBGROUP_SIZE.description+"\n");
+			out.write("EVENT_LIST_SUBGROUP_SIZE = "+this.EVENT_LIST_SUBGROUP_SIZE.value+";\n\n");
+			out.write("#"+this.EVENT_LIST_USES_FR.description+"\n");
+			out.write("EVENT_LIST_USES_FR = "+this.EVENT_LIST_USES_FR.value+";\n\n");
 
-		    		result = File.createTempFile(filename, Constants.PARAMETR_FILE_EXTENSION,directory);
-			    	filename = result.getName();
+			//SIMULATION-OUTPUT PARAMETERS
+			out.write("OUTPUT_FOLDER = \""+this.OUTPUT_FOLDER.value+"\";\n\n");
+			out.write("#"+this.OUTPUT_FILENAME.description+"\n");
+			out.write("OUTPUT_FILENAME = \""+this.OUTPUT_FILENAME.value+"\";\n\n");
 
-					// FG: output id of the files to stdout
-					printOutputFilesParameters(filename, result.getParent());
-		    	}
+			out.write("#"+this.PRINT_INTERMEDIARY_RESULTS_AFTER.description+"\n");
+			out.write("PRINT_INTERMEDIARY_RESULTS_AFTER = \""+this.PRINT_INTERMEDIARY_RESULTS_AFTER.value+"\";\n\n");
+			out.write("#"+this.PRINT_FINAL_OCCUPANCY.description+"\n");
+			out.write("PRINT_FINAL_OCCUPANCY = \""+this.PRINT_FINAL_OCCUPANCY.value+"\";\n\n");
+			out.write("#"+this.DEBUG_MODE.description+"\n");
+			out.write("DEBUG_MODE = "+this.DEBUG_MODE.value+";\n\n");
+			out.write("#"+this.OUTPUT_TF.description+"\n");
+			out.write("OUTPUT_TF = \""+this.OUTPUT_TF.value+"\";\n\n");
+			out.write("#"+this.OUTPUT_TF_POINTS.description+"\n");
+			out.write("OUTPUT_TF_POINTS = "+this.OUTPUT_TF_POINTS.value+";\n\n");
+			out.write("#"+this.FOLLOW_TS.description+"\n");
+			out.write("FOLLOW_TS = "+this.FOLLOW_TS.value+";\n\n");
+			out.write("#"+this.OUTPUT_AFFINITY_LANDSCAPE.description+"\n");
+			out.write("OUTPUT_AFFINITY_LANDSCAPE = "+this.OUTPUT_AFFINITY_LANDSCAPE.value+";\n\n");
+			out.write("#"+this.OUTPUT_BINDING_ENERGY.description+"\n");
+			out.write("OUTPUT_BINDING_ENERGY = "+this.OUTPUT_BINDING_ENERGY.value+";\n\n");
+			out.write("#"+this.OUTPUT_DNA_OCCUPANCY.description+"\n");
+			out.write("OUTPUT_DNA_OCCUPANCY = "+this.OUTPUT_DNA_OCCUPANCY.value+";\n\n");
+			out.write("#"+this.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.description+"\n");
+			out.write("DNA_OCCUPANCY_FULL_MOLECULE_SIZE = "+this.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.value+";\n\n");
+			out.write("#"+this.OUTPUT_SLIDING_LENGTHS.description+"\n");
+			out.write("OUTPUT_SLIDING_LENGTHS = "+this.OUTPUT_SLIDING_LENGTHS.value+";\n\n");
+			out.write("#"+this.WIG_STEP.description+"\n");
+			out.write("WIG_STEP = "+this.WIG_STEP.value+";\n\n");
+			out.write("#"+this.WIG_THRESHOLD.description+"\n");
+			out.write("WIG_THRESHOLD = "+this.WIG_THRESHOLD.value+";\n\n");
 
-		    		// Write to temp file
-		        BufferedWriter out = new BufferedWriter(new FileWriter(result));
+			//TF PARAMETERS
+			out.write("\n#TF PARAMETERS\n\n");
+			out.write("#"+this.TF_FILE.description+"\n");
+			out.write("TF_FILE = \""+this.TF_FILE.value+"\";\n\n");
+			out.write("#"+this.TF_COOPERATIVITY_FILE.description+"\n");
+			out.write("TF_COOPERATIVITY_FILE = \""+this.TF_COOPERATIVITY_FILE.value+"\";\n\n");
+			out.write("#"+this.TS_FILE.description+"\n");
+			out.write("TS_FILE = \""+this.TS_FILE.value+"\";\n\n");
 
-		        
-				//SIMULATION PARAMETERS
-				out.write("#SIMULATION PARAMETERS\n\n");
-				out.write("#"+this.STOP_TIME.description+"\n");
-				out.write("STOP_TIME = "+this.STOP_TIME.value+";\n\n");
-				out.write("#"+this.ENSEMBLE_SIZE.description+"\n");
-				out.write("ENSAMBLE_SIZE = "+this.ENSEMBLE_SIZE.value+";\n\n");
-				out.write("#"+this.RANDOM_SEED.description+"\n");
-				out.write("RANDOM_SEED = "+this.RANDOM_SEED.value+";\n\n");
-				out.write("#"+this.OUTPUT_FOLDER.description+"\n");
-				out.write("#"+this.COMPUTED_AFFINITY_PRECISION.description+"\n");
-				out.write("COMPUTED_AFFINITY_PRECISION = "+this.COMPUTED_AFFINITY_PRECISION.value+";\n\n");
-				out.write("#"+this.DNA_SECTOR_SIZE.description+"\n");
-				out.write("DNA_SECTOR_SIZE = "+this.DNA_SECTOR_SIZE.value+";\n\n");
-				out.write("#"+this.EVENT_LIST_SUBGROUP_SIZE.description+"\n");
-				out.write("EVENT_LIST_SUBGROUP_SIZE = "+this.EVENT_LIST_SUBGROUP_SIZE.value+";\n\n");
-				out.write("#"+this.EVENT_LIST_USES_FR.description+"\n");
-				out.write("EVENT_LIST_USES_FR = "+this.EVENT_LIST_USES_FR.value+";\n\n");
+			//TF_RANDOM PARAMETERS
+			out.write("\n#TF_RANDOM PARAMETERS\n\n");
+			out.write("#"+this.TF_DBD_LENGTH_MIN.description+"\n");
+			out.write("TF_DBD_LENGTH_MIN = "+this.TF_DBD_LENGTH_MIN.value+";\n\n");
+			out.write("#"+this.TF_DBD_LENGTH_MAX.description+"\n");
+			out.write("TF_DBD_LENGTH_MAX = "+this.TF_DBD_LENGTH_MAX.value+";\n\n");
+			out.write("#"+this.TF_SPECIES_COUNT.description+"\n");
+			out.write("TF_SPECIES_COUNT = "+this.TF_SPECIES_COUNT.value+";\n\n");
+			out.write("#"+this.TF_COPY_NUMBER_MIN.description+"\n");
+			out.write("TF_COPY_NUMBER_MIN = "+this.TF_COPY_NUMBER_MIN.value+";\n\n");
+			out.write("#"+this.TF_COPY_NUMBER_MAX.description+"\n");
+			out.write("TF_COPY_NUMBER_MAX = "+this.TF_COPY_NUMBER_MAX.value+";\n\n");
+			out.write("#"+this.TF_ES.description+"\n");
+			out.write("TF_ES = "+this.TF_ES.value+";\n\n");
+			out.write("#"+this.TF_SIZE_LEFT.description+"\n");
+			out.write("TF_SIZE_LEFT = "+this.TF_SIZE_LEFT.value+";\n\n");
+			out.write("#"+this.TF_SIZE_RIGHT.description+"\n");
+			out.write("TF_SIZE_RIGHT = "+this.TF_SIZE_RIGHT.value+";\n\n");
+			out.write("#"+this.TF_ASSOC_RATE.description+"\n");
+			out.write("TF_ASSOC_RATE = "+this.TF_ASSOC_RATE.value+";\n\n");
+			out.write("#"+this.TF_READ_IN_BOTH_DIRECTIONS.description+"\n");
+			out.write("TF_READ_IN_BOTH_DIRECTIONS = "+this.TF_READ_IN_BOTH_DIRECTIONS.value+";\n\n");
+			out.write("#"+this.TF_PREBOUND_PROPORTION.description+"\n");
+			out.write("TF_PREBOUND_PROPORTION = "+this.TF_PREBOUND_PROPORTION.value+";\n\n");
+			out.write("#"+this.TF_PREBOUND_TO_HIGHEST_AFFINITY.description+"\n");
+			out.write("TF_PREBOUND_TO_HIGHEST_AFFINITY = "+this.TF_PREBOUND_TO_HIGHEST_AFFINITY.value+";\n\n");
+			out.write("#"+this.SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE.description+"\n");
+			out.write("SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE = "+this.SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE.value+";\n\n");
+			//TF REPRESSION PARAMETERS
+			out.write("\n#TF_REPRESSION PARAMETERS\n\n");
+			out.write("#"+this.TF_REPRESSION_RATE.description+"\n");
+			out.write("TF_REPRESSION_RATE = "+this.TF_REPRESSION_RATE.value+";\n\n");
+			out.write("#"+this.TF_REPR_LEN_LEFT.description+"\n");
+			out.write("TF_REPR_LEN_LEFT = "+this.TF_REPR_LEN_LEFT.value+";\n\n");
+			out.write("#"+this.TF_REPR_LEN_RIGHT.description+"\n");
+			out.write("TF_REPR_LEN_RIGHT = "+this.TF_REPR_LEN_RIGHT.value+";\n\n");
 
-				//SIMULATION-OUTPUT PARAMETERS
-				out.write("OUTPUT_FOLDER = \""+this.OUTPUT_FOLDER.value+"\";\n\n");
-				out.write("#"+this.OUTPUT_FILENAME.description+"\n");
-				out.write("OUTPUT_FILENAME = \""+this.OUTPUT_FILENAME.value+"\";\n\n");
+			//DNA PARAMETERS
+			out.write("\n#DNA PARAMETERS\n\n");
+			out.write("#"+this.DNA_SEQUENCE_FILE.description+"\n");
+			out.write("DNA_SEQUENCE_FILE = \""+this.DNA_SEQUENCE_FILE.value+"\";\n\n");
+			out.write("#"+this.DNA_AVAILABILITY_FILE.description+"\n");
+			out.write("DNA_AVAILABILITY_FILE = \""+this.DNA_AVAILABILITY_FILE.value+"\";\n\n");
+			out.write("#"+this.DNA_DEREPRESSION_RATE.description+"\n");
+			out.write("DNA_DEREPRESSION_RATE = "+this.DNA_DEREPRESSION_RATE.value+";\n\n");
 
-				out.write("#"+this.PRINT_INTERMEDIARY_RESULTS_AFTER.description+"\n");
-				out.write("PRINT_INTERMEDIARY_RESULTS_AFTER = \""+this.PRINT_INTERMEDIARY_RESULTS_AFTER.value+"\";\n\n");
-				out.write("#"+this.PRINT_FINAL_OCCUPANCY.description+"\n");
-				out.write("PRINT_FINAL_OCCUPANCY = \""+this.PRINT_FINAL_OCCUPANCY.value+"\";\n\n");
-				out.write("#"+this.DEBUG_MODE.description+"\n");
-				out.write("DEBUG_MODE = "+this.DEBUG_MODE.value+";\n\n");
-				out.write("#"+this.OUTPUT_TF.description+"\n");
-				out.write("OUTPUT_TF = \""+this.OUTPUT_TF.value+"\";\n\n");
-				out.write("#"+this.OUTPUT_TF_POINTS.description+"\n");
-				out.write("OUTPUT_TF_POINTS = "+this.OUTPUT_TF_POINTS.value+";\n\n");
-				out.write("#"+this.FOLLOW_TS.description+"\n");
-				out.write("FOLLOW_TS = "+this.FOLLOW_TS.value+";\n\n");
-				out.write("#"+this.OUTPUT_AFFINITY_LANDSCAPE.description+"\n");
-				out.write("OUTPUT_AFFINITY_LANDSCAPE = "+this.OUTPUT_AFFINITY_LANDSCAPE.value+";\n\n");
-				out.write("#"+this.OUTPUT_BINDING_ENERGY.description+"\n");
-				out.write("OUTPUT_BINDING_ENERGY = "+this.OUTPUT_BINDING_ENERGY.value+";\n\n");
-				out.write("#"+this.OUTPUT_DNA_OCCUPANCY.description+"\n");
-				out.write("OUTPUT_DNA_OCCUPANCY = "+this.OUTPUT_DNA_OCCUPANCY.value+";\n\n");
-				out.write("#"+this.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.description+"\n");
-				out.write("DNA_OCCUPANCY_FULL_MOLECULE_SIZE = "+this.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.value+";\n\n");
-				out.write("#"+this.OUTPUT_SLIDING_LENGTHS.description+"\n");
-				out.write("OUTPUT_SLIDING_LENGTHS = "+this.OUTPUT_SLIDING_LENGTHS.value+";\n\n");
-				out.write("#"+this.WIG_STEP.description+"\n");
-				out.write("WIG_STEP = "+this.WIG_STEP.value+";\n\n");
-				out.write("#"+this.WIG_THRESHOLD.description+"\n");
-				out.write("WIG_THRESHOLD = "+this.WIG_THRESHOLD.value+";\n\n");
+			//DNA_RANDOM PARAMETERS
+			out.write("\n#DNA_RANDOM PARAMETERS\n\n");
+			out.write("#"+this.DNA_LENGTH.description+"\n");
+			out.write("DNA_LENGTH = "+this.DNA_LENGTH.value+";\n\n");
+			out.write("#"+this.DNA_PROPORTION_OF_A.description+"\n");
+			out.write("DNA_PROPORTION_OF_A = "+this.DNA_PROPORTION_OF_A.value+";\n\n");
+			out.write("#"+this.DNA_PROPORTION_OF_T.description+"\n");
+			out.write("DNA_PROPORTION_OF_T = "+this.DNA_PROPORTION_OF_T.value+";\n\n");
+			out.write("#"+this.DNA_PROPORTION_OF_C.description+"\n");
+			out.write("DNA_PROPORTION_OF_C = "+this.DNA_PROPORTION_OF_C.value+";\n\n");
+			out.write("#"+this.DNA_PROPORTION_OF_G.description+"\n");
+			out.write("DNA_PROPORTION_OF_G = "+this.DNA_PROPORTION_OF_G.value+";\n\n");
+			out.write("#"+this.DNA_BOUNDARY_CONDITION.description+"\n");
+			out.write("DNA_BOUNDARY_CONDITION = "+this.DNA_BOUNDARY_CONDITION.value+";\n\n");
 
-				//TF PARAMETERS
-				out.write("\n#TF PARAMETERS\n\n");
-				out.write("#"+this.TF_FILE.description+"\n");
-				out.write("TF_FILE = \""+this.TF_FILE.value+"\";\n\n");
-				out.write("#"+this.TF_COOPERATIVITY_FILE.description+"\n");
-				out.write("TF_COOPERATIVITY_FILE = \""+this.TF_COOPERATIVITY_FILE.value+"\";\n\n");
-				out.write("#"+this.TS_FILE.description+"\n");
-				out.write("TS_FILE = \""+this.TS_FILE.value+"\";\n\n");
+			//TF RANDOM WALK PARAMETERS
+			out.write("\n#TF_RANDOM_WALK PARAMETERS\n\n");
+			out.write("#"+this.TF_IS_IMMOBILE.description+"\n");
+			out.write("TF_IS_IMMOBILE = "+this.TF_IS_IMMOBILE.value+";\n\n");
+			out.write("#"+this.TF_UNBINDING_PROBABILITY.description+"\n");
+			out.write("TF_UNBINDING_PROBABILITY = "+this.TF_UNBINDING_PROBABILITY.value+";\n\n");
+			out.write("#"+this.TF_SLIDE_LEFT_PROBABILITY.description+"\n");
+			out.write("TF_SLIDE_LEFT_PROBABILITY = "+this.TF_SLIDE_LEFT_PROBABILITY.value+";\n\n");
+			out.write("#"+this.TF_SLIDE_RIGHT_PROBABILITY.description+"\n");
+			out.write("TF_SLIDE_RIGHT_PROBABILITY = "+this.TF_SLIDE_RIGHT_PROBABILITY.value+";\n\n");
+			out.write("#"+this.TF_JUMPING_PROBABILITY.description+"\n");
+			out.write("TF_JUMPING_PROBABILITY = "+this.TF_JUMPING_PROBABILITY.value+";\n\n");
+			out.write("#"+this.TF_HOP_STD_DISPLACEMENT.description+"\n");
+			out.write("TF_HOP_STD_DISPLACEMENT = "+this.TF_HOP_STD_DISPLACEMENT.value+";\n\n");
+			out.write("#"+this.TF_SPECIFIC_WAITING_TIME.description+"\n");
+			out.write("TF_SPECIFIC_WAITING_TIME = "+this.TF_SPECIFIC_WAITING_TIME.value+";\n\n");
+			out.write("#"+this.TF_STEP_LEFT_SIZE.description+"\n");
+			out.write("TF_STEP_LEFT_SIZE = "+this.TF_STEP_LEFT_SIZE.value+";\n\n");
+			out.write("#"+this.TF_STEP_RIGHT_SIZE.description+"\n");
+			out.write("TF_STEP_RIGHT_SIZE = "+this.TF_STEP_RIGHT_SIZE.value+";\n\n");
+			out.write("#"+this.TF_UNCORRELATED_DISPLACEMENT_SIZE.description+"\n");
+			out.write("TF_UNCORRELATED_DISPLACEMENT_SIZE = "+this.TF_UNCORRELATED_DISPLACEMENT_SIZE.value+";\n\n");
+			out.write("#"+this.TF_STALLS_IF_BLOCKED.description+"\n");
+			out.write("TF_STALLS_IF_BLOCKED = "+this.TF_STALLS_IF_BLOCKED.value+";\n\n");
+			out.write("#"+this.TF_COLLISION_UNBIND_PROBABILITY.description+"\n");
+			out.write("TF_COLLISION_UNBIND_PROBABILITY = "+this.TF_COLLISION_UNBIND_PROBABILITY.value+";\n\n");
+			out.write("#"+this.TF_AFFINITY_LANDSCAPE_ROUGHNESS.description+"\n");
+			out.write("TF_AFFINITY_LANDSCAPE_ROUGHNESS = "+this.TF_AFFINITY_LANDSCAPE_ROUGHNESS.value+";\n\n");
+			out.write("#"+this.CHECK_OCCUPANCY_ON_BINDING.description+"\n");
+			out.write("CHECK_OCCUPANCY_ON_BINDING = "+this.CHECK_OCCUPANCY_ON_BINDING.value+";\n\n");
+			out.write("#"+this.CHECK_OCCUPANCY_ON_SLIDING.description+"\n");
+			out.write("CHECK_OCCUPANCY_ON_SLIDING = "+this.CHECK_OCCUPANCY_ON_SLIDING.value+";\n\n");
+			out.write("#"+this.CHECK_OCCUPANCY_ON_REBINDING.description+"\n");
+			out.write("CHECK_OCCUPANCY_ON_REBINDING = "+this.CHECK_OCCUPANCY_ON_REBINDING.value+";\n\n");
+			out.write("#"+this.IS_BIASED_RANDOM_WALK.description+"\n");
+			out.write("IS_BIASED_RANDOM_WALK = "+this.IS_BIASED_RANDOM_WALK.value+";\n\n");
+			out.write("#"+this.IS_TWO_STATE_RANDOM_WALK.description+"\n");
+			out.write("IS_TWO_STATE_RANDOM_WALK = "+this.IS_TWO_STATE_RANDOM_WALK.value+";\n\n");
 
-				//TF_RANDOM PARAMETERS
-				out.write("\n#TF_RANDOM PARAMETERS\n\n");
-				out.write("#"+this.TF_DBD_LENGTH_MIN.description+"\n");
-				out.write("TF_DBD_LENGTH_MIN = "+this.TF_DBD_LENGTH_MIN.value+";\n\n");
-				out.write("#"+this.TF_DBD_LENGTH_MAX.description+"\n");
-				out.write("TF_DBD_LENGTH_MAX = "+this.TF_DBD_LENGTH_MAX.value+";\n\n");
-				out.write("#"+this.TF_SPECIES_COUNT.description+"\n");
-				out.write("TF_SPECIES_COUNT = "+this.TF_SPECIES_COUNT.value+";\n\n");
-				out.write("#"+this.TF_COPY_NUMBER_MIN.description+"\n");
-				out.write("TF_COPY_NUMBER_MIN = "+this.TF_COPY_NUMBER_MIN.value+";\n\n");
-				out.write("#"+this.TF_COPY_NUMBER_MAX.description+"\n");
-				out.write("TF_COPY_NUMBER_MAX = "+this.TF_COPY_NUMBER_MAX.value+";\n\n");
-				out.write("#"+this.TF_ES.description+"\n");
-				out.write("TF_ES = "+this.TF_ES.value+";\n\n");
-				out.write("#"+this.TF_SIZE_LEFT.description+"\n");
-				out.write("TF_SIZE_LEFT = "+this.TF_SIZE_LEFT.value+";\n\n");
-				out.write("#"+this.TF_SIZE_RIGHT.description+"\n");
-				out.write("TF_SIZE_RIGHT = "+this.TF_SIZE_RIGHT.value+";\n\n");
-				out.write("#"+this.TF_ASSOC_RATE.description+"\n");
-				out.write("TF_ASSOC_RATE = "+this.TF_ASSOC_RATE.value+";\n\n");
-				out.write("#"+this.TF_READ_IN_BOTH_DIRECTIONS.description+"\n");
-				out.write("TF_READ_IN_BOTH_DIRECTIONS = "+this.TF_READ_IN_BOTH_DIRECTIONS.value+";\n\n");
-				out.write("#"+this.TF_PREBOUND_PROPORTION.description+"\n");
-				out.write("TF_PREBOUND_PROPORTION = "+this.TF_PREBOUND_PROPORTION.value+";\n\n");
-				out.write("#"+this.TF_PREBOUND_TO_HIGHEST_AFFINITY.description+"\n");
-				out.write("TF_PREBOUND_TO_HIGHEST_AFFINITY = "+this.TF_PREBOUND_TO_HIGHEST_AFFINITY.value+";\n\n");
-				out.write("#"+this.SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE.description+"\n");
-				out.write("SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE = "+this.SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE.value+";\n\n");
-				//TF REPRESSION PARAMETERS
-				out.write("\n#TF_REPRESSION PARAMETERS\n\n");
-				out.write("#"+this.TF_REPRESSION_RATE.description+"\n");
-				out.write("TF_REPRESSION_RATE = "+this.TF_REPRESSION_RATE.value+";\n\n");
-				out.write("#"+this.TF_REPR_LEN_LEFT.description+"\n");
-				out.write("TF_REPR_LEN_LEFT = "+this.TF_REPR_LEN_LEFT.value+";\n\n");
-				out.write("#"+this.TF_REPR_LEN_RIGHT.description+"\n");
-				out.write("TF_REPR_LEN_RIGHT = "+this.TF_REPR_LEN_RIGHT.value+";\n\n");
-				//out.write("#"+this.PWM_REP_THRESHOLD.description+"\n");
-				//out.write("PWM_REP_THRESHOLD = "+this.PWM_REP_THRESHOLD.value+";\n\n");
+			out.close();
 
-				//DNA PARAMETERS
-				out.write("\n#DNA PARAMETERS\n\n");
-				out.write("#"+this.DNA_SEQUENCE_FILE.description+"\n");
-				out.write("DNA_SEQUENCE_FILE = \""+this.DNA_SEQUENCE_FILE.value+"\";\n\n");
-				out.write("#"+this.DNA_AVAILABILITY_FILE.description+"\n");
-				out.write("DNA_AVAILABILITY_FILE = \""+this.DNA_AVAILABILITY_FILE.value+"\";\n\n");
-				out.write("#"+this.DNA_DEREPRESSION_RATE.description+"\n");
-				out.write("DNA_DEREPRESSION_RATE = "+this.DNA_DEREPRESSION_RATE.value+";\n\n");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-				//DNA_RANDOM PARAMETERS
-				out.write("\n#DNA_RANDOM PARAMETERS\n\n");
-				out.write("#"+this.DNA_LENGTH.description+"\n");
-				out.write("DNA_LENGTH = "+this.DNA_LENGTH.value+";\n\n");
-				out.write("#"+this.DNA_PROPORTION_OF_A.description+"\n");
-				out.write("DNA_PROPORTION_OF_A = "+this.DNA_PROPORTION_OF_A.value+";\n\n");
-				out.write("#"+this.DNA_PROPORTION_OF_T.description+"\n");
-				out.write("DNA_PROPORTION_OF_T = "+this.DNA_PROPORTION_OF_T.value+";\n\n");
-				out.write("#"+this.DNA_PROPORTION_OF_C.description+"\n");
-				out.write("DNA_PROPORTION_OF_C = "+this.DNA_PROPORTION_OF_C.value+";\n\n");
-				out.write("#"+this.DNA_PROPORTION_OF_G.description+"\n");
-				out.write("DNA_PROPORTION_OF_G = "+this.DNA_PROPORTION_OF_G.value+";\n\n");
-				out.write("#"+this.DNA_BOUNDARY_CONDITION.description+"\n");
-				out.write("DNA_BOUNDARY_CONDITION = "+this.DNA_BOUNDARY_CONDITION.value+";\n\n");
-
-				//TF RANDOM WALK PARAMETERS
-				out.write("\n#TF_RANDOM_WALK PARAMETERS\n\n");
-				out.write("#"+this.TF_IS_IMMOBILE.description+"\n");
-				out.write("TF_IS_IMMOBILE = "+this.TF_IS_IMMOBILE.value+";\n\n");
-				out.write("#"+this.TF_UNBINDING_PROBABILITY.description+"\n");
-				out.write("TF_UNBINDING_PROBABILITY = "+this.TF_UNBINDING_PROBABILITY.value+";\n\n");
-				out.write("#"+this.TF_SLIDE_LEFT_PROBABILITY.description+"\n");
-				out.write("TF_SLIDE_LEFT_PROBABILITY = "+this.TF_SLIDE_LEFT_PROBABILITY.value+";\n\n");
-				out.write("#"+this.TF_SLIDE_RIGHT_PROBABILITY.description+"\n");
-				out.write("TF_SLIDE_RIGHT_PROBABILITY = "+this.TF_SLIDE_RIGHT_PROBABILITY.value+";\n\n");
-				out.write("#"+this.TF_JUMPING_PROBABILITY.description+"\n");
-				out.write("TF_JUMPING_PROBABILITY = "+this.TF_JUMPING_PROBABILITY.value+";\n\n");
-				out.write("#"+this.TF_HOP_STD_DISPLACEMENT.description+"\n");
-				out.write("TF_HOP_STD_DISPLACEMENT = "+this.TF_HOP_STD_DISPLACEMENT.value+";\n\n");
-				out.write("#"+this.TF_SPECIFIC_WAITING_TIME.description+"\n");
-				out.write("TF_SPECIFIC_WAITING_TIME = "+this.TF_SPECIFIC_WAITING_TIME.value+";\n\n");
-				out.write("#"+this.TF_STEP_LEFT_SIZE.description+"\n");
-				out.write("TF_STEP_LEFT_SIZE = "+this.TF_STEP_LEFT_SIZE.value+";\n\n");
-				out.write("#"+this.TF_STEP_RIGHT_SIZE.description+"\n");
-				out.write("TF_STEP_RIGHT_SIZE = "+this.TF_STEP_RIGHT_SIZE.value+";\n\n");
-				out.write("#"+this.TF_UNCORRELATED_DISPLACEMENT_SIZE.description+"\n");
-				out.write("TF_UNCORRELATED_DISPLACEMENT_SIZE = "+this.TF_UNCORRELATED_DISPLACEMENT_SIZE.value+";\n\n");
-				out.write("#"+this.TF_STALLS_IF_BLOCKED.description+"\n");
-				out.write("TF_STALLS_IF_BLOCKED = "+this.TF_STALLS_IF_BLOCKED.value+";\n\n");
-				out.write("#"+this.TF_COLLISION_UNBIND_PROBABILITY.description+"\n");
-				out.write("TF_COLLISION_UNBIND_PROBABILITY = "+this.TF_COLLISION_UNBIND_PROBABILITY.value+";\n\n");
-				out.write("#"+this.TF_AFFINITY_LANDSCAPE_ROUGHNESS.description+"\n");
-				out.write("TF_AFFINITY_LANDSCAPE_ROUGHNESS = "+this.TF_AFFINITY_LANDSCAPE_ROUGHNESS.value+";\n\n");
-				out.write("#"+this.CHECK_OCCUPANCY_ON_BINDING.description+"\n");
-				out.write("CHECK_OCCUPANCY_ON_BINDING = "+this.CHECK_OCCUPANCY_ON_BINDING.value+";\n\n");
-				out.write("#"+this.CHECK_OCCUPANCY_ON_SLIDING.description+"\n");
-				out.write("CHECK_OCCUPANCY_ON_SLIDING = "+this.CHECK_OCCUPANCY_ON_SLIDING.value+";\n\n");
-				out.write("#"+this.CHECK_OCCUPANCY_ON_REBINDING.description+"\n");
-				out.write("CHECK_OCCUPANCY_ON_REBINDING = "+this.CHECK_OCCUPANCY_ON_REBINDING.value+";\n\n");
-				out.write("#"+this.IS_BIASED_RANDOM_WALK.description+"\n");
-				out.write("IS_BIASED_RANDOM_WALK = "+this.IS_BIASED_RANDOM_WALK.value+";\n\n");
-				out.write("#"+this.IS_TWO_STATE_RANDOM_WALK.description+"\n");
-				out.write("IS_TWO_STATE_RANDOM_WALK = "+this.IS_TWO_STATE_RANDOM_WALK.value+";\n\n");
-
-				out.close();
-
-		    } catch (IOException e) {
-		    	e.printStackTrace();
-		    }
-		    
-
-		    
-		    return result;
+		return result;
 	}
 
 	private void printOutputFilesParameters (String filename, String path) {
@@ -583,18 +537,15 @@ public class InputParameters  implements Serializable{
 		String strID = strList[strList.length - 1].replaceAll(Constants.PARAMETR_FILE_EXTENSION, "");
 		System.out.println("output files id: " + strID);
 		System.out.println("output files prefix: " + strList[0]);
-		//String[] pathList = filename.split(File.separator);
-		//String dir = String.join(File.separator, Arrays.copyOfRange(pathList, 0, pathList.length-1));
 		System.out.println("output files directory: " + path);
 	}
 	
 	/**
-	 * extracts an array list for parameter value from a file 
+	 * extracts an array list for parameter value from a file
 	 * @param reader the parameters file
 	 * @param comment comment lines start with
 	 * @param lineEnding the line ends with
-	 * @param assignment the assignment sign 
-	 * @return
+	 * @param assignment the assignment sign
 	 */
 	private ArrayList<ArrayList<String>> getParamArray(BufferedReader reader, String comment, String lineEnding, String assignment){
 		ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>> ();
@@ -636,12 +587,6 @@ public class InputParameters  implements Serializable{
 	
 	/**
 	 * sets a parameter
-	 * @param name
-	 * @param label
-	 * @param description
-	 * @param category
-	 * @param value
-	 * @return
 	 */
 	public boolean setParameter(String name, String label, String description, String category,String value){
 		boolean found = false;
@@ -652,7 +597,7 @@ public class InputParameters  implements Serializable{
 			if(!description.isEmpty()){this.STOP_TIME.description = description;}
 			if(!category.isEmpty()){this.STOP_TIME.category = category;}
 			found = true;
-		} else if(name.equals("ENSAMBLE_SIZE")){
+		} else if(name.equals("ENSEMBLE_SIZE")){
 			this.ENSEMBLE_SIZE.value =  Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.ENSEMBLE_SIZE.label = label;}
 			if(!description.isEmpty()){this.ENSEMBLE_SIZE.description = description;}
@@ -669,26 +614,26 @@ public class InputParameters  implements Serializable{
 			if(!label.isEmpty()){this.COMPUTED_AFFINITY_PRECISION.label = label;}
 			if(!description.isEmpty()){this.COMPUTED_AFFINITY_PRECISION.description = description;}
 			if(!category.isEmpty()){this.COMPUTED_AFFINITY_PRECISION.category = category;}
-			found = true;	
+			found = true;
 		} else if(name.equals("DNA_SECTOR_SIZE")){
 			this.DNA_SECTOR_SIZE.value = Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.DNA_SECTOR_SIZE.label = label;}
 			if(!description.isEmpty()){this.DNA_SECTOR_SIZE.description = description;}
 			if(!category.isEmpty()){this.DNA_SECTOR_SIZE.category = category;}
-			found = true;	
+			found = true;
 		} else if(name.equals("EVENT_LIST_SUBGROUP_SIZE")){
 			this.EVENT_LIST_SUBGROUP_SIZE.value = Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.EVENT_LIST_SUBGROUP_SIZE.label = label;}
 			if(!description.isEmpty()){this.EVENT_LIST_SUBGROUP_SIZE.description = description;}
 			if(!category.isEmpty()){this.EVENT_LIST_SUBGROUP_SIZE.category = category;}
-			found = true;	
+			found = true;
 		} else if(name.equals("EVENT_LIST_USES_FR")){
 			this.EVENT_LIST_USES_FR.value = Utils.parseBoolean(value,false);
 			if(!label.isEmpty()){this.EVENT_LIST_USES_FR.label = label;}
 			if(!description.isEmpty()){this.EVENT_LIST_USES_FR.description = description;}
 			if(!category.isEmpty()){this.EVENT_LIST_USES_FR.category = category;}
 			found = true;
-		} 
+		}
 		//SIMULATION-OUTPUT PARAMETERS
 		else if(name.equals("OUTPUT_FOLDER")){
 			this.OUTPUT_FOLDER.value = value;
@@ -713,7 +658,7 @@ public class InputParameters  implements Serializable{
 			if(!label.isEmpty()){this.PRINT_FINAL_OCCUPANCY.label = label;}
 			if(!description.isEmpty()){this.PRINT_FINAL_OCCUPANCY.description = description;}
 			if(!category.isEmpty()){this.PRINT_FINAL_OCCUPANCY.category = category;}
-			found = true;	      
+			found = true;
 		} else if(name.equals("DEBUG_MODE")){
 			this.DEBUG_MODE.value = Utils.parseBoolean(value,false);
 			if(!label.isEmpty()){this.DEBUG_MODE.label = label;}
@@ -725,19 +670,19 @@ public class InputParameters  implements Serializable{
 			if(!label.isEmpty()){this.OUTPUT_TF.label = label;}
 			if(!description.isEmpty()){this.OUTPUT_TF.description = description;}
 			if(!category.isEmpty()){this.OUTPUT_TF.category = category;}
-			found = true;		
+			found = true;
 		} else if(name.equals("OUTPUT_TF_POINTS")){
 			this.OUTPUT_TF_POINTS.value = Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.OUTPUT_TF_POINTS.label = label;}
 			if(!description.isEmpty()){this.OUTPUT_TF_POINTS.description = description;}
 			if(!category.isEmpty()){this.OUTPUT_TF_POINTS.category = category;}
-			found = true;	
+			found = true;
 		} else if(name.equals("FOLLOW_TS")){
 			this.FOLLOW_TS.value = Utils.parseBoolean(value,false);
 			if(!label.isEmpty()){this.FOLLOW_TS.label = label;}
 			if(!description.isEmpty()){this.FOLLOW_TS.description = description;}
 			if(!category.isEmpty()){this.FOLLOW_TS.category = category;}
-			found = true;			
+			found = true;
 		} else if(name.equals("OUTPUT_AFFINITY_LANDSCAPE")){
 			this.OUTPUT_AFFINITY_LANDSCAPE.value = Utils.parseBoolean(value,false);
 			if(!label.isEmpty()){this.OUTPUT_AFFINITY_LANDSCAPE.label = label;}
@@ -779,15 +724,15 @@ public class InputParameters  implements Serializable{
 			if(!label.isEmpty()){this.WIG_THRESHOLD.label = label;}
 			if(!description.isEmpty()){this.WIG_THRESHOLD.description = description;}
 			if(!category.isEmpty()){this.WIG_THRESHOLD.category = category;}
-			found = true;	
-		}       	
+			found = true;
+		}
 		//TF PARAMETERS
 		else if(name.equals("TF_FILE")){
 			this.TF_FILE.value = value;
 			if(!label.isEmpty()){this.TF_FILE.label = label;}
 			if(!description.isEmpty()){this.TF_FILE.description = description;}
 			if(!category.isEmpty()){this.TF_FILE.category = category;}
-			found = true;	
+			found = true;
 		}  else if(name.equals("TF_COOPERATIVITY_FILE")){
 			this.TF_COOPERATIVITY_FILE.value = value;
 			if(!label.isEmpty()){this.TF_COOPERATIVITY_FILE.label = label;}
@@ -867,7 +812,7 @@ public class InputParameters  implements Serializable{
 			if(!label.isEmpty()){this.TF_READ_IN_BOTH_DIRECTIONS.label = label;}
 			if(!description.isEmpty()){this.TF_READ_IN_BOTH_DIRECTIONS.description = description;}
 			if(!category.isEmpty()){this.TF_READ_IN_BOTH_DIRECTIONS.category = category;}
-			found = true;			
+			found = true;
 		} else if(name.equals("TF_PREBOUND_PROPORTION")){
 			this.TF_PREBOUND_PROPORTION.value =  Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_PREBOUND_PROPORTION.label = label;}
@@ -958,7 +903,8 @@ public class InputParameters  implements Serializable{
 			if(!description.isEmpty()){this.DNA_PROPORTION_OF_G.description = description;}
 			if(!category.isEmpty()){this.DNA_PROPORTION_OF_G.category = category;}
 			found = true;
-		} //TF RANDOM WALK PARAMETERS
+		}
+		//TF RANDOM WALK PARAMETERS
 		else if(name.equals("TF_IS_IMMOBILE")){
 			this.TF_IS_IMMOBILE.value =  Utils.parseBoolean(value, true);
 			if(!label.isEmpty()){this.TF_IS_IMMOBILE.label = label;}

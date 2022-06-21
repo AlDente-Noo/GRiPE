@@ -15,9 +15,7 @@ import utils.Utils;
  *
  */
 public class PFM  implements Serializable{
-    /**
-     *
-     */
+
     private static final long serialVersionUID = 1372756026390102207L;
     public ArrayList<ArrayList<Double>> pfm;
     public ArrayList<ArrayList<Double>> normPFM;
@@ -29,17 +27,15 @@ public class PFM  implements Serializable{
     /**
      * class constructor
      * an example of a correct PFM specification is A=[3, 1, 5, 7, 3, 6, 4, 7, 1, 9, 8, 5, 4, 2]; C=[1, 1, 2, 0, 0, 0, 1, 0, 8, 0, 0, 0, 0, 3]; G=[4, 1, 1, 1, 0, 0, 4, 1, 0, 0, 1, 3, 0, 2]; T=[1, 6, 1, 1, 6, 3, 0, 1, 0, 0, 0, 1, 5, 2]
-     * @param str
+     * @param str string with PFM
      */
     public PFM(String str, Cell n){
-
         if(str.startsWith(Constants.DBD_TYPE_PWM)){
             str = str.replaceAll(Constants.DBD_TYPE_PWM, "").trim();
         }
         else {
             n.stopSimulation("PFM (PWM) string has to begin with '"+Constants.DBD_TYPE_PWM+"'");
         }
-
         pfm = new ArrayList<ArrayList<Double>>();
         motifSize = Constants.NONE;
         ArrayList<Double> bufferPFM;
@@ -121,7 +117,6 @@ public class PFM  implements Serializable{
      * returns the PWM-score of the nucleotide
      * @param nucleotide current nucleotide
      * @param position in the motif
-     * @return
      */
     public double getScorePFM(byte nucleotide, int position){
         return normPFM.get(this.nucleotidePosition[nucleotide]).get(position);
@@ -130,8 +125,8 @@ public class PFM  implements Serializable{
     /**
      * AD
      * returns max PWM score for a position on the DNA
-     * @param position
-     * @return
+     * FG: this function is needed to normalize PWM-scores, so that the strongest site has PWM-score = 0
+     * and weaker sites have negative scores. The affinity of a site is
      */
     public double getMaxScorePFM(int position){
         double max = 0;

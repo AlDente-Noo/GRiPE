@@ -24,7 +24,7 @@ public abstract class DBP implements Serializable {
     public ProteinEvent pe;
     public RepressionEvent re;
     public double moveRate;
-    public double repressionRate;
+    public double repressionEventRate;
     public int leftNeighbour;
     public int rightNeighbour;
     public int stickToLeft;
@@ -55,7 +55,7 @@ public abstract class DBP implements Serializable {
         size = 0;
         timeBound = 0;
         moveRate = Constants.NONE;
-        repressionRate = Constants.NONE;
+        repressionEventRate = Constants.NONE;
 
         leftNeighbour = Constants.NONE;
         rightNeighbour = Constants.NONE;
@@ -90,7 +90,7 @@ public abstract class DBP implements Serializable {
         this.size = size;
         timeBound = 0;
         moveRate = Constants.NONE;
-        repressionRate = Constants.NONE;
+        repressionEventRate = Constants.NONE;
         leftNeighbour = Constants.NONE;
         rightNeighbour = Constants.NONE;
         pe = null;
@@ -270,8 +270,8 @@ public abstract class DBP implements Serializable {
      * returns repressionRate, which is either rate of repression event if TF is not repressing DNA
      * or rate of 'derepression' event if TF is repressing DNA
      */
-    public double getRepressionRate() {
-        return this.repressionRate;
+    public double getRepressionEventRate() {
+        return this.repressionEventRate;
     }
 
     /**
@@ -279,11 +279,11 @@ public abstract class DBP implements Serializable {
      */
     public void updateRepressionRate(Cell n) {
         if (this.position == Constants.NONE) {
-            repressionRate = 0.0;
+            repressionEventRate = 0.0;
         } else if (this.repressesDNA) {
-            repressionRate = n.TFspecies[speciesID].derepressionRate;
+            repressionEventRate = n.remodeller.derepressionRate / n.TFspecies[speciesID].repressionAttenuationFactor;
         } else {
-            repressionRate = n.TFspecies[speciesID].repressionRate;
+            repressionEventRate = n.TFspecies[speciesID].repressionRate;
         }
     }
 

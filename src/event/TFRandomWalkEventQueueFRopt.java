@@ -180,7 +180,7 @@ public class TFRandomWalkEventQueueFRopt extends TFEventQueue {
 //					newPosition = 0;
 //				} else if( newPosition >= n.dna.strand.length-n.dbp[moleculeID].size){
 //					newPosition =  n.dna.strand.length-n.dbp[moleculeID].size;
-//				} else if (Math.abs(newPosition-position) > n.TFspecies[speciesID].uncorrelatedDisplacementSize){
+//				} else if (Math.abs(newPosition-position) > n.TFSpecies[speciesID].uncorrelatedDisplacementSize){
 //					//the hop size is to big and the hop becomes a jump
 //					nextAction = Constants.EVENT_TF_RANDOM_WALK_JUMP;
 //					newPosition = Constants.NONE;

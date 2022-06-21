@@ -190,13 +190,13 @@ public class TF extends DBP implements Serializable {
         //if (!this.isRepressed(n) && (!this.isRepressingDNA() || this.position == Constants.NONE)) {
             if (this.position != Constants.NONE && n.dna.isTargetSite[this.speciesID][this.position][this.direction] != Constants.NONE) {
                 n.updateTargetSiteStatistics(n.dna.isTargetSite[this.speciesID][this.position][this.direction],
-                        this.timeOfLastPositionChange, true, timeBound);
+                        this.timeOfLastPositionChange, true);
                 if (n.runUntilTSReached) {
                     n.areTargetSitesToBeReached = n.tsg.areTargetSitesToBeReached();
                 }
             } else if (this.lastPosition != Constants.NONE && n.dna.isTargetSite[this.speciesID][this.lastPosition][oldDirection] != Constants.NONE) {
                 n.updateTargetSiteStatistics(n.dna.isTargetSite[this.speciesID][this.lastPosition][oldDirection],
-                        this.timeOfLastPositionChange, false, timeBound);
+                        this.timeOfLastPositionChange, false);
             }
         //}
     }
@@ -450,7 +450,7 @@ public class TF extends DBP implements Serializable {
 
         // FG: schedule derepression event if the unbound molecule is repressing the DNA region
         if (n.dbp[this.ID].repressesDNA) {
-            n.dbp[this.ID].repressionRate = n.remodeller.derepressionRate;
+            n.dbp[this.ID].repressionEventRate = n.remodeller.derepressionRate;
             n.eventQueue.scheduleNextTFRepressionEvent(n, this.ID, time, false);
             n.dbp[this.ID].repressesDNA = false;
         }

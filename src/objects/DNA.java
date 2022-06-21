@@ -31,17 +31,17 @@ public class DNA implements Serializable {
     public int[] sectorID;
 
     public int[] TFsize;
-    public double[][][] TFavgMoveRate;//TFspecies; position; direction
+    public double[][][] TFavgMoveRate;//TFSpecies; position; direction
     public boolean[][] effectiveTFavailability;// speciesID, position
     public int[][] effectiveTFsectorsAvailabilitySum; //species id, sectors
     public int[] effectiveTFavailabilitySum;
     public int[] effectiveTFavailabilityMaxSum;
-    public double[][][] effectiveTFOccupancy;//TFspecies; position; direction
-    public int[][][] finalTFOccupancy;//TFspecies; position; direction
-    public double[][][] firstReached;//TFspecies; position; direction
+    public double[][][] effectiveTFOccupancy;//TFSpecies; position; direction
+    public int[][][] finalTFOccupancy;//TFSpecies; position; direction
+    public double[][][] firstReached;//TFSpecies; position; direction
 
-    public double[][][] TFSlideLeftNo;//TFspecies; position; direction
-    public double[][][] TFSlideRightNo;//TFspecies; position; direction
+    public double[][][] TFSlideLeftNo;//TFSpecies; position; direction
+    public double[][][] TFSlideRightNo;//TFSpecies; position; direction
 
 
     public double[] bpFreq;
@@ -63,7 +63,7 @@ public class DNA implements Serializable {
     public HashMap<Integer, String> TFposName;
     public int[] collisionsCount;
     public long collisionsCountTotal;
-    double TFNonspecificWaitingTime;
+    double TFSpecificWaitingTime;
 
 
     /**
@@ -328,8 +328,8 @@ public class DNA implements Serializable {
     /**
      * compute the affinity landscape for a list of TF species
      */
-    public void computeTFaffinityLandscape(Cell n, Random generator, TFspecies[] TFspecies, int affinityPrecision,
-                                           double TFnonspecificWaitingTime, int TFdirections, int DNAsectorSize,
+    public void computeTFaffinityLandscape(Cell n, Random generator, TFSpecies[] TFspecies, int affinityPrecision,
+                                           double TFSpecificWaitingTime, int TFdirections, int DNAsectorSize,
                                            boolean printFinalOccupancy) {
         if (TFspecies != null && TFspecies.length > 0) {
             TFsize = new int[TFspecies.length];
@@ -358,7 +358,7 @@ public class DNA implements Serializable {
 
             this.TFdirections = TFdirections;
             isTargetSite = new int[TFspecies.length][strand.length][TFdirections];
-            this.TFNonspecificWaitingTime = TFnonspecificWaitingTime;
+            this.TFSpecificWaitingTime = TFSpecificWaitingTime;
             firstReached = new double[TFspecies.length][strand.length][TFdirections];
 
             this.collisionsCount = new int[strand.length];
@@ -473,7 +473,7 @@ public class DNA implements Serializable {
                     //generate from PWM
                     TFaffinitiesLR[i] = CellUtils.computeTFAffinities(generator, strand, TFspecies[i].pfm,
                             TFspecies[i].sizeLeft, TFspecies[i].sizeTotal, TFspecies[i].es, 0,
-                            TFspecies[i].affinityLandscapeRoughness, this.bpFreq);
+                            TFspecies[i].affinityLandscapeRoughness);
                 } else {
                     //generate from sequence
                     TFaffinitiesLR[i] = CellUtils.computeTFAffinities(generator, strand, TFspecies[i].dbd,
@@ -523,7 +523,7 @@ public class DNA implements Serializable {
                     } else if (TFspecies[i].pfm != null && TFspecies[i].pfm.motifSize > 0) {
                         TFaffinitiesRL[i] = CellUtils.computeTFAffinities(generator, strand, TFspecies[i].pfm,
                                 TFspecies[i].sizeLeft, TFspecies[i].sizeTotal, TFspecies[i].es, 1,
-                                TFspecies[i].affinityLandscapeRoughness, this.bpFreq);
+                                TFspecies[i].affinityLandscapeRoughness);
                     } else {
                         TFaffinitiesRL[i] = CellUtils.computeTFAffinities(generator, strand, TFspecies[i].dbd,
                                 TFspecies[i].sizeLeft, TFspecies[i].sizeTotal, TFspecies[i].es, 1,
@@ -604,7 +604,7 @@ public class DNA implements Serializable {
      * @throws FileNotFoundException
      */
     public void printAffinities(String path, String filename, int start, int end, int TFreadDirections,
-                                TFspecies[] tfs, boolean fullOccupancy, int wigStepSize, double wigThreshold,
+                                TFSpecies[] tfs, boolean fullOccupancy, int wigStepSize, double wigThreshold,
                                 boolean printBindingEnergy) throws FileNotFoundException {
 
 
@@ -735,6 +735,7 @@ public class DNA implements Serializable {
 
             out.close();
         } catch (IOException e) {
+            e.printStackTrace();
         }
 
 
@@ -888,6 +889,7 @@ public class DNA implements Serializable {
 
             out.close();
         } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -1678,6 +1680,7 @@ public class DNA implements Serializable {
             out.close();
         } catch (IOException e) {
             // FG TODO: figure out what to do here
+            e.printStackTrace();
         }
 
 
