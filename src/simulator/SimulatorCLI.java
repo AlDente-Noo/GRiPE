@@ -141,7 +141,6 @@ public class SimulatorCLI {
 
                 in.close();
                 System.out.println("restore file " + tmpBackupFile);
-                backupRestarted = true;
             } catch (Exception e) {
                 e.printStackTrace();
             }

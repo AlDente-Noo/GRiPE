@@ -250,17 +250,25 @@ public class InputParameters  implements Serializable{
 		String lastLoadParam = "";
 		for (ArrayList<String> param : params) {
 			switch (param.get(0)) {
-				case "name" -> {
+				case "name" :
 					if (!name.isEmpty()) {
 						setParameter(name, label, description, category, value);
 						lastLoadParam = name;
 					}
 					name = param.get(1);
-				}
-				case "label" -> label = param.get(1);
-				case "description" -> description = param.get(1);
-				case "category" -> category = param.get(1);
-				case "value" -> value = param.get(1);
+					break;
+				case "label" :
+					label = param.get(1);
+					break;
+				case "description" :
+					description = param.get(1);
+					break;
+				case "category" :
+					category = param.get(1);
+					break;
+				case "value" :
+					value = param.get(1);
+					break;
 			}
 		}
 		

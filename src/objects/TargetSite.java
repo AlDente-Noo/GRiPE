@@ -97,7 +97,7 @@ public class TargetSite implements Serializable {
 
             this.TFid = n.getTFspeciesID(TFstr);
             if (this.TFid == Constants.NONE) {
-                n.stopSimulation("error while parsion target site " + description + "; unkown TF");
+                n.stopSimulation("error while parsing target site " + description + "; unkown TF");
             }
             this.TFname = n.TFspecies[TFid].name;
             TFsize = n.TFspecies[this.TFid].sizeTotal;
@@ -111,7 +111,7 @@ public class TargetSite implements Serializable {
             this.targetSiteID = targetSiteID;
 
         } else {
-            n.stopSimulation("error while parsion target site " + description + "; no TF species");
+            n.stopSimulation("error while parsing target site " + description + "; no TF species");
         }
     }
 

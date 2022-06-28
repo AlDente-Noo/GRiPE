@@ -52,7 +52,7 @@ public class TF extends DBP implements Serializable {
         this.direction = direction;
         this.hasDNAbasedCooperativity = hasDNAbasedCooperativity;
         this.hasDirectCooperativity = hasDirectCooperativity;
-        this.repressesDNA = false; // FG: TODO: make it a parameter
+        this.repressesDNA = false;
     }
 
     /**
@@ -69,7 +69,7 @@ public class TF extends DBP implements Serializable {
             assert this.position == Constants.NONE;
             n.bindTFMolecule(n.dbp[pe.proteinID].speciesID, pe.time);
         } else {
-            // random walk event
+            // random walk events
             if (pe.nextAction == Constants.EVENT_TF_RANDOM_WALK_JUMP) {
                 //the TF unbinds
                 unbindMolecule(n, pe.time);
@@ -81,7 +81,10 @@ public class TF extends DBP implements Serializable {
                                     n.TFspecies[speciesID].name + " from position " + position + " to " + pe.position +
                                     ", but the TF is repressing or repressed, therefore the TF is released in the cytoplasm.");
                         }
-                        unbindMolecule(n, pe.time);
+                        // decrease the unbinding rate for the repressing DNA
+                        if (!this.isRepressingDNA() || n.randomGenerator.nextDouble() < 1 / n.TFspecies[speciesID].repressionAttenuationFactor) {
+                            unbindMolecule(n, pe.time);
+                        }
                     } else {
                         if (n.isInDebugMode()) {
                             n.printDebugInfo(pe.time + ": attempted to move (via sliding or hop) TF " + this.ID + " of type " +
@@ -89,89 +92,89 @@ public class TF extends DBP implements Serializable {
                                     ", but the TF is repressing or repressed, the TF is stalled.");
                         }
                     }
-                } else { if (pe.nextAction == Constants.EVENT_TF_RANDOM_WALK_HOP) {
-                    assert pe.isHoppingEvent; // FG: seems like if the event is hop then isHoppingEvent is always true
-                    // FG: prevent hopping of the repressed molecule
-                    if (pe.position < 0 || pe.position > n.dna.strand.length - this.size) {
-                        // hop outside of DNA results in unbinding
-                        unbindMolecule(n, pe.time);
-                        n.TFspecies[speciesID].countTFHopsOutside++;
-                    } else if (Math.abs(pe.position - this.position) > n.TFspecies[speciesID].uncorrelatedDisplacementSize) {
-                        // too big hop results in unbinding
-                        unbindMolecule(n, pe.time);
-                        n.TFspecies[speciesID].countTFforcedJumpsEvents++;
-                    } else if (pe.position == this.position) {
-                        //the TF hops and rebinds at the same position
-                        hopMoleculeSamePos(n, pe.time, this.position);
-                    } else {
-                        //the TF hops and rebinds at a different position
-                        hopMolecule(n, pe.time, pe.position);
-                    }
-                } else if (pe.nextAction == Constants.EVENT_TF_RANDOM_WALK_SLIDE_LEFT) {
-                    if (n.dna.isAbsorbing && pe.position < 0) {
-                        // absorbing boundary conditions cause unbinding when DNA end is reached
-                        if (n.isInDebugMode()) {
-                            n.printDebugInfo(pe.time + " TF " + this.ID + " reached left limit and, due to absorbing " +
-                                    "boundary condition, it will unbind!");
-                        }
-                        unbindMolecule(n, pe.time);
-                    } else if (n.dna.isPeriodic && pe.position < 0) {
-                        // periodic b.c. cause the movement of the molecule to the opposite end of DNA when a DNA end is reached
-                        if (n.isInDebugMode()) {
-                            n.printDebugInfo(pe.time + " TF " + this.ID + " reached left limit and, due to periodic " +
-                                    "boundary condition, it will attempt to bind at the end!");
-                        }
-                        hopMolecule(n, pe.time, n.dna.strand.length - this.size - 1);
-                    } else {
-                        if (pe.position >= 0) {
-                            // slide molecule is possible
-                            slideLeftMolecule(n, pe.time, pe.position, pe.isHoppingEvent, false);
+                } else {
+                    if (pe.nextAction == Constants.EVENT_TF_RANDOM_WALK_HOP) {
+                        assert pe.isHoppingEvent; // FG: seems like if the event is hop then isHoppingEvent is always true
+                        if (pe.position < 0 || pe.position > n.dna.strand.length - this.size) {
+                            // hop outside of DNA results in unbinding
+                            unbindMolecule(n, pe.time);
+                            n.TFspecies[speciesID].countTFHopsOutside++;
+                        } else if (Math.abs(pe.position - this.position) > n.TFspecies[speciesID].uncorrelatedDisplacementSize) {
+                            // too big hop results in unbinding
+                            unbindMolecule(n, pe.time);
+                            n.TFspecies[speciesID].countTFforcedJumpsEvents++;
+                        } else if (pe.position == this.position) {
+                            //the TF hops and rebinds at the same position
+                            hopMoleculeSamePos(n, pe.time, this.position);
                         } else {
-                            // reflective b.c. prevent movement of the molecule outside of DNA
+                            //the TF hops and rebinds at a different position
+                            hopMolecule(n, pe.time, pe.position);
+                        }
+                    } else if (pe.nextAction == Constants.EVENT_TF_RANDOM_WALK_SLIDE_LEFT) {
+                        if (n.dna.isAbsorbing && pe.position < 0) {
+                            // absorbing boundary conditions cause unbinding when DNA end is reached
                             if (n.isInDebugMode()) {
-                                n.printDebugInfo(pe.time + ": attempted to slide left TF " + this.ID +
-                                        " of type " + n.TFspecies[speciesID].name + " from position " + position +
-                                        ", but the left border is reached");
+                                n.printDebugInfo(pe.time + " TF " + this.ID + " reached left limit and, due to absorbing " +
+                                        "boundary condition, it will unbind!");
                             }
-                            resetPosition(pe.time);
-                        }
-                        if (pe.isHoppingEvent) {
-                            // sliding event can be invoked by hopping event with small distance (less than slide length)
-                            // in that case TF unbinds from DNA and can rebind to another strand
-                            this.changeDirection(n);
-                        }
-                    }
-                } else if (pe.nextAction == Constants.EVENT_TF_RANDOM_WALK_SLIDE_RIGHT) {
-                    // similar to the slide left
-                    assert (this.position != Constants.NONE);
-                    if (n.dna.isAbsorbing && pe.position >= (n.dna.strand.length - this.size)) {
-                        if (n.isInDebugMode()) {
-                            n.printDebugInfo(pe.time + " TF " + this.ID + " reached right limit and, due to absorbing" +
-                                    " boundary condition, it will unbind!");
-                        }
-                        unbindMolecule(n, pe.time);
-                    } else if (n.dna.isPeriodic && pe.position >= (n.dna.strand.length - this.size)) {
-                        if (n.isInDebugMode()) {
-                            n.printDebugInfo(pe.time + " TF " + this.ID + " reached right limit and, due to periodic " +
-                                    "boundary condition, it will attempt to bind at the start!");
-                        }
-                        hopMolecule(n, pe.time, 0);
-                    } else {
-                        if (pe.position < (n.dna.strand.length - this.size)) {
-                            slideRightMolecule(n, pe.time, pe.position, pe.isHoppingEvent, false);
+                            unbindMolecule(n, pe.time);
+                        } else if (n.dna.isPeriodic && pe.position < 0) {
+                            // periodic b.c. cause the movement of the molecule to the opposite end of DNA when a DNA end is reached
+                            if (n.isInDebugMode()) {
+                                n.printDebugInfo(pe.time + " TF " + this.ID + " reached left limit and, due to periodic " +
+                                        "boundary condition, it will attempt to bind at the end!");
+                            }
+                            hopMolecule(n, pe.time, n.dna.strand.length - this.size - 1);
                         } else {
-                            if (n.isInDebugMode()) {
-                                n.printDebugInfo(pe.time + ": attempted to slide right TF " + this.ID +
-                                        " of type " + n.TFspecies[speciesID].name + " from position " + position +
-                                        ", but the right border is reached");
+                            if (pe.position >= 0) {
+                                // slide molecule is possible
+                                slideLeftMolecule(n, pe.time, pe.position, pe.isHoppingEvent, false);
+                            } else {
+                                // reflective b.c. prevent movement of the molecule outside of DNA
+                                if (n.isInDebugMode()) {
+                                    n.printDebugInfo(pe.time + ": attempted to slide left TF " + this.ID +
+                                            " of type " + n.TFspecies[speciesID].name + " from position " + position +
+                                            ", but the left border is reached");
+                                }
+                                resetPosition(pe.time);
                             }
-                            resetPosition(pe.time);
+                            if (pe.isHoppingEvent) {
+                                // sliding event can be invoked by hopping event with small distance (less than slide length)
+                                // in that case TF unbinds from DNA and can rebind to another strand
+                                this.changeDirection(n);
+                            }
                         }
-                        if (pe.isHoppingEvent) {
-                            this.changeDirection(n);
+                    } else if (pe.nextAction == Constants.EVENT_TF_RANDOM_WALK_SLIDE_RIGHT) {
+                        // similar to the slide left
+                        assert (this.position != Constants.NONE);
+                        if (n.dna.isAbsorbing && pe.position >= (n.dna.strand.length - this.size)) {
+                            if (n.isInDebugMode()) {
+                                n.printDebugInfo(pe.time + " TF " + this.ID + " reached right limit and, due to absorbing" +
+                                        " boundary condition, it will unbind!");
+                            }
+                            unbindMolecule(n, pe.time);
+                        } else if (n.dna.isPeriodic && pe.position >= (n.dna.strand.length - this.size)) {
+                            if (n.isInDebugMode()) {
+                                n.printDebugInfo(pe.time + " TF " + this.ID + " reached right limit and, due to periodic " +
+                                        "boundary condition, it will attempt to bind at the start!");
+                            }
+                            hopMolecule(n, pe.time, 0);
+                        } else {
+                            if (pe.position < (n.dna.strand.length - this.size)) {
+                                slideRightMolecule(n, pe.time, pe.position, pe.isHoppingEvent, false);
+                            } else {
+                                if (n.isInDebugMode()) {
+                                    n.printDebugInfo(pe.time + ": attempted to slide right TF " + this.ID +
+                                            " of type " + n.TFspecies[speciesID].name + " from position " + position +
+                                            ", but the right border is reached");
+                                }
+                                resetPosition(pe.time);
+                            }
+                            if (pe.isHoppingEvent) {
+                                this.changeDirection(n);
+                            }
                         }
                     }
-                }
                 }
             }
         }
@@ -186,19 +189,16 @@ public class TF extends DBP implements Serializable {
         }
 
         // update target sited statistics
-		// if random walk or binding or unbinding was performed (which could be prevented by repression)
-        //if (!this.isRepressed(n) && (!this.isRepressingDNA() || this.position == Constants.NONE)) {
-            if (this.position != Constants.NONE && n.dna.isTargetSite[this.speciesID][this.position][this.direction] != Constants.NONE) {
-                n.updateTargetSiteStatistics(n.dna.isTargetSite[this.speciesID][this.position][this.direction],
-                        this.timeOfLastPositionChange, true);
-                if (n.runUntilTSReached) {
-                    n.areTargetSitesToBeReached = n.tsg.areTargetSitesToBeReached();
-                }
-            } else if (this.lastPosition != Constants.NONE && n.dna.isTargetSite[this.speciesID][this.lastPosition][oldDirection] != Constants.NONE) {
-                n.updateTargetSiteStatistics(n.dna.isTargetSite[this.speciesID][this.lastPosition][oldDirection],
-                        this.timeOfLastPositionChange, false);
+        if (this.position != Constants.NONE && n.dna.isTargetSite[this.speciesID][this.position][this.direction] != Constants.NONE) {
+            n.updateTargetSiteStatistics(n.dna.isTargetSite[this.speciesID][this.position][this.direction],
+                    this.timeOfLastPositionChange, true);
+            if (n.runUntilTSReached) {
+                n.areTargetSitesToBeReached = n.tsg.areTargetSitesToBeReached();
             }
-        //}
+        } else if (this.lastPosition != Constants.NONE && n.dna.isTargetSite[this.speciesID][this.lastPosition][oldDirection] != Constants.NONE) {
+            n.updateTargetSiteStatistics(n.dna.isTargetSite[this.speciesID][this.lastPosition][oldDirection],
+                    this.timeOfLastPositionChange, false);
+        }
     }
 
     /**
@@ -343,7 +343,7 @@ public class TF extends DBP implements Serializable {
             }
 
             if (n.isInDebugMode()) {
-                n.printDebugInfo("The affinity of the TF " + n.TFspecies[bufferCoop.species1ID].name + " for site " + bufferCoop.region1 + " was reseted due to the unbinding of TF " + n.TFspecies[bufferCoop.species0ID].name + " from site" + bufferCoop.region0);
+                n.printDebugInfo("The affinity of the TF " + n.TFspecies[bufferCoop.species1ID].name + " for site " + bufferCoop.region1 + " was reset due to the unbinding of TF " + n.TFspecies[bufferCoop.species0ID].name + " from site" + bufferCoop.region0);
             }
         }
     }
@@ -387,7 +387,7 @@ public class TF extends DBP implements Serializable {
         if (this.stickToRight != Constants.NONE) {
             this.setMoveRate(n);
             n.dbp[this.stickToRight].setMoveRate(n);
-            //reshedule the right neighbour move rate
+            //reschedule the right neighbour move rate
             n.eventQueue.TFRandomWalkEventQueue.updateNextEvent(n, this.stickToRight, time);
 
             n.dbp[this.stickToRight].stickToLeft = Constants.NONE;
@@ -430,7 +430,7 @@ public class TF extends DBP implements Serializable {
     public void resetCooperativityLeft(Cell n, double time) {
         if (this.stickToLeft != Constants.NONE) {
             n.dbp[this.stickToLeft].setMoveRate(n);
-            //reshedule the right neighbour move rate
+            //reschedule the right neighbour move rate
             n.eventQueue.TFRandomWalkEventQueue.updateNextEvent(n, this.stickToLeft, time);
             n.dbp[this.stickToLeft].stickToRight = Constants.NONE;
             this.stickToLeft = Constants.NONE;
@@ -446,7 +446,6 @@ public class TF extends DBP implements Serializable {
     public boolean unbindMolecule(Cell n, double time) {
 
         boolean unbound = false;
-        int pos = this.position;
 
         // FG: schedule derepression event if the unbound molecule is repressing the DNA region
         if (n.dbp[this.ID].repressesDNA) {
@@ -780,11 +779,15 @@ public class TF extends DBP implements Serializable {
                     n.TFspecies[speciesID].observedSlidingLength.remove(n.TFspecies[speciesID].observedSlidingLength.size() - 1);
                 }
 
-                //if rebound the last position is reseted to the previous one before unbinding
+                //if rebound, the last position is reset to the previous one before unbinding
                 this.lastPosition = oldLastPosition;
 
                 n.TFspecies[speciesID].countTFHoppingEvents++;
 
+                // FG: decrease number of binding and unbinding events, because they were increased in
+                // unbindMolecule and bindMolecule functions
+                n.TFspecies[speciesID].countTFBindingEvents--;
+                n.TFspecies[speciesID].countTFUnbindingEvents--;
             }
 
         }

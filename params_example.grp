@@ -37,7 +37,7 @@ PRINT_FINAL_OCCUPANCY = false;
 DEBUG_MODE = false;
 
 #TF species of which dynamic behaviour is followed
-OUTPUT_TF = "bcd, tll, hkb, hb, Kr, kni, gt, cad";
+OUTPUT_TF = "bcd, tll, hkb, hb, kr, kni, gt, cad";
 
 #The number of intermediary points at which the TF species dynamic behaviour is recorded.
 OUTPUT_TF_POINTS = 1000;
@@ -90,10 +90,10 @@ TF_READ_IN_BOTH_DIRECTIONS = true;
 #DNA PARAMETERS
 
 #The fasta file which stores the DNA sequence.
-DNA_SEQUENCE_FILE = "params_example/Kr_sequence.fasta";
+DNA_SEQUENCE_FILE = "params_example/kr_sequence.fasta";
 
 #The btrack file which stores experimentally found regions of open chromatin in the DNA sequence.
-DNA_AVAILABILITY_FILE = "params_example/Kr.btrack";
+DNA_AVAILABILITY_FILE = "params_example/kr.btrack";
 
 #derepression when repressor is unbound
 DNA_DEREPRESSION_RATE = 10.0;
