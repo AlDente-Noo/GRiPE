@@ -1117,7 +1117,7 @@ public class DNA implements Serializable {
         return Math.min(this.strand.length - 1, right);
     }
 
-    public void derepress(Cell n, int boundaryLeft, int boundaryRight, int proteinID) {
+    public void derepressDNA(int boundaryLeft, int boundaryRight) {
         //boundaryLeft = updateLeftBoundary(boundaryLeft);
         //boundaryRight = updateRightBoundary(boundaryRight);
         for (int bpIdx = boundaryLeft; bpIdx <= boundaryRight; bpIdx++) {
@@ -1125,6 +1125,10 @@ public class DNA implements Serializable {
                 this.closed[bpIdx] = Constants.BP_IS_OPEN;
             }
         }
+    }
+
+    public void derepress(Cell n, int boundaryLeft, int boundaryRight, int proteinID) {
+        derepressDNA(boundaryLeft, boundaryRight);
         this.recomputeTFAffinityLandscapeOnDerepression(n, boundaryLeft, boundaryRight, proteinID);
     }
 

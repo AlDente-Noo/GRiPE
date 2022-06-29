@@ -81,10 +81,7 @@ public class TF extends DBP implements Serializable {
                                     n.TFspecies[speciesID].name + " from position " + position + " to " + pe.position +
                                     ", but the TF is repressing or repressed, therefore the TF is released in the cytoplasm.");
                         }
-                        // decrease the unbinding rate for the repressing DNA
-                        if (!this.isRepressingDNA() || n.randomGenerator.nextDouble() < 1 / n.TFspecies[speciesID].repressionAttenuationFactor) {
-                            unbindMolecule(n, pe.time);
-                        }
+                        unbindMolecule(n, pe.time);
                     } else {
                         if (n.isInDebugMode()) {
                             n.printDebugInfo(pe.time + ": attempted to move (via sliding or hop) TF " + this.ID + " of type " +
@@ -500,8 +497,8 @@ public class TF extends DBP implements Serializable {
             // FG: update repression rate
             this.updateRepressionRate(n);
         }
-        return unbound;
 
+        return unbound;
     }
 
 

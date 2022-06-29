@@ -197,8 +197,6 @@ public class Cell implements Serializable {
 
     /**
      * initialises the internal parameters
-     *
-     * @throws FileNotFoundException
      */
     private void resetInternalParameters() {
 
@@ -207,8 +205,12 @@ public class Cell implements Serializable {
 
         this.cellTime = 0;
         eventQueue = new EventList(this);
-        this.unbindMolecules();
+        this.unbindMoleculesAndDerepressDNA();
         this.bindMolecules();
+
+        for (DBP value : this.dbp) {
+            assert !value.isRepressingDNA();
+        }
 
         //reset target site reached
         for (int i = 0; i < TFspecies.length; i++) {
@@ -580,13 +582,22 @@ public class Cell implements Serializable {
     }
 
     /**
-     * unbind all molecules on the DNA
+     * unbind all molecules on the DNA (FG: and derepresses DNA)
      */
-    public void unbindMolecules() {
+    public void unbindMoleculesAndDerepressDNA() {
+        // FG: unbind all molecules
         for (DBP value : this.dbp) {
             if (value.getPosition() != Constants.NONE) {
                 value.unbindMolecule(this, this.cellTime);
             }
+        }
+        // FG: execute all derepression events in the queue
+        RepressionEvent re = (RepressionEvent) this.eventQueue.TFRepressionEventQueue.pop();
+        while (re != null && !re.isEmpty()) {
+            if (re.nextAction == Constants.EVENT_TF_DEREPRESSION) {
+                this.remodeller.act(this, re);
+            }
+            re = (RepressionEvent) this.eventQueue.TFRepressionEventQueue.pop();
         }
         this.eventQueue.TFBindingEventQueue.updateProteinBindingPropensities(this);
     }

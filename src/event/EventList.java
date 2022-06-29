@@ -178,6 +178,10 @@ public class EventList implements Serializable {
         if (!n.TFspecies[n.dbp[moleculeID].speciesID].isImmobile) {
             ProteinEvent pe = (ProteinEvent) TFRandomWalkEventQueue.createNextEvent(n, moleculeID, time);
             RepressionEvent re = (RepressionEvent) TFRepressionEventQueue.createNextEvent(n, moleculeID, time);
+            // decrease movement rate if the TF is repressing DNA
+            if (n.dbp[moleculeID].isRepressingDNA()) {
+                pe.propensity /= n.TFspecies[n.dbp[moleculeID].speciesID].repressionAttenuationFactor;
+            }
             propensitySum = Math.min(pe.propensity + re.propensity, Double.MAX_VALUE);
             if (propensitySum > 0) {
                 nextTime = Gillespie.computeNextReactionTime(propensitySum, n.randomGenerator);
