@@ -518,7 +518,8 @@ public class SimulatorGUI {
 		ip.OUTPUT_BINDING_ENERGY.value= outputParamaters.OUTPUT_BINDING_ENERGY.getValue();
 		ip.OUTPUT_DNA_OCCUPANCY.value= outputParamaters.OUTPUT_DNA_OCCUPANCY.getValue();	
 		ip.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.value= outputParamaters.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.getValue();	
-		ip.OUTPUT_SLIDING_LENGTHS.value= outputParamaters.OUTPUT_SLIDING_LENGTHS.getValue();	
+		ip.OUTPUT_SLIDING_LENGTHS.value= outputParamaters.OUTPUT_SLIDING_LENGTHS.getValue();
+		ip.OUTPUT_REPRESSED_LENGTHS.value= outputParamaters.OUTPUT_REPRESSED_LENGTHS.getValue();
 		ip.WIG_STEP.value= outputParamaters.WIG_STEP.getValue();	
 		ip.WIG_THRESHOLD.value= outputParamaters.WIG_THRESHOLD.getValue();	
 
@@ -610,6 +611,7 @@ public class SimulatorGUI {
 		outputParamaters.OUTPUT_DNA_OCCUPANCY.setValue(ip.OUTPUT_DNA_OCCUPANCY.value);
 		outputParamaters.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.setValue(ip.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.value);
 		outputParamaters.OUTPUT_SLIDING_LENGTHS.setValue(ip.OUTPUT_SLIDING_LENGTHS.value);
+		outputParamaters.OUTPUT_REPRESSED_LENGTHS.setValue(ip.OUTPUT_REPRESSED_LENGTHS.value);
 		outputParamaters.WIG_STEP.setValue(ip.WIG_STEP.value);
 		outputParamaters.WIG_THRESHOLD.setValue(ip.WIG_THRESHOLD.value);
 		

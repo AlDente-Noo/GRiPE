@@ -12,13 +12,8 @@ import simulator.SimulatorGUI;
 import utils.*;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.StringTokenizer;
+import java.util.*;
 
-//import java.util.HashMap;
-//import java.util.PriorityQueue;
 
 /**
  * class that simulates the behaviour of a nucleus
@@ -595,6 +590,7 @@ public class Cell implements Serializable {
         RepressionEvent re = (RepressionEvent) this.eventQueue.TFRepressionEventQueue.pop();
         while (re != null && !re.isEmpty()) {
             if (re.nextAction == Constants.EVENT_TF_DEREPRESSION) {
+                re.time = this.cellTime;
                 this.remodeller.act(this, re);
             }
             re = (RepressionEvent) this.eventQueue.TFRepressionEventQueue.pop();
@@ -971,9 +967,7 @@ public class Cell implements Serializable {
         double nextPercent = 10;
         double elapsedTimeSec = 0;
 
-        double doubleZero = Constants.DOUBLE_ZERO * this.totalStopTime;
-
-        while ((this.ip.STOP_TIME.value - cellTime >= doubleZero) && hasNextEvent) {
+        while (!isEndOfPartialSimulation(this.cellTime) && hasNextEvent) {
 
             //if no TF binding event is scheduled then schedule one
             if (eventQueue.TFBindingEventQueue.isEmpty() && this.freeTFmoleculesTotal > 0) {
@@ -996,7 +990,7 @@ public class Cell implements Serializable {
             }
 
             //print intermediary steady state results
-            if (this.ip.PRINT_INTERMEDIARY_RESULTS_AFTER.value > 0 && this.cellTime < this.totalStopTime && this.cellTime >= this.lastPrintResultsAfter + this.ip.PRINT_INTERMEDIARY_RESULTS_AFTER.value && this.totalStopTime > this.lastPrintResultsAfter + 2 * this.ip.PRINT_INTERMEDIARY_RESULTS_AFTER.value) {
+            if (this.ip.PRINT_INTERMEDIARY_RESULTS_AFTER.value > 0 && !isEndOfSimulation(this.cellTime) && this.cellTime >= this.lastPrintResultsAfter + this.ip.PRINT_INTERMEDIARY_RESULTS_AFTER.value && this.totalStopTime > this.lastPrintResultsAfter + 2 * this.ip.PRINT_INTERMEDIARY_RESULTS_AFTER.value) {
                 this.lastPrintResultsAfter += this.ip.PRINT_INTERMEDIARY_RESULTS_AFTER.value;
                 printSteadyStates(this.lastPrintResultsAfter);
             }
@@ -1006,18 +1000,26 @@ public class Cell implements Serializable {
 
         printFinalInfo(elapsedTimeSec);
 
-        //print steady state info (FG: only at the end of simulation)
-        if (this.totalStopTime - this.cellTime <= doubleZero) {
+        //print steady state info
+        if (isEndOfSimulation(this.cellTime)) {
             performEndSampleActions(curTime);
             if (ensemble >= this.ip.ENSEMBLE_SIZE.value) {
                 performEndActions(elapsedTimeSec);
-            }
-            if (this.ensemble >= this.ip.ENSEMBLE_SIZE.value - 1) {
                 printFinalDebugInfo(elapsedTimeSec);
             }
         }
 
         return elapsedTimeSec;
+    }
+
+    public boolean isEndOfSimulation(double time) {
+        double doubleZero = Constants.DOUBLE_ZERO * this.totalStopTime;
+        return (this.totalStopTime - time < doubleZero);
+    }
+
+    private boolean isEndOfPartialSimulation(double time) {
+        double doubleZero = Constants.DOUBLE_ZERO * this.totalStopTime;
+        return (this.ip.STOP_TIME.value - time < doubleZero);
     }
 
     /**
@@ -1057,7 +1059,7 @@ public class Cell implements Serializable {
         this.computeDNABoundTime();
 
         //record last sliding lengths
-        this.recordLastSlidingLenths();
+        this.recordLastSlidingLengths();
 
         //if the simulator follows the occupancy of target sites write the last values;
         if (this.ip.FOLLOW_TS.value) {
@@ -1086,10 +1088,6 @@ public class Cell implements Serializable {
 
         e = eventQueue.getNextEvent();
 
-        //if (cellTime >= 573762.9145780302) {
-        //System.out.println("Here");
-        //}
-
         if (e != null) {
             eventsCount++;
             // there is at least one event in the queue
@@ -1101,7 +1099,8 @@ public class Cell implements Serializable {
                 if (!fixStopTime || e.time <= this.totalStopTime) {
                     this.dbp[proteinID].act(this, pe);
                     this.cellTime = e.time;
-                } else if (fixStopTime && e.time > this.totalStopTime) {
+                } else {
+                    // fixStopTime == True && e.time > this.totalStopTime
                     this.cellTime = this.totalStopTime;
                 }
                 this.eventQueue.scheduleNextTFOnDNAEvent(this, pe.proteinID, e.time);
@@ -1112,7 +1111,8 @@ public class Cell implements Serializable {
                 if (!fixStopTime || e.time <= this.totalStopTime) {
                     this.remodeller.act(this, re);
                     this.cellTime = e.time;
-                } else if (fixStopTime && e.time > this.totalStopTime) {
+                } else {
+                    // fixStopTime == True && e.time > this.totalStopTime
                     this.cellTime = this.totalStopTime;
                 }
                 // prevent scheduling event if this is derepression event scheduled due to repressor unbinding
@@ -1190,7 +1190,7 @@ public class Cell implements Serializable {
         this.dna.collisionsCountTotal = Utils.computeSum(this.dna.collisionsCount);
         printFinalInfo(elapsedTimeSec);
 
-        if (this.cellTime >= this.totalStopTime && this.ensemble >= this.ip.ENSEMBLE_SIZE.value - 1) {
+        if (this.cellTime >= this.totalStopTime && this.ensemble >= this.ip.ENSEMBLE_SIZE.value) {
             printFinalDebugInfo(elapsedTimeSec);
         }
 
@@ -1260,7 +1260,7 @@ public class Cell implements Serializable {
             //occupancy
             if (this.ip.OUTPUT_DNA_OCCUPANCY.value) {
                 filename = outputDNAOccupancyFile;
-                if (time < this.totalStopTime) {
+                if (!isEndOfSimulation(time)) {
                     filename = filename.replaceAll("occupancy", "occupancy_" + time + "s");
                 }
                 dna.printDNAoccupancy(this.outputPath, filename, start, end, this.totalStopTime,
@@ -1271,7 +1271,7 @@ public class Cell implements Serializable {
             //print current occupancy
             if (this.ip.PRINT_FINAL_OCCUPANCY.value) {
                 filename = outputDNAOccupancyFinalFile;
-                if (time < this.totalStopTime) {
+                if (!isEndOfSimulation(time)) {
                     filename = filename.replaceAll("occupancy_final", "occupancy_final_" + time + "s");
                 }
                 dna.printFinalPosition(this.outputPath, filename, start, end,
@@ -1281,12 +1281,11 @@ public class Cell implements Serializable {
 
             //print the sliding lengths
             if (this.ip.OUTPUT_SLIDING_LENGTHS.value) {
-                //record last sliding lengths
                 for (int i = 0; i < TFspecies.length; i++) {
                     filename = this.outputParamsFile.getName().replaceAll("params", TFspecies[i].name +
                             "_sliding_lengths").replaceAll(Constants.PARAMETR_FILE_EXTENSION,
                             Constants.SLIDING_LENGTHS_FILE_EXTENSION);
-                    if (time < this.totalStopTime) {
+                    if (!isEndOfSimulation(time)) {
                         filename = filename.replaceAll("sliding_lengths", "sliding_lengths_" + time + "s");
                     }
                     TFspecies[i].printSlidingLengths(this.outputPath, filename);
@@ -1294,7 +1293,7 @@ public class Cell implements Serializable {
                     filename = this.outputParamsFile.getName().replaceAll("params", TFspecies[i].name +
                             "_observed_sliding_lengths").replaceAll(Constants.PARAMETR_FILE_EXTENSION,
                             Constants.SLIDING_LENGTHS_FILE_EXTENSION);
-                    if (time < this.totalStopTime) {
+                    if (!isEndOfSimulation(time)) {
                         filename = filename.replaceAll("observed_sliding_lengths",
                                 "observed_sliding_lengths_" + time + "s");
                     }
@@ -1304,14 +1303,51 @@ public class Cell implements Serializable {
                 }
             }
 
+            // FG: print the repressed lengths
+            if (this.ip.OUTPUT_REPRESSED_LENGTHS.value) {
+                filename = this.outputParamsFile.getName().replaceAll("params",
+                        "repressed_lengths").replaceAll(Constants.PARAMETR_FILE_EXTENSION,
+                        Constants.SLIDING_LENGTHS_FILE_EXTENSION);
+                if (!isEndOfSimulation(time)) {
+                    filename = filename.replaceAll("repressed_lengths", "repressed_lengths_" + time + "s");
+                }
+                this.printRepressedLengths(this.outputPath, filename);
+                this.printDebugInfo("repressed lengths were printed in file " + filename);
+            }
+
             //Target sites
             filename = this.outputTargetSiteFile;
-            if (time < this.totalStopTime) {
+            if (!isEndOfSimulation(time)) {
                 filename = filename.replaceAll("target_site", "target_site_" + time + "s");
             }
             printTargetSitesInformation();
             printTFspecies(time, false, filename);
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * prints the repressed lengths to a file
+     */
+    public void printRepressedLengths(String path, String filename) {
+        try {
+            BufferedWriter out = new BufferedWriter(new FileWriter(path + filename));
+            StringBuilder strBuf = new StringBuilder();
+
+            out.write("\"time\", \"repressedLength\" \n");
+
+            for (int i = 0; i < this.dna.repressedLength.size(); i++) {
+                strBuf.delete(0, strBuf.length());
+                strBuf.append(this.dna.repressedLength.get(i).getVal1());
+                strBuf.append(", ");
+                strBuf.append(this.dna.repressedLength.get(i).getVal2());
+                out.write(strBuf.toString());
+                out.newLine();
+            }
+
+            out.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -1323,7 +1359,7 @@ public class Cell implements Serializable {
             BufferedWriter bufferFile = null;
 
             filename = this.outputTFFile;
-            if (time < this.totalStopTime) {
+            if (!isEndOfSimulation(time)) {
                 filename = filename.replaceAll("TF_species", "TF_species_" + time + "s");
             }
             //Construct the BufferedWriter object
@@ -1347,12 +1383,14 @@ public class Cell implements Serializable {
     /**
      * records last sliding lengths
      */
-    public void recordLastSlidingLenths() {
+    public void recordLastSlidingLengths() {
         if (this.ip.OUTPUT_SLIDING_LENGTHS.value) {
             for (DBP value : this.dbp) {
-                TFspecies[value.speciesID].slidingLength.add(value.getSlidingLength());
-                TFspecies[value.speciesID].slidingEvents.add(value.getSlidingEvents());
-                TFspecies[value.speciesID].observedSlidingLength.add(value.getObservedSlidingLength());
+                if (value.getPosition() != Constants.NONE) {
+                    TFspecies[value.speciesID].slidingLength.add(value.getSlidingLength());
+                    TFspecies[value.speciesID].slidingEvents.add(value.getSlidingEvents());
+                    TFspecies[value.speciesID].observedSlidingLength.add(value.getObservedSlidingLength());
+                }
             }
         }
     }

@@ -3,11 +3,13 @@ package objects;
 import environment.Cell;
 import utils.CellUtils;
 import utils.Constants;
+import utils.Pair;
 import utils.Utils;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Random;
 
 /**
@@ -65,10 +67,11 @@ public class DNA implements Serializable {
     public long collisionsCountTotal;
     double TFSpecificWaitingTime;
 
+    public Integer currentRepressedLength;
+    //public LinkedHashMap<Double, Integer> repressedLength; // FG: time, length
+    public ArrayList<Pair<Double, Integer>> repressedLength; // FG: time, length
+    //public int avgRepressedLength;
 
-    /**
-     * empty constructor doesn't do anything
-     */
     public DNA() {
         strand = new byte[0];
         region = new DNAregion("", 0, 0);
@@ -80,8 +83,8 @@ public class DNA implements Serializable {
     /**
      * class constructor - generates everything random
      */
-    public DNA(Cell n, Random generator, int length, double proportionOfA, double proportionOfT, double proportionOfC
-            , double proportionOfG, String boundaryCondition) {
+    public DNA(Cell n, Random generator, int length, double proportionOfA, double proportionOfT, double proportionOfC,
+               double proportionOfG, String boundaryCondition) {
         strand = CellUtils.generateRandomDNASequence(generator, length, proportionOfA, proportionOfT, proportionOfC,
                 proportionOfG);
         computeBPfreq();
@@ -94,6 +97,9 @@ public class DNA implements Serializable {
         ts = new ArrayList<TargetSite>();
         setOccupancyAndClosenessVectorsFree(n);
         isRandom = true;
+
+        currentRepressedLength = 0;
+        repressedLength = new ArrayList<Pair<Double, Integer>>();
     }
 
 
@@ -121,6 +127,9 @@ public class DNA implements Serializable {
 
         ts = new ArrayList<TargetSite>();
         setOccupancyAndClosenessVectorsFree(n);
+
+        currentRepressedLength = 0;
+        repressedLength = new ArrayList<Pair<Double, Integer>>();
     }
 
     /**
@@ -1100,6 +1109,7 @@ public class DNA implements Serializable {
         for (int bpIdx = boundaryLeft; bpIdx <= boundaryRight; bpIdx++) {
             if (this.closed[bpIdx] == Constants.BP_IS_OPEN) {
                 this.closed[bpIdx] = Constants.BP_IS_REPRESSED;
+                this.currentRepressedLength++;
             }
         }
     }
@@ -1123,8 +1133,10 @@ public class DNA implements Serializable {
         for (int bpIdx = boundaryLeft; bpIdx <= boundaryRight; bpIdx++) {
             if (this.closed[bpIdx] == Constants.BP_IS_REPRESSED) {
                 this.closed[bpIdx] = Constants.BP_IS_OPEN;
+                this.currentRepressedLength--;
             }
         }
+        assert(this.currentRepressedLength >= 0);
     }
 
     public void derepress(Cell n, int boundaryLeft, int boundaryRight, int proteinID) {

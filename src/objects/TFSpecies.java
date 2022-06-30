@@ -625,8 +625,6 @@ public class TFSpecies implements Serializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
 
     /**

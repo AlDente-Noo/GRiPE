@@ -3,8 +3,10 @@ package agents;
 import environment.Cell;
 import event.RepressionEvent;
 import utils.Constants;
+import utils.Pair;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * This class specifies Remodeller which closes or opens chromatin (DNA).
@@ -54,6 +56,7 @@ public class Remodeller implements Serializable {
                 }
                 n.eventQueue.TFBindingEventQueue.updateProteinBindingPropensities(n);
                 n.TFspecies[speciesID].countTFRepressionEvents++;
+                n.dna.repressedLength.add(new Pair<>(re.time, n.dna.currentRepressedLength));
             } else if (n.isInDebugMode()) {
                 n.printDebugInfo(re.time + ": TF " + re.proteinID + " of type " + n.TFspecies[speciesID].name + " at " +
                         "position " + n.dbp[re.proteinID].getPosition() + " attempted to start repression but is " +
@@ -70,6 +73,7 @@ public class Remodeller implements Serializable {
 
             n.dna.derepress(n, re.boundaryLeft, re.boundaryRight, re.proteinID);
             n.TFspecies[speciesID].countTFDerepressionEvents++;
+            n.dna.repressedLength.add(new Pair<>(re.time, n.dna.currentRepressedLength));
 
             if (n.isInDebugMode()) {
                 n.printDebugInfo(re.time + ": TF " + re.proteinID + " of type " + n.TFspecies[speciesID].name + " " +

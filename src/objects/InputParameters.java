@@ -41,6 +41,7 @@ public class InputParameters  implements Serializable{
 	public Parameter<Boolean> OUTPUT_DNA_OCCUPANCY;
 	public Parameter<Boolean> DNA_OCCUPANCY_FULL_MOLECULE_SIZE;
 	public Parameter<Boolean> OUTPUT_SLIDING_LENGTHS;
+	public Parameter<Boolean> OUTPUT_REPRESSED_LENGTHS;
 	public Parameter<Integer> WIG_STEP;
 	public Parameter<Double> WIG_THRESHOLD;
 
@@ -174,6 +175,7 @@ public class InputParameters  implements Serializable{
 		this.OUTPUT_DNA_OCCUPANCY = new Parameter<Boolean>("", "", "", "", false);
 		this.DNA_OCCUPANCY_FULL_MOLECULE_SIZE = new Parameter<Boolean>("", "", "", "", false);
 		this.OUTPUT_SLIDING_LENGTHS = new Parameter<Boolean>("", "", "", "", false);
+		this.OUTPUT_REPRESSED_LENGTHS = new Parameter<Boolean>("", "", "", "", false);
 		this.WIG_STEP = new Parameter<Integer>("", "", "", "", 0);
 		this.WIG_THRESHOLD = new Parameter<Double>("", "", "", "", 0.0);
 
@@ -417,6 +419,8 @@ public class InputParameters  implements Serializable{
 			out.write("DNA_OCCUPANCY_FULL_MOLECULE_SIZE = "+this.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.value+";\n\n");
 			out.write("#"+this.OUTPUT_SLIDING_LENGTHS.description+"\n");
 			out.write("OUTPUT_SLIDING_LENGTHS = "+this.OUTPUT_SLIDING_LENGTHS.value+";\n\n");
+			out.write("#"+this.OUTPUT_REPRESSED_LENGTHS.description+"\n");
+			out.write("OUTPUT_REPRESSED_LENGTHS = "+this.OUTPUT_REPRESSED_LENGTHS.value+";\n\n");
 			out.write("#"+this.WIG_STEP.description+"\n");
 			out.write("WIG_STEP = "+this.WIG_STEP.value+";\n\n");
 			out.write("#"+this.WIG_THRESHOLD.description+"\n");
@@ -720,6 +724,12 @@ public class InputParameters  implements Serializable{
 			if(!label.isEmpty()){this.OUTPUT_SLIDING_LENGTHS.label = label;}
 			if(!description.isEmpty()){this.OUTPUT_SLIDING_LENGTHS.description = description;}
 			if(!category.isEmpty()){this.OUTPUT_SLIDING_LENGTHS.category = category;}
+			found = true;
+		} else if(name.equals("OUTPUT_REPRESSED_LENGTHS")){
+			this.OUTPUT_REPRESSED_LENGTHS.value = Utils.parseBoolean(value,false);
+			if(!label.isEmpty()){this.OUTPUT_REPRESSED_LENGTHS.label = label;}
+			if(!description.isEmpty()){this.OUTPUT_REPRESSED_LENGTHS.description = description;}
+			if(!category.isEmpty()){this.OUTPUT_REPRESSED_LENGTHS.category = category;}
 			found = true;
 		} else if(name.equals("WIG_STEP")){
 			this.WIG_STEP.value = Utils.parseInteger(value, Constants.NONE);

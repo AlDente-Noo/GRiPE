@@ -30,6 +30,7 @@ public class OutputParameters extends JPanel{
 	public LabelledCheckBox OUTPUT_DNA_OCCUPANCY;
 	public LabelledCheckBox DNA_OCCUPANCY_FULL_MOLECULE_SIZE;
 	public LabelledCheckBox OUTPUT_SLIDING_LENGTHS;
+	public LabelledCheckBox OUTPUT_REPRESSED_LENGTHS;
 	public LabelledInteger WIG_STEP;
 	public LabelledDouble WIG_THRESHOLD;	
 
@@ -65,7 +66,8 @@ public class OutputParameters extends JPanel{
 		OUTPUT_BINDING_ENERGY = new LabelledCheckBox(ip.OUTPUT_BINDING_ENERGY.label, ip.OUTPUT_BINDING_ENERGY.description, ip.OUTPUT_BINDING_ENERGY.value);
 		OUTPUT_DNA_OCCUPANCY = new LabelledCheckBox(ip.OUTPUT_DNA_OCCUPANCY.label, ip.OUTPUT_DNA_OCCUPANCY.description, ip.OUTPUT_DNA_OCCUPANCY.value); 
 		DNA_OCCUPANCY_FULL_MOLECULE_SIZE = new LabelledCheckBox(ip.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.label, ip.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.description, ip.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.value); 
-		OUTPUT_SLIDING_LENGTHS = new LabelledCheckBox(ip.OUTPUT_SLIDING_LENGTHS.label, ip.OUTPUT_SLIDING_LENGTHS.description, ip.OUTPUT_SLIDING_LENGTHS.value); 
+		OUTPUT_SLIDING_LENGTHS = new LabelledCheckBox(ip.OUTPUT_SLIDING_LENGTHS.label, ip.OUTPUT_SLIDING_LENGTHS.description, ip.OUTPUT_SLIDING_LENGTHS.value);
+		OUTPUT_REPRESSED_LENGTHS = new LabelledCheckBox(ip.OUTPUT_REPRESSED_LENGTHS.label, ip.OUTPUT_REPRESSED_LENGTHS.description, ip.OUTPUT_REPRESSED_LENGTHS.value);
 		WIG_STEP = new LabelledInteger(ip.WIG_STEP.label,GUIconstants.TEXTAREA_WIDTH,ip.WIG_STEP.description,ip.WIG_STEP.value.intValue());
 		WIG_THRESHOLD = new LabelledDouble(ip.WIG_THRESHOLD.label,GUIconstants.TEXTAREA_WIDTH,ip.WIG_THRESHOLD.description,ip.WIG_THRESHOLD.value);	
 
@@ -86,6 +88,7 @@ public class OutputParameters extends JPanel{
 		componentsStack.add(OUTPUT_DNA_OCCUPANCY);
 		componentsStack.add(DNA_OCCUPANCY_FULL_MOLECULE_SIZE);
 		componentsStack.add(OUTPUT_SLIDING_LENGTHS);
+		componentsStack.add(OUTPUT_REPRESSED_LENGTHS);
 		componentsStack.add(WIG_STEP);
 		componentsStack.add(WIG_THRESHOLD);
 		

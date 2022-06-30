@@ -60,6 +60,9 @@ DNA_OCCUPANCY_FULL_MOLECULE_SIZE = false;
 #If this is true, the simulator will print all recorded sliding lengths.
 OUTPUT_SLIDING_LENGTHS = false;
 
+#If this is true, the simulator will print all recorded repressed lengths.
+OUTPUT_REPRESSED_LENGTHS = false;
+
 #The value of the step in a fixed step wig file, used for the occupancy output.
 WIG_STEP = 1;
 

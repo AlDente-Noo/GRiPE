@@ -114,7 +114,7 @@ public class Constants {
 	public static final String DNA_FASTA_BOUNDARY_ABSORBING = "absorbing";
 	public static final String DNA_FASTA_DELIMITER = ";";
 	
-	public static final double DOUBLE_ZERO=1E-7;
+	public static final double DOUBLE_ZERO=1E-14;
 	
 	// save states after at least 4 hours 14400s
 	public static final int MIN_INTERMEDIARY_STATE=1;
