@@ -9,7 +9,6 @@ import utils.Utils;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Random;
 
 /**
@@ -273,6 +272,9 @@ public class DNA implements Serializable {
         if (strand.length > 0) {
             //count
             for (int i = 0; i < strand.length; i++) {
+                if (strand[i] > 3) {
+                    System.out.println("Error: unknown bp " + strand[i] + " " + i);
+                }
                 countBP[strand[i]]++;
             }
             //compute frequency
@@ -294,7 +296,7 @@ public class DNA implements Serializable {
     }
 
 
-    private void recomputeTFAffinityLandscapeForClosedRegions(Cell n, int startPos, int endPos, int speciesID) {
+    private void recomputeTFAffinityLandscapeForClosedRegions(int startPos, int endPos, int speciesID) {
         boolean stop = false;
         int start = startPos, end = startPos;
         while (!stop) {
@@ -505,24 +507,31 @@ public class DNA implements Serializable {
                     }
 
                     TFavgMoveRate[i][j][0] = CellUtils.computeAvgMoveRate(TFspecies[i].specificWaitingTime,
-                            TFaffinitiesLR[i][j]);
+                            -TFaffinitiesLR[i][j]);
                     this.isTargetSite[i][j][0] = Constants.NONE;
                     firstReached[i][j][0] = Constants.NONE;
                     effectiveTFOccupancy[i][j][0] = 0;
                 }
 
-                // FG: compute maximal TF availability sum
+                // FG: compute TF availability sum before closing inaccessible regions
                 for (int j = 0; j < strand.length; j++) {
                     if (effectiveTFavailability[i][j]) {
                         effectiveTFavailabilitySum[i]++;
-                        effectiveTFavailabilityMaxSum[i]++;
+                        //effectiveTFavailabilityMaxSum[i]++;
                         // increase the number of available spots for sectors position/ sectorSize
                         effectiveTFsectorsAvailabilitySum[i][this.sectorID[j]]++;
                     }
                 }
 
                 // FG: recompute affinity landscape due to the closed regions (here, from btrack file)
-                recomputeTFAffinityLandscapeForClosedRegions(n, 0, strand.length, i);
+                recomputeTFAffinityLandscapeForClosedRegions(0, strand.length, i);
+
+                // FG: compute maximal TF availability sum
+                for (int j = 0; j < strand.length; j++) {
+                    if (effectiveTFavailability[i][j]) {
+                        effectiveTFavailabilityMaxSum[i]++;
+                    }
+                }
 
                 // read the affinities RL
                 if (TFdirections == 2) {
@@ -541,7 +550,7 @@ public class DNA implements Serializable {
 
                     for (int j = 0; j < strand.length; j++) {
                         TFavgMoveRate[i][j][1] = CellUtils.computeAvgMoveRate(TFspecies[i].specificWaitingTime,
-                                TFaffinitiesRL[i][j]);
+                                -TFaffinitiesRL[i][j]);
                         effectiveTFOccupancy[i][j][1] = 0;
                         this.isTargetSite[i][j][1] = Constants.NONE;
                         firstReached[i][j][1] = Constants.NONE;
@@ -1027,7 +1036,7 @@ public class DNA implements Serializable {
                     effectiveTFavailability[speciesID][bpIdx] = true;
                 }
             }
-            recomputeTFAffinityLandscapeForClosedRegions(n, start, end + TFsize[speciesID] - 1, speciesID);
+            recomputeTFAffinityLandscapeForClosedRegions(start, end + TFsize[speciesID] - 1, speciesID);
         }
 
         // find all repressors in the repressed region and close chromatin in their repression regions

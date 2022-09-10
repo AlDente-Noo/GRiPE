@@ -143,7 +143,7 @@ public class CellUtils {
      * @param DNApos   the index of the starting bp of the position on the DNA where the affinity is computed
      * @param TFseq    the recognise DNA sequence
      * @param sizeLeft TF size to the left of its motif
-     * @param es       the specific energy
+     * @param es       the specific energy (mismatch energy in kT units)
      * @return the value of the affinity
      */
     public static double computeTFAffinityLR(byte[] DNAseq, int DNApos, byte[] TFseq, int sizeLeft, double es) {
@@ -165,7 +165,7 @@ public class CellUtils {
      * @param DNApos   the index of the starting bp of the position on the DNA where the affinity is computed
      * @param TFseq    the recognise DNA sequence
      * @param sizeLeft TF size to the left of its motif
-     * @param es       the specific energy
+     * @param es       the specific energy (mismatch energy in kT units)
      * @return the value of the affinity
      */
     public static double computeTFAffinityRL(byte[] DNAseq, int DNApos, byte[] TFseq, int sizeLeft, double es) {
@@ -173,7 +173,7 @@ public class CellUtils {
         byte[] revSeq = getReversedComplementSequences(TFseq);
         for (int i = 0; i < TFseq.length; i++) {
             if (revSeq[i] != bpANYID && DNAseq[DNApos + i + sizeLeft] != revSeq[i]) {
-                sumRL += es;
+                sumRL += es; // TODO: change to -es ??
             }
         }
         return sumRL;
@@ -336,7 +336,7 @@ public class CellUtils {
      * @param DNApos   the index of the starting bp of the position on the DNA where the affinity is computed
      * @param pfm      PFM
      * @param sizeLeft TF size to the left of its motif
-     * @param es       the specific energy
+     * @param es       the specific energy (converts PWM-score to energy in kT units: E = -es * PWM-score)
      * @param isPWMscore if true returns the score, otherwise returns normalized score
      * @return the value of the affinity
      */
@@ -345,7 +345,7 @@ public class CellUtils {
         double sumLR = 0, sumMax = 0;
         for (int i = 0; i < pfm.motifSize; i++) {
             sumLR += es * pfm.getScorePFM(DNAseq[DNApos + i + sizeLeft], i);
-            sumMax += pfm.getMaxScorePFM(i);
+            sumMax += es * pfm.getMaxScorePFM(i);
         }
         return isPWMscore ? sumLR : (sumLR - sumMax);
     }
@@ -359,7 +359,7 @@ public class CellUtils {
      * @param DNApos   the index of the starting bp of the position on the DNA where the affinity is computed
      * @param pfm      PFM
      * @param sizeLeft TF size to the left of its motif
-     * @param es       the specific energy
+     * @param es       the specific energy (converts PWM-score to energy in kT units)
      * @param isPWMscore if true returns the score, otherwise returns normalized score
      * @return the value of the affinity
      */
@@ -369,7 +369,7 @@ public class CellUtils {
         byte[] revComplement = getReversedComplementSequences(DNAseq, DNApos + sizeLeft, pfm.motifSize);
         for (int i = 0; i < pfm.motifSize; i++) {
             sumRL += es * pfm.getScorePFM(revComplement[i], i);
-            sumMax += pfm.getMaxScorePFM(i);
+            sumMax += es * pfm.getMaxScorePFM(i);
         }
         return isPWMscore ? sumRL : (sumRL - sumMax);
     }
@@ -379,7 +379,7 @@ public class CellUtils {
      * computes the rate at which a bound TF will take a decision whether to move or not from current position.
      */
     public static double computeAvgMoveRate(double specificWaitingTime, double bindingEnergy) {
-        return 1.0 / (specificWaitingTime * Math.exp(bindingEnergy));
+        return 1.0 / (specificWaitingTime * Math.exp(-bindingEnergy));
     }
 
     /**

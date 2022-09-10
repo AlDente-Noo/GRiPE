@@ -102,6 +102,7 @@ public class InputParameters  implements Serializable{
 	public Parameter<Boolean> CHECK_OCCUPANCY_ON_REBINDING;
 	public Parameter<Boolean> IS_BIASED_RANDOM_WALK;
 	public Parameter<Boolean> IS_TWO_STATE_RANDOM_WALK;
+	public Parameter<Double> TF_SPECIFIC_ENERGY_THRESHOLD;
 
 	public InputParameters(String parametersFile){
 		BufferedReader br ;
@@ -238,6 +239,7 @@ public class InputParameters  implements Serializable{
 		this.CHECK_OCCUPANCY_ON_REBINDING = new Parameter<Boolean>("", "", "", "", false);
 		this.IS_BIASED_RANDOM_WALK = new Parameter<Boolean>("", "", "", "", false);
 		this.IS_TWO_STATE_RANDOM_WALK = new Parameter<Boolean>("", "", "", "", false);
+		this.TF_SPECIFIC_ENERGY_THRESHOLD = new Parameter<Double>("", "", "", "", 0.0);
 	}
 
 	/**
@@ -534,6 +536,8 @@ public class InputParameters  implements Serializable{
 			out.write("IS_BIASED_RANDOM_WALK = "+this.IS_BIASED_RANDOM_WALK.value+";\n\n");
 			out.write("#"+this.IS_TWO_STATE_RANDOM_WALK.description+"\n");
 			out.write("IS_TWO_STATE_RANDOM_WALK = "+this.IS_TWO_STATE_RANDOM_WALK.value+";\n\n");
+			out.write("#"+this.TF_SPECIFIC_ENERGY_THRESHOLD.description+"\n");
+			out.write("TF_SPECIFIC_ENERGY_THRESHOLD = "+this.TF_SPECIFIC_ENERGY_THRESHOLD.value+";\n\n");
 
 			out.close();
 
@@ -1031,8 +1035,14 @@ public class InputParameters  implements Serializable{
 			if(!description.isEmpty()){this.IS_TWO_STATE_RANDOM_WALK.description = description;}
 			if(!category.isEmpty()){this.IS_TWO_STATE_RANDOM_WALK.category = category;}
 			found = true;
+		} else if(name.equals("TF_SPECIFIC_ENERGY_THRESHOLD")){
+			this.TF_SPECIFIC_ENERGY_THRESHOLD.value = Utils.parseDouble(value, 0.0);
+			if(!label.isEmpty()){this.TF_SPECIFIC_ENERGY_THRESHOLD.label = label;}
+			if(!description.isEmpty()){this.TF_SPECIFIC_ENERGY_THRESHOLD.description = description;}
+			if(!category.isEmpty()){this.TF_SPECIFIC_ENERGY_THRESHOLD.category = category;}
+			found = true;
 		} else{
-		System.out.println(name+" not recognised.");
+			System.out.println(name+" not recognised.");
 		}
 
 		return found;

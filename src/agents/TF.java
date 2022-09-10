@@ -273,6 +273,9 @@ public class TF extends DBP implements Serializable {
 
     public void setMoveRate(Cell n) {
         moveRate = n.dna.TFavgMoveRate[speciesID][position][direction];
+        if (n.TFspecies[speciesID].isTwoStateRandomWalk) {
+            moveRate = Math.min(moveRate, n.TFspecies[speciesID].maxMoveRate);
+        }
     }
 
     /**

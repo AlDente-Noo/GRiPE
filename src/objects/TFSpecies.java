@@ -89,6 +89,8 @@ public class TFSpecies implements Serializable {
     public boolean isBiasedRandomWalk;
     public boolean isTwoStateRandomWalk;
     public boolean isImmobile;
+    public double specificEnergyThreshold;
+    public double maxMoveRate;
 
     //public double moveRateThreshold;
 
@@ -102,7 +104,8 @@ public class TFSpecies implements Serializable {
                      int stepLeftSize, int stepRightSize, int uncorrelatedDisplacementSize, boolean stallsIfBlocked,
                      double collisionUnbindingProbability, double affinityLandscapeRoughness,
                      double preboundProportion, boolean preboundToHighestAffinity, boolean isImmobile,
-                     boolean isBiasedRandomWalk, boolean isTwoStateRandomWalk, double repressionRate,
+                     boolean isBiasedRandomWalk, boolean isTwoStateRandomWalk,
+                     double specificEnergyThreshold, double repressionRate,
                      double repressionAttenuationFactor, int repressionLenLeft, int repressionLenRight) {
         this.id = id;
         name = "TF" + id;
@@ -175,6 +178,8 @@ public class TFSpecies implements Serializable {
         this.isBiasedRandomWalk = isBiasedRandomWalk;
         this.isTwoStateRandomWalk = isTwoStateRandomWalk;
         this.dbdFile = "";
+        this.specificEnergyThreshold = specificEnergyThreshold;
+        maxMoveRate = CellUtils.computeAvgMoveRate(specificWaitingTime, specificEnergyThreshold);
     }
 
 
@@ -188,7 +193,8 @@ public class TFSpecies implements Serializable {
                      int stepLeftSize, int stepRightSize, int uncorrelatedDisplacementSize, boolean stallsIfBlocked,
                      double collisionUnbindingProbability, double affinityLandscapeRoughness,
                      double preboundProportion, boolean preboundToHighestAffinity, boolean isImmobile,
-                     boolean isBiasedRandomWalk, boolean isTwoStateRandomWalk, double repressionRate,
+                     boolean isBiasedRandomWalk, boolean isTwoStateRandomWalk,
+                     double specificEnergyThreshold, double repressionRate,
                      double repressionAttenuationFactor, int repressionLenLeft, int repressionLenRight, Cell n) {
         this.id = id;
         this.name = name;
@@ -266,6 +272,8 @@ public class TFSpecies implements Serializable {
         slidingEvents = new ArrayList<Integer>();
         this.isBiasedRandomWalk = isBiasedRandomWalk;
         this.isTwoStateRandomWalk = isTwoStateRandomWalk;
+        this.specificEnergyThreshold = specificEnergyThreshold;
+        maxMoveRate = CellUtils.computeAvgMoveRate(specificWaitingTime, specificEnergyThreshold);
     }
 
     public boolean isRepressor() {
@@ -452,6 +460,8 @@ public class TFSpecies implements Serializable {
         str.append(", ").append(this.repressionRate).append(", ").append(this.repressionAttenuationFactor).append(", "
         ).append(this.repressionLeftSize).append(", ").append(this.repressionRightSize);
 
+        str.append(", ").append(this.specificEnergyThreshold);
+
         if (!reduced) {
             //"eventsBindingTotal\", \"eventsUnbindingTotal\", \"eventsSlideLeftTotal\", \"eventsSlideRightTotal\",
             // \"eventsSlideTotal\", \"eventsHoppingTotal\", \"eventsForcedJumps\", \"eventsHopOutsideDNA\",
@@ -485,7 +495,8 @@ public class TFSpecies implements Serializable {
                 "\"STEPRIGHTSIZE\", \"UNCORRELATEDDISPLACEMENTSIZE\", \"STALLSIFBLOCKED\", " +
                 "\"COLLISIONUNBINDPROBABILITY\", \"AFFINITYLANDSCAPEROUGHNESS\", \"PREBOUNDPROPORTION\", " +
                 "\"PREBOUNDTOHIGHESTAFFINITY\", \"TFISIMMOBILE\", \"ISBIASEDRANDOMWALK\", \"ISTWOSTATERANDOMWALK\", " +
-                "\"REPRESSIONRATE\", \"DEREPRESSIONATTENUATIONFACTOR\", \"REPRLENLEFT\", \"REPRLENRIGHT\"";
+                "\"REPRESSIONRATE\", \"DEREPRESSIONATTENUATIONFACTOR\", \"REPRLENLEFT\", \"REPRLENRIGHT\", " +
+                "\"SPECIFICENERGYTHRESHOLD\"";
         if (!reduced) {
             str += ", \"eventsBindingTotal\", \"eventsUnbindingTotal\", \"eventsSlideLeftTotal\", " +
                     "\"eventsSlideRightTotal\", \"eventsSlideTotal\", \"eventsHoppingTotal\", \"eventsForcedJumps\", " +

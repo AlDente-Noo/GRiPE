@@ -552,7 +552,7 @@ public class GenerateDNAsequence {
 		TFfileParser TFparser=new TFfileParser(n, TFfile, Utils.generateNextInteger(randomGenerator, n.ip.TF_COPY_NUMBER_MIN.value, n.ip.TF_COPY_NUMBER_MAX.value), n.ip.TF_ES.value, n.ip.TF_SIZE_LEFT.value, n.ip.TF_SIZE_RIGHT.value, n.ip.TF_ASSOC_RATE.value, n.dna.strand.length, n.ip.TF_UNBINDING_PROBABILITY.value, n.ip.TF_SLIDE_LEFT_PROBABILITY.value, n.ip.TF_SLIDE_RIGHT_PROBABILITY.value, n.ip.TF_JUMPING_PROBABILITY.value,
 				n.ip.TF_HOP_STD_DISPLACEMENT.value, n.ip.TF_SPECIFIC_WAITING_TIME.value, n.ip.TF_STEP_LEFT_SIZE.value, n.ip.TF_STEP_RIGHT_SIZE.value, n.ip.TF_UNCORRELATED_DISPLACEMENT_SIZE.value,
 				n.ip.TF_STALLS_IF_BLOCKED.value, n.ip.TF_COLLISION_UNBIND_PROBABILITY.value, n.ip.TF_AFFINITY_LANDSCAPE_ROUGHNESS.value, n.ip.TF_PREBOUND_PROPORTION.value, n.ip.TF_PREBOUND_TO_HIGHEST_AFFINITY.value, n.ip.TF_IS_IMMOBILE.value,dnaRegion, n.ip.IS_BIASED_RANDOM_WALK.value,n.ip.IS_TWO_STATE_RANDOM_WALK.value,
-				n.ip.TF_REPRESSION_RATE.value, n.ip.TF_DEREPRESSION_ATTENUATION_FACTOR.value, n.ip.TF_REPR_LEN_LEFT.value, n.ip.TF_REPR_LEN_RIGHT.value);
+				n.ip.TF_SPECIFIC_ENERGY_THRESHOLD.value, n.ip.TF_REPRESSION_RATE.value, n.ip.TF_DEREPRESSION_ATTENUATION_FACTOR.value, n.ip.TF_REPR_LEN_LEFT.value, n.ip.TF_REPR_LEN_RIGHT.value);
 		if(TFparser.parsed){
 			// load TF species
 			if(TFparser.data==null || TFparser.data.isEmpty()){
