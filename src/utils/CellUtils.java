@@ -66,7 +66,7 @@ public class CellUtils {
 
 
     /**
-     * comptes the affinities between a TF and DNA
+     * computes the affinities between a TF and DNA
      *
      * @param strand    the DNA strand
      * @param TFseq     the recognise DNA sequence
@@ -243,11 +243,11 @@ public class CellUtils {
 
 
     /**
-     * comptes the affinities between a TF and DNA
+     * computes the affinities between a TF and DNA (using PWM or randomly)
      *
-     * @param generator random numer generator
+     * @param generator random number generator
      * @param strand    the DNA strand
-     * @param pfm       PFM
+     * @param pfm       PFM (PWM)
      * @param sizeLeft  The size on the left of the DBD that the TF occupies on the DNA.
      * @param sizeTotal The total number of bp  that the TF occupies on the DNA.
      * @param es        the specific energy
@@ -274,7 +274,6 @@ public class CellUtils {
         } else {
             for (int i = 0; i < strand.length - sizeTotal; i++) {
                 affinities[i] = Utils.generateNextNormalDistributedDouble(generator, es, roughness, 0);
-
             }
         }
 
@@ -287,7 +286,7 @@ public class CellUtils {
 
 
     /**
-     * comptes the affinities between a TF and DNA
+     * computes the affinities between a TF and DNA from user-specified affinities
      *
      * @param strand    the DNA strand
      * @param sizeLeft  The size on the left of the DBD that the TF occupies on the DNA.
@@ -305,8 +304,6 @@ public class CellUtils {
                 for (int i = 0; i < strand.length - sizeTotal; i++) {
                     affinities[i] = computeTFAffinityLR(strand, i, seqsAffinities, sizeLeft, sizeMotif,
                             defaultAffinity);
-
-
                 }
             }
             if (direction == 1) {
@@ -318,7 +315,6 @@ public class CellUtils {
         } else {
             for (int i = 0; i < strand.length - sizeTotal; i++) {
                 affinities[i] = defaultAffinity;
-
             }
         }
 
@@ -330,7 +326,7 @@ public class CellUtils {
     }
 
     /**
-     * computes the affinity between a TF and the DNA at a specific position using the Gerland 2002 one way 5'->3'
+     * computes the PWM (PFM) affinity between a TF and the DNA at a specific position for the 5'->3' strand
      *
      * @param DNAseq   the DNA sequence
      * @param DNApos   the index of the starting bp of the position on the DNA where the affinity is computed
@@ -352,8 +348,7 @@ public class CellUtils {
 
 
     /**
-     * computes the affinity between a TF and the DNA at a specific position using the Gerland 2002 two ways from 3'
-     * to 5'
+     * computes the PWM (PFM) affinity between a TF and the DNA at a specific position for the 3'->5' strand
      *
      * @param DNAseq   the DNA sequence
      * @param DNApos   the index of the starting bp of the position on the DNA where the affinity is computed
@@ -452,7 +447,7 @@ public class CellUtils {
 
 
     /**
-     * returns the revered complement of a sequence
+     * returns the reversed complement of a sequence
      */
     public static ArrayList<Byte> getReversedComplementSequences(ArrayList<Byte> seq) {
         ArrayList<Byte> revSeq = new ArrayList<Byte>();
@@ -464,7 +459,7 @@ public class CellUtils {
 
 
     /**
-     * returns the revered complement of a sequence
+     * returns the reversed complement of a sequence
      */
     public static byte[] getReversedComplementSequences(byte[] seq) {
         byte[] revSeq = new byte[seq.length];
@@ -478,7 +473,7 @@ public class CellUtils {
 
 
     /**
-     * returns the revered complement of a sub sequence
+     * returns the reversed complement of a subsequence
      *
      * @param seq    the DNA sequence
      * @param start  the start position
@@ -490,9 +485,7 @@ public class CellUtils {
             start = 0;
         }
         byte[] revSeq = new byte[length];
-
         int j = 0;
-
         for (int i = (length + start) - 1; i >= start; i--) {
             revSeq[j] = bps.getComplement(seq[i]);
             j++;
@@ -537,14 +530,12 @@ public class CellUtils {
             StringBuilder buffer;
             for (int i = 0; i < sectors; i++) {
                 buffer = new StringBuilder();
-
                 for (int j = i * sectorSize; j < Math.min((i + 1) * sectorSize, seq.length); j++) {
                     buffer.append(CellUtils.bps.bps[seq[j]]);
                 }
                 out.write(buffer.toString());
                 out.newLine();
             }
-
             out.close();
         } catch (IOException e) {
             e.printStackTrace();

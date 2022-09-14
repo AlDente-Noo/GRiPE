@@ -450,16 +450,17 @@ public class TFSpecies implements Serializable {
         // \"UNBINDINGPROBABILITY\", \"SLIDELEFTPROBABILITY\", \"SLIDERIGHTPROBABILITY\", \"JUMPINGPROBABILITY\",
         // \"HOPSTDDISPLACEMENT\", \"SPECIFICWAITINGTIME\", \"STEPLEFTSIZE\", \"STEPRIGHTSIZE\",
         // \"UNCORRELATEDDISPLACEMENTSIZE\", \"STALLSIFBLOCKED\", \"COLLISIONUNBINDPROBABILITY\",
-        // \"AFFINITYLANDSCAPEROUGHNESS\", \"PREBOUNDPROPORTION\", \"PREBOUNDTOHIGHESTAFFINITY\"
+        // \"AFFINITYLANDSCAPEROUGHNESS\", \"PREBOUNDPROPORTION\"
         str.append("\",").append(es).append(", ").append(copyNumber).append(", ").append(this.sizeLeft).append(", ").append(this.sizeRight).append(", ").append(this.assocRate).append(", \"").append(this.initialDrop).append("\"").append(", ").append(unBindingProbability).append(", ").append(slideLeftProbability).append(", ").append(slideRightProbability).append(", ").append(jumpingProbability).append(", ").append(hopSTDdisplacement).append(", ").append(specificWaitingTime).append(", ").append(stepLeftSize).append(", ").append(stepRightSize).append(", ").append(uncorrelatedDisplacementSize).append(", ").append(stallsIfBlocked).append(", ").append(collisionUnbindingProbability).append(", ").append(affinityLandscapeRoughness).append(", ").append(preboundProportion).append(", ").append(preboundToHighestAffinity).append(", ").append(isImmobile);
 
-        //"ISBIASEDRANDOMWALK\", \"ISTWOSTATERANDOMWALK\",
+        //"ISBIASEDRANDOMWALK\", \"ISTWOSTATERANDOMWALK\", \"SPECIFICENERGYTHRESHOLD\",
         str.append(", ").append(this.isBiasedRandomWalk).append(", ").append(this.isTwoStateRandomWalk);
 
         //"REPRESSIONRATE", "DEREPRESSIONATTENUATIONFACTOR", "REPRLENLEFT", "REPRLENRIGHT"
         str.append(", ").append(this.repressionRate).append(", ").append(this.repressionAttenuationFactor).append(", "
         ).append(this.repressionLeftSize).append(", ").append(this.repressionRightSize);
 
+        // FG: \"PREBOUNDTOHIGHESTAFFINITY\"
         str.append(", ").append(this.specificEnergyThreshold);
 
         if (!reduced) {

@@ -78,13 +78,13 @@ public class DNAFilesParser {
 					}
 					return "";
 				}
-				return "different size of dna strand and dna availability (btrack) files";
+				return "different size of dna strand and dna accessibility (btrack) files";
 			} catch (Exception e) {
 				e.printStackTrace();
-				return "failed to read the btrack file";
+				return "failed to read the dna accessibility file";
 			}
 		} else {
-			return "the btrack file does not exist";
+			return "the dna accessibility file does not exist";
 		}
 	}
 }

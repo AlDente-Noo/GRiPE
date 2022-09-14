@@ -27,7 +27,7 @@ import utilsGUI.*;
 
 /**
  * runnable class with GUI
- * @author n.r.zabet@gen.cam.ac.uk
+ * @author n.r.zabet@gen.cam.ac.uk, modified by fedor.garbuzov@gmail.com
  *
  */
 public class SimulatorGUI {
@@ -55,9 +55,6 @@ public class SimulatorGUI {
 	private TFParameters TFParameters;
 	private DNAParameters DNAParameters;
 	private TFRandomWalkParameters TFRandomWalkParameters;
-
-
-	
 	
 	private InputParameters ip;
 	
@@ -105,9 +102,7 @@ public class SimulatorGUI {
 		gui.makeFrame();
 	}
 	
-	
-	
-	
+
 
 	/**
 	 * construct the frame
@@ -116,15 +111,13 @@ public class SimulatorGUI {
 		frame = new JFrame(GUIconstants.WINDOW_TITLE);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		
 		Container contentPane = frame.getContentPane();
 		contentPane.setLayout(new BorderLayout());
 		
 		fc = new JFileChooser();
 		FileFilter filter1 = new ExtensionFileFilter(GUIconstants.EXTENSION_FILE_DESCRIPTION, new String[] { GUIconstants.EXTENSION_FILE});
 	    fc.setFileFilter(filter1);
-	    
-	    
+
 		InputStream in;
 		logoImg = new ImageIcon();
 	    File logoImgFile = new File(GUIconstants.LOGO_IMAGE);
@@ -165,8 +158,6 @@ public class SimulatorGUI {
 		simulationArea.setPreferredSize(new Dimension(GUIconstants.SETUP_AREA_WIDTH,GUIconstants.SIMULATION_AREA_HIGHT));
 
 		// load button
-
-		
 		InputStream in;
 		buttonLoadImg = new ImageIcon();
 	    File buttonLoadImgFile = new File(GUIconstants.LOAD_IMAGE);
@@ -243,9 +234,7 @@ public class SimulatorGUI {
 		} else{
 			buttonPauseImg= new ImageIcon(GUIconstants.PAUSE_IMAGE);
 		}
-		
 
-		
 		simulationsStart = new JButton(buttonPlayImg);
 		simulationsStart.setText(GUIconstants.SIMULATE_BUTTON_START);
 		simulationsStart.setBackground(Color.white);
@@ -257,9 +246,6 @@ public class SimulatorGUI {
 		});
 		simulating=false;
 		simulationArea.add(simulationsStart);
-		
-
-		
 		
 		// progress bar
 		simulationsProgress = new JProgressBar();
@@ -276,23 +262,17 @@ public class SimulatorGUI {
 		timeLabel = new JLabel(getTimeString(0,0)+" ");
         timeLabel.setEnabled(false);
 		simulationArea.add(timeLabel);
-		
-		
-		contentPane.add(simulationArea, BorderLayout.SOUTH);
 
+		contentPane.add(simulationArea, BorderLayout.SOUTH);
 	}
 	
 
 	public void makeSetupArea(Container contentPane){
 		//setup area
-		setupArea = new JPanel();		
-	
+		setupArea = new JPanel();
 		setupAreaTabbedPane = new JTabbedPane();
 		setupAreaTabbedPane.setPreferredSize(new Dimension(GUIconstants.SETUP_AREA_WIDTH-GUIconstants.SCROLLBAR_SIZE,GUIconstants.SETUP_AREA_HIGHT-GUIconstants.SCROLLBAR_SIZE));
-
 		setupArea.setLayout(new FlowLayout());
-		
-
 
 		simulationParamaters = new SimulationParameters(ip);
 		setupAreaTabbedPane.addTab(GUIconstants.SIMULATION_AREA_SIMULATION_PARAMATERS, null, simulationParamaters, null);
@@ -303,23 +283,17 @@ public class SimulatorGUI {
 		TFParameters = new TFParameters(ip);
 		setupAreaTabbedPane.addTab(GUIconstants.SIMULATION_AREA_TF_PARAMATERS, null, TFParameters, null);
 
-		
 		DNAParameters = new DNAParameters(ip);
 		setupAreaTabbedPane.addTab(GUIconstants.SIMULATION_AREA_DNA_PARAMATERS, null, DNAParameters, null);
 
-		
 		TFRandomWalkParameters = new TFRandomWalkParameters(ip);
 		setupAreaTabbedPane.addTab(GUIconstants.SIMULATION_AREA_TF_RANDOM_WALK_PARAMATERS, null, TFRandomWalkParameters, null);
 
-		
 		setupArea.add(setupAreaTabbedPane);
 		
 		setupAreaScroll = new JScrollPane(setupArea);
 		setupAreaScroll.setPreferredSize(new Dimension(GUIconstants.SETUP_AREA_WIDTH,GUIconstants.SETUP_AREA_HIGHT));
 		contentPane.add(setupAreaScroll,BorderLayout.CENTER);
-		
-		
-		//contentPane.add(setupArea,BorderLayout.CENTER);
 	}
 	
 
@@ -356,8 +330,7 @@ public class SimulatorGUI {
 			}
 		});
 		fileMenu.add(openItem);
-		
-		
+
 		JMenuItem saveItem = new JMenuItem(GUIconstants.MENU_FILE_SAVE);
 		saveItem.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
@@ -365,8 +338,7 @@ public class SimulatorGUI {
 			}
 		});
 		fileMenu.add(saveItem);
-		
-		
+
 		JMenuItem saveasItem = new JMenuItem(GUIconstants.MENU_FILE_SAVE_AS);
 		saveasItem.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
@@ -394,11 +366,7 @@ public class SimulatorGUI {
 			}
 		});
 		helpMenu.add(aboutItem);
-		
-		
 	}
-	
-	
 
 	/**
 	 * writes a line in the status area
@@ -407,14 +375,11 @@ public class SimulatorGUI {
 	public void printlnStatusArea(String line){
 		statusTextArea.append(line+"\n");
 	}
-	
-	
 
 	/**
 	 * opens a file
 	 */
 	private void openFile(){
-		
 		int returnVal = fc.showOpenDialog(setupArea);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
@@ -429,11 +394,8 @@ public class SimulatorGUI {
 			}
             this.setInputParameters();
 		}
-		
-		
 	}
 
-	
 	/**
 	 * save a file
 	 */
@@ -462,7 +424,6 @@ public class SimulatorGUI {
 		}
 		
 		return result;
-
 	}
 	
 	/**
@@ -472,17 +433,13 @@ public class SimulatorGUI {
 		System.exit(0);     
 	}
 
-	
-	
 	/**
 	 * save a file
 	 */
 	private void aboutHelp(){
 		  JOptionPane.showMessageDialog(frame, GUIconstants.MENU_ABOUT_DESCRIPTION, GUIconstants.MENU_HELP_ABOUT, JOptionPane.INFORMATION_MESSAGE, logoImg);
 	}
-	
-	
-	
+
 	/**
 	 * save the model
 	 */
@@ -490,13 +447,12 @@ public class SimulatorGUI {
 		getInputParameters();
 		this.currentFile = this.ip.exportParameterFile(currentFile).getAbsolutePath();
 	}
-	
 
 	/**
 	 * collect the new input parameters
 	 */
 	private void getInputParameters(){
-		//SIMULATION PARAMATERS
+		//SIMULATION PARAMETERS
 		ip.STOP_TIME.value= simulationParamaters.STOP_TIME.getValue();	
 		ip.ENSEMBLE_SIZE.value= simulationParamaters.ENSEMBLE_SIZE.getValue();
 		ip.RANDOM_SEED.value= simulationParamaters.RANDOM_SEED.getValue();	
@@ -505,7 +461,7 @@ public class SimulatorGUI {
 		ip.EVENT_LIST_SUBGROUP_SIZE.value= simulationParamaters.EVENT_LIST_SUBGROUP_SIZE.getValue();	
 		ip.EVENT_LIST_USES_FR.value= simulationParamaters.EVENT_LIST_USES_FR.getValue();
 		
-		//SIMULATION-OUTPUT PARAMATERS
+		//SIMULATION-OUTPUT PARAMETERS
 		ip.OUTPUT_FOLDER.value= outputParamaters.OUTPUT_FOLDER.getValue();	
 		ip.OUTPUT_FILENAME.value= outputParamaters.OUTPUT_FILENAME.getValue();	
 		ip.PRINT_INTERMEDIARY_RESULTS_AFTER.value= outputParamaters.PRINT_INTERMEDIARY_RESULTS_AFTER.getValue();	
@@ -524,7 +480,8 @@ public class SimulatorGUI {
 		ip.WIG_THRESHOLD.value= outputParamaters.WIG_THRESHOLD.getValue();	
 
 		//TF PARAMETERS
-		ip.TF_FILE.value= TFParameters.TF_FILE.getValue();	
+		ip.TF_FILE.value= TFParameters.TF_FILE.getValue();
+		ip.TS_FILE.value= TFParameters.TS_FILE.getValue();
 		ip.TF_COOPERATIVITY_FILE.value= TFParameters.TF_COOPERATIVITY_FILE.getValue();	
 
 		//TF_RANDOM PARAMETERS
@@ -543,11 +500,15 @@ public class SimulatorGUI {
 		ip.TF_READ_IN_BOTH_DIRECTIONS.value= TFParameters.TF_READ_IN_BOTH_DIRECTIONS.getValue();	
 		ip.SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE.value= TFParameters.SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE.getValue();	
 
-	
-		
-		
+		ip.TF_REPR_LEN_LEFT.value = TFParameters.TF_REPR_LEN_LEFT.getValue();
+		ip.TF_REPR_LEN_RIGHT.value = TFParameters.TF_REPR_LEN_RIGHT.getValue();
+		ip.TF_REPRESSION_RATE.value = TFParameters.TF_REPRESSION_RATE.getValue();
+		ip.TF_DEREPRESSION_ATTENUATION_FACTOR.value = TFParameters.TF_DEREPRESSION_ATTENUATION_FACTOR.getValue();
+
 		//DNA PARAMETERS
-		ip.DNA_SEQUENCE_FILE.value= DNAParameters.DNA_SEQUENCE_FILE.getValue();	
+		ip.DNA_SEQUENCE_FILE.value= DNAParameters.DNA_SEQUENCE_FILE.getValue();
+		ip.DNA_AVAILABILITY_FILE.value= DNAParameters.DNA_AVAILABILITY_FILE.getValue();
+		ip.DNA_DEREPRESSION_RATE.value= DNAParameters.DNA_DEREPRESSION_RATE.getValue();
 
 		//DNA_RANDOM PARAMETERS
 		ip.DNA_LENGTH.value= DNAParameters.DNA_LENGTH.getValue();	
@@ -556,14 +517,12 @@ public class SimulatorGUI {
 		ip.DNA_PROPORTION_OF_C.value= DNAParameters.DNA_PROPORTION_OF_C.getValue();	
 		ip.DNA_PROPORTION_OF_G.value= DNAParameters.DNA_PROPORTION_OF_G.getValue();	
 		ip.DNA_BOUNDARY_CONDITION.value= DNAParameters.DNA_BOUNDARY_CONDITION.getValue();	
-		
 
-		//TF RANDOM WALK PARAMATERS
+		//TF RANDOM WALK PARAMETERS
 		ip.CHECK_OCCUPANCY_ON_BINDING.value= TFRandomWalkParameters.CHECK_OCCUPANCY_ON_BINDING.getValue();	
 		ip.CHECK_OCCUPANCY_ON_SLIDING.value= TFRandomWalkParameters.CHECK_OCCUPANCY_ON_SLIDING.getValue();	
 		ip.CHECK_OCCUPANCY_ON_REBINDING.value= TFRandomWalkParameters.CHECK_OCCUPANCY_ON_REBINDING.getValue();	
-	
-		//TF RANDOM WALK RANDOM PARAMATERS
+
 		ip.TF_SLIDE_LEFT_PROBABILITY.value= TFRandomWalkParameters.TF_SLIDE_LEFT_PROBABILITY.getValue();	
 		ip.TF_SLIDE_RIGHT_PROBABILITY.value= TFRandomWalkParameters.TF_SLIDE_RIGHT_PROBABILITY.getValue();	
 		ip.TF_UNBINDING_PROBABILITY.value= TFRandomWalkParameters.TF_UNBINDING_PROBABILITY.getValue();	
@@ -580,7 +539,7 @@ public class SimulatorGUI {
 		ip.IS_BIASED_RANDOM_WALK.value= TFRandomWalkParameters.IS_BIASED_RANDOM_WALK.getValue();	
 		ip.IS_TWO_STATE_RANDOM_WALK.value= TFRandomWalkParameters.IS_TWO_STATE_RANDOM_WALK.getValue();	
 
-				
+		ip.TF_SPECIFIC_ENERGY_THRESHOLD.value = TFRandomWalkParameters.TF_SPECIFIC_ENERGY_THRESHOLD.getValue();
 	}
 	
 	/**
@@ -588,7 +547,7 @@ public class SimulatorGUI {
 	 */
 	private void setInputParameters(){
 		
-		//SIMULATION PARAMATERS
+		//SIMULATION PARAMETERS
 		simulationParamaters.STOP_TIME.setValue(ip.STOP_TIME.value);
 		simulationParamaters.ENSEMBLE_SIZE.setValue(ip.ENSEMBLE_SIZE.value);
 		simulationParamaters.RANDOM_SEED.setValue(ip.RANDOM_SEED.value);
@@ -597,7 +556,7 @@ public class SimulatorGUI {
 		simulationParamaters.EVENT_LIST_SUBGROUP_SIZE.setValue(ip.EVENT_LIST_SUBGROUP_SIZE.value);
 		simulationParamaters.EVENT_LIST_USES_FR.setValue(ip.EVENT_LIST_USES_FR.value);
 		
-		//SIMULATION-OUTPUT PARAMATERS
+		//SIMULATION-OUTPUT PARAMETERS
 		outputParamaters.OUTPUT_FOLDER.setValue(ip.OUTPUT_FOLDER.value);
 		outputParamaters.OUTPUT_FILENAME.setValue(ip.OUTPUT_FILENAME.value);
 		outputParamaters.PRINT_INTERMEDIARY_RESULTS_AFTER.setValue(ip.PRINT_INTERMEDIARY_RESULTS_AFTER.value);
@@ -615,10 +574,9 @@ public class SimulatorGUI {
 		outputParamaters.WIG_STEP.setValue(ip.WIG_STEP.value);
 		outputParamaters.WIG_THRESHOLD.setValue(ip.WIG_THRESHOLD.value);
 		
-		
-		
 		//TF PARAMETERS
 		TFParameters.TF_FILE.setValue(ip.TF_FILE.value);
+		TFParameters.TS_FILE.setValue(ip.TS_FILE.value);
 		TFParameters.TF_COOPERATIVITY_FILE.setValue(ip.TF_COOPERATIVITY_FILE.value);
 
 		//TF_RANDOM PARAMETERS
@@ -635,13 +593,16 @@ public class SimulatorGUI {
 		TFParameters.TF_PREBOUND_TO_HIGHEST_AFFINITY.setValue(ip.TF_PREBOUND_TO_HIGHEST_AFFINITY.value);
 		TFParameters.TF_READ_IN_BOTH_DIRECTIONS.setValue(ip.TF_READ_IN_BOTH_DIRECTIONS.value);
 		TFParameters.SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE.setValue(ip.SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE.value);
-		
-		
 
-		
-		
+		TFParameters.TF_REPR_LEN_LEFT.setValue(ip.TF_REPR_LEN_LEFT.value);
+		TFParameters.TF_REPR_LEN_RIGHT.setValue(ip.TF_REPR_LEN_RIGHT.value);
+		TFParameters.TF_REPRESSION_RATE.setValue(ip.TF_REPRESSION_RATE.value);
+		TFParameters.TF_DEREPRESSION_ATTENUATION_FACTOR.setValue(ip.TF_DEREPRESSION_ATTENUATION_FACTOR.value);
+
 		//DNA PARAMETERS
 		DNAParameters.DNA_SEQUENCE_FILE.setValue(ip.DNA_SEQUENCE_FILE.value);
+		DNAParameters.DNA_AVAILABILITY_FILE.setValue(ip.DNA_AVAILABILITY_FILE.value);
+		DNAParameters.DNA_DEREPRESSION_RATE.setValue(ip.DNA_DEREPRESSION_RATE.value);
 		
 		//DNA_RANDOM PARAMETERS
 		DNAParameters.DNA_LENGTH.setValue(ip.DNA_LENGTH.value);
@@ -651,13 +612,13 @@ public class SimulatorGUI {
 		DNAParameters.DNA_PROPORTION_OF_G.setValue(ip.DNA_PROPORTION_OF_G.value);
 		DNAParameters.DNA_BOUNDARY_CONDITION.setValue(ip.DNA_BOUNDARY_CONDITION.value);
 		
-		//TF RANDOM WALK PARAMATERS
+		//TF RANDOM WALK PARAMETERS
 		TFRandomWalkParameters.CHECK_OCCUPANCY_ON_BINDING.setValue(ip.CHECK_OCCUPANCY_ON_BINDING.value);
 		TFRandomWalkParameters.CHECK_OCCUPANCY_ON_SLIDING.setValue(ip.CHECK_OCCUPANCY_ON_SLIDING.value);
 		TFRandomWalkParameters.CHECK_OCCUPANCY_ON_REBINDING.setValue(ip.CHECK_OCCUPANCY_ON_REBINDING.value);
 		
 		
-		//TF RANDOM WALK RANDOM PARAMATERS
+		//TF RANDOM WALK RANDOM PARAMETERS
 		TFRandomWalkParameters.TF_SLIDE_LEFT_PROBABILITY.setValue(ip.TF_SLIDE_LEFT_PROBABILITY.value);
 		TFRandomWalkParameters.TF_SLIDE_RIGHT_PROBABILITY.setValue(ip.TF_SLIDE_RIGHT_PROBABILITY.value);
 		TFRandomWalkParameters.TF_UNBINDING_PROBABILITY.setValue(ip.TF_UNBINDING_PROBABILITY.value);
@@ -676,7 +637,7 @@ public class SimulatorGUI {
 		TFRandomWalkParameters.IS_BIASED_RANDOM_WALK.setValue(ip.IS_BIASED_RANDOM_WALK.value);
 		TFRandomWalkParameters.IS_TWO_STATE_RANDOM_WALK.setValue(ip.IS_TWO_STATE_RANDOM_WALK.value);
 
-		
+		TFRandomWalkParameters.TF_SPECIFIC_ENERGY_THRESHOLD.setValue(ip.TF_SPECIFIC_ENERGY_THRESHOLD.value);
 	}
 	
 	
@@ -694,30 +655,22 @@ public class SimulatorGUI {
 		if(!loaded){
 			disableSetupArea();
 			this.simulationsLoad.setEnabled(false);
-
 			simulationsProgress.setString(GUIconstants.SIMULATION_PROGRESS_INIT);
-
 			saveModel("");
 					
 			double stopTimeValue = simulationParamaters.STOP_TIME.getValue();
-			
 			if(stopTimeValue/this.steps > GUIconstants.SIMULATION_PROGRESS_MAX_STEP){
-				this.steps = (int) Math.ceil((double)stopTimeValue/GUIconstants.SIMULATION_PROGRESS_MAX_STEP);
+				this.steps = (int) Math.ceil(stopTimeValue /GUIconstants.SIMULATION_PROGRESS_MAX_STEP);
 			} else{
 				this.steps = GUIconstants.SIMULATION_PROGRESS_MAX;
 			}
-			
 			this.simulationsProgress.setMaximum(this.steps*this.ip.ENSEMBLE_SIZE.value);
-			
 			statusTextArea.setText(null);
-			
+
 			simulatorThread = new SimulatorThread(currentFile, this,this.steps);
 			
 			if(simulatorThread.isInitialised()){
-			
 				loaded = true;
-				
-				
 				this.simulationsLoad.setIcon(this.buttonUnloadImg);
 				this.simulationsLoad.setText(GUIconstants.UNLOAD_BUTTON);
 				this.simulationsLoad.setEnabled(true);
@@ -758,7 +711,6 @@ public class SimulatorGUI {
 			this.simulationsStart.setIcon(this.buttonPauseImg);
 			simulationsStart.setText(GUIconstants.SIMULATE_BUTTON_PAUSE);
 
-		
 			if(!paused){
 				this.simulationsLoad.setEnabled(false);
 				simulationsProgress.setEnabled(true);
@@ -785,7 +737,7 @@ public class SimulatorGUI {
 		}
 		this.simulationsStart.setEnabled(true);
 	}
-	
+
 	/**
 	 * generates the printed text on the time label
 	 * @param elapsedTime
@@ -795,74 +747,62 @@ public class SimulatorGUI {
 	private String getTimeString(double elapsedTime, double estimatedTime){
 		return GUIconstants.TIME_ELAPSED+" "+formatTime(elapsedTime)+"  / "+GUIconstants.TIME_ESTIMATED+" "+formatTime(estimatedTime)+"";
 	}
-	
-	
+
 	private String formatTime(double time){
 		long millis = (long) (time * 1000);
 		return df.format(new Date(millis));
 	}
-	
-	 
-	 /**
-	  * updates simulation progress
-	  * @param i step
-	  * @param elapsedTime
-	  * @param estimatedTime
-	  */
-	 public void updateProgress(int i, double elapsedTime, double estimatedTime, int ensemble){
-		 
-		 	double value = Utils.roundTwoDecimals((double)(i*GUIconstants.SIMULATION_PROGRESS_MAX)/(this.steps*ensemble));
-		 
-			simulationsProgress.setString(value+" %");
-		 
-		 	
-		 	
-			simulationsProgress.setValue(i);
-			timeLabel.setText(getTimeString(elapsedTime,estimatedTime));
-	 }
-	 
-	 
-	 
-	 
-	 /**
-	  * disables the setup area
-	  */
-	 private void disableSetupArea(){
-		 setupAreaTabbedPane.setVisible(false);
-		 statusAreaScroll.setVisible(true); 
-	 }
-	 
-	 /**
-	  * enables the setup area
-	  */
-	 private void enableSetupArea(){
-		 setupAreaTabbedPane.setVisible(true);
-		 statusAreaScroll.setVisible(false);
-	 
-	 }
-	 
-	 /**
-	  * when simulations are finished, then do...
-	  */
-	 public void finishedSimulations(){
-		 simulating = false;
-		 paused=false;
-		 simulatorThread = null;
-		 this.simulationsLoad.setEnabled(true);
-		 this.simulationsStart.setIcon(this.buttonPlayImg);
-		 simulationsStart.setText(GUIconstants.SIMULATE_BUTTON_START);
-		 simulationsProgress.setString("100 %");
-		 simulationsProgress.setValue(GUIconstants.SIMULATION_PROGRESS_MAX);
-		 this.simulationsProgress.setEnabled(false);
-		 this.timeLabel.setEnabled(false);
-	 }
-	 
-	 /**
-	  * enables the simulation start button
-	  * @param enabled
-	  */
-	 public void setEnableSimulationStart(boolean enabled){
+
+	/**
+	* updates simulation progress
+	* @param i step
+	* @param elapsedTime
+	* @param estimatedTime
+	*/
+	public void updateProgress(int i, double elapsedTime, double estimatedTime, int ensemble){
+		double value = Utils.roundTwoDecimals((double)(i*GUIconstants.SIMULATION_PROGRESS_MAX)/(this.steps*ensemble));
+		simulationsProgress.setString(value+" %");
+		simulationsProgress.setValue(i);
+		timeLabel.setText(getTimeString(elapsedTime,estimatedTime));
+	}
+
+	/**
+	* disables the setup area
+	*/
+	private void disableSetupArea(){
+	 setupAreaTabbedPane.setVisible(false);
+	 statusAreaScroll.setVisible(true);
+	}
+
+	/**
+	* enables the setup area
+	*/
+	private void enableSetupArea(){
+	 setupAreaTabbedPane.setVisible(true);
+	 statusAreaScroll.setVisible(false);
+	}
+
+	/**
+	* when simulations are finished, then do...
+	*/
+	public void finishedSimulations(){
+	 simulating = false;
+	 paused=false;
+	 simulatorThread = null;
+	 this.simulationsLoad.setEnabled(true);
+	 this.simulationsStart.setIcon(this.buttonPlayImg);
+	 simulationsStart.setText(GUIconstants.SIMULATE_BUTTON_START);
+	 simulationsProgress.setString("100 %");
+	 simulationsProgress.setValue(GUIconstants.SIMULATION_PROGRESS_MAX);
+	 this.simulationsProgress.setEnabled(false);
+	 this.timeLabel.setEnabled(false);
+	}
+
+	/**
+	* enables the simulation start button
+	* @param enabled
+	*/
+	public void setEnableSimulationStart(boolean enabled){
 		 simulationsStart.setEnabled(enabled);
 	 }
-	
 }

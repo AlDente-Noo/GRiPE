@@ -64,7 +64,7 @@ public class InputParameters  implements Serializable{
 	public Parameter<Double>  TF_PREBOUND_PROPORTION;
 	public Parameter<Boolean> TF_PREBOUND_TO_HIGHEST_AFFINITY;
 	public Parameter<Boolean> SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE;
-	// TF REPRESSION
+	// FG: TF REPRESSION
 	public Parameter<Integer> TF_REPR_LEN_LEFT;
 	public Parameter<Integer> TF_REPR_LEN_RIGHT;
 	public Parameter<Double> TF_REPRESSION_RATE;
@@ -102,7 +102,7 @@ public class InputParameters  implements Serializable{
 	public Parameter<Boolean> CHECK_OCCUPANCY_ON_REBINDING;
 	public Parameter<Boolean> IS_BIASED_RANDOM_WALK;
 	public Parameter<Boolean> IS_TWO_STATE_RANDOM_WALK;
-	public Parameter<Double> TF_SPECIFIC_ENERGY_THRESHOLD;
+	public Parameter<Double> TF_SPECIFIC_ENERGY_THRESHOLD; // FG
 
 	public InputParameters(String parametersFile){
 		BufferedReader br ;
@@ -203,7 +203,6 @@ public class InputParameters  implements Serializable{
 		//TF_REPRESSION PARAMETERS
 		this.TF_REPR_LEN_LEFT = new Parameter<Integer>("", "", "", "", 0);
 		this.TF_REPR_LEN_RIGHT = new Parameter<Integer>("", "", "", "", 0);
-		//this.TF_PWM_REPR_THRESH = new Parameter<>();
 		this.TF_REPRESSION_RATE = new Parameter<Double>("", "", "", "", 0.0);
 		this.TF_DEREPRESSION_ATTENUATION_FACTOR = new Parameter<Double>("", "", "", "", 0.0);
 		
@@ -469,6 +468,8 @@ public class InputParameters  implements Serializable{
 			out.write("\n#TF_REPRESSION PARAMETERS\n\n");
 			out.write("#"+this.TF_REPRESSION_RATE.description+"\n");
 			out.write("TF_REPRESSION_RATE = "+this.TF_REPRESSION_RATE.value+";\n\n");
+			out.write("#"+this.TF_DEREPRESSION_ATTENUATION_FACTOR.description+"\n");
+			out.write("TF_DEREPRESSION_ATTENUATION_FACTOR = "+this.TF_DEREPRESSION_ATTENUATION_FACTOR.value+";\n\n");
 			out.write("#"+this.TF_REPR_LEN_LEFT.description+"\n");
 			out.write("TF_REPR_LEN_LEFT = "+this.TF_REPR_LEN_LEFT.value+";\n\n");
 			out.write("#"+this.TF_REPR_LEN_RIGHT.description+"\n");
@@ -865,6 +866,12 @@ public class InputParameters  implements Serializable{
 			if(!label.isEmpty()){this.TF_REPR_LEN_RIGHT.label = label;}
 			if(!description.isEmpty()){this.TF_REPR_LEN_RIGHT.description = description;}
 			if(!category.isEmpty()){this.TF_REPR_LEN_RIGHT.category = category;}
+			found = true;
+		} else if(name.equals("TF_DEREPRESSION_ATTENUATION_FACTOR")){
+			this.TF_DEREPRESSION_ATTENUATION_FACTOR.value =  Utils.parseDouble(value, Constants.NONE);
+			if(!label.isEmpty()){this.TF_DEREPRESSION_ATTENUATION_FACTOR.label = label;}
+			if(!description.isEmpty()){this.TF_DEREPRESSION_ATTENUATION_FACTOR.description = description;}
+			if(!category.isEmpty()){this.TF_DEREPRESSION_ATTENUATION_FACTOR.category = category;}
 			found = true;
 		}
 

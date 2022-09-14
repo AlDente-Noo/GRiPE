@@ -7,7 +7,7 @@ package utilsGUI;
  */
 public class GUIconstants {
 	public static final int SETUP_AREA_WIDTH=920;
-	public static final int SETUP_AREA_HIGHT=720;
+	public static final int SETUP_AREA_HIGHT=820;
 	public static final int SCROLLBAR_SIZE=20;
 	public static final int SIMULATION_AREA_HIGHT=47;
 	public static final int SIMULATION_PROGRESS_MIN=0;

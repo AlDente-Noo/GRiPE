@@ -119,8 +119,7 @@ public class Cell implements Serializable {
      */
     private void generateOutputFilenames(File paramsFilename) throws FileNotFoundException {
         this.outputStatusFile =
-                paramsFilename.getName().replaceAll("params", "status").replaceAll(Constants.PARAMETR_FILE_EXTENSION,
-                        Constants.STATUS_FILE_EXTENSION);
+                paramsFilename.getName().replaceAll("params", "status").replaceAll(Constants.PARAMETR_FILE_EXTENSION, Constants.STATUS_FILE_EXTENSION);
         this.outputDNAOccupancyFile =
                 paramsFilename.getName().replaceAll("params", "occupancy").replaceAll(Constants.PARAMETR_FILE_EXTENSION, Constants.OCCUPANCY_FILE_EXTENSION);
         this.outputTargetSiteFile =
@@ -128,8 +127,7 @@ public class Cell implements Serializable {
         this.outputTargetSiteFollowFile =
                 paramsFilename.getName().replaceAll("params", "target_site_follow").replaceAll(Constants.PARAMETR_FILE_EXTENSION, Constants.TF_FILE_EXTENSION);
         this.outputDNASequenceFile =
-                paramsFilename.getName().replaceAll("params", "DNA_seq").replaceAll(Constants.PARAMETR_FILE_EXTENSION
-                        , Constants.SEQUENCE_FILE_EXTENSION);
+                paramsFilename.getName().replaceAll("params", "DNA_seq").replaceAll(Constants.PARAMETR_FILE_EXTENSION, Constants.SEQUENCE_FILE_EXTENSION);
         this.outputAffinityLandscapeFile =
                 paramsFilename.getName().replaceAll("params", "affinity_landscape").replaceAll(Constants.PARAMETR_FILE_EXTENSION, Constants.AFFINITY_FILE_EXTENSION);
         this.outputTFFile =
