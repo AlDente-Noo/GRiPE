@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -82,8 +84,16 @@ public class TFRandomWalkParameters extends JPanel{
 		IS_TWO_STATE_RANDOM_WALK = new LabelledCheckBox(ip.IS_TWO_STATE_RANDOM_WALK.label, ip.IS_TWO_STATE_RANDOM_WALK.description, ip.IS_TWO_STATE_RANDOM_WALK.value);
 
 		TF_SPECIFIC_ENERGY_THRESHOLD = new LabelledDouble(ip.TF_SPECIFIC_ENERGY_THRESHOLD.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_SPECIFIC_ENERGY_THRESHOLD.description,ip.TF_SPECIFIC_ENERGY_THRESHOLD.value);
+		TF_SPECIFIC_ENERGY_THRESHOLD.setEditable(IS_TWO_STATE_RANDOM_WALK.getValue());
 
 		resetLabelsWidth();
+
+		IS_TWO_STATE_RANDOM_WALK.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				TF_SPECIFIC_ENERGY_THRESHOLD.setEditable(IS_TWO_STATE_RANDOM_WALK.getValue());
+			}
+		});
 		
 		//TF RANDOM WALK PARAMATERS
 		componentsStack.add(label1);
