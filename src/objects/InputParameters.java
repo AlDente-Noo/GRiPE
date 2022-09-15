@@ -109,7 +109,7 @@ public class InputParameters  implements Serializable{
 		InputStream in;
 		InputStreamReader is;
 		
-		String default_filename="";
+		String default_filename;
 		//initialise the internal parameters
 		initialiseInputParameters();
 		
@@ -246,8 +246,8 @@ public class InputParameters  implements Serializable{
 	 */
 	private void loadInitialInputParameters(BufferedReader br){
 
-		ArrayList<ArrayList<String>> params = getParamArray(br, Constants.PARAMS_FILE_COMMENT_CHAR,
-				Constants.PARAMS_FILE_LINE_ENDING, Constants.PARAMS_FILE_ASSIGNMENT_CHAR);
+		ArrayList<ArrayList<String>> params = getParamArray(br
+		);
 		String name = "", label = "", description = "", category = "", value = "";
 
 		String lastLoadParam = "";
@@ -287,9 +287,9 @@ public class InputParameters  implements Serializable{
 	 */
 	public void loadParameters(BufferedReader br){
 
-		ArrayList<ArrayList<String>> params = getParamArray(br, Constants.PARAMS_FILE_COMMENT_CHAR,
-				Constants.PARAMS_FILE_LINE_ENDING, Constants.PARAMS_FILE_ASSIGNMENT_CHAR);
-		String name = "", value = "";
+		ArrayList<ArrayList<String>> params = getParamArray(br
+		);
+		String name, value;
 
 		for (ArrayList<String> strings : params) {
 			name = strings.get(0);
@@ -307,7 +307,7 @@ public class InputParameters  implements Serializable{
 	 */
 	public File exportParameterFile(String parameterFilename){
 		File result=null;
-		String filename="params_";
+		String filename=Constants.PARAMS_FILE_PREFIX;
 		boolean fileCreated=false;
 
 		File directory;
@@ -333,9 +333,9 @@ public class InputParameters  implements Serializable{
 				fileCreated = true;
 			} else if( !this.OUTPUT_FILENAME.value.trim().isEmpty()){
 				if(this.OUTPUT_FILENAME.value.endsWith(Constants.PARAMETR_FILE_EXTENSION)){
-					filename= this.OUTPUT_FILENAME.value.replaceAll(Constants.PARAMETR_FILE_EXTENSION, "_params_");
+					filename= this.OUTPUT_FILENAME.value.replaceAll(Constants.PARAMETR_FILE_EXTENSION, "_" + Constants.PARAMS_FILE_PREFIX);
 				} else{
-					filename= this.OUTPUT_FILENAME.value + "_params_";
+					filename= this.OUTPUT_FILENAME.value + "_" + Constants.PARAMS_FILE_PREFIX;
 				}
 
 				if(this.OUTPUT_FOLDER.value.isEmpty()){
@@ -552,30 +552,31 @@ public class InputParameters  implements Serializable{
 	private void printOutputFilesParameters (String filename, String path) {
 		String[] strList = filename.split("_");
 		String strID = strList[strList.length - 1].replaceAll(Constants.PARAMETR_FILE_EXTENSION, "");
+		String name = filename.replaceAll(Constants.PARAMETR_FILE_EXTENSION, "");
+		name = name.replaceAll("_" + Constants.PARAMS_FILE_PREFIX, "");
+		name = name.replaceAll(strID, "");
 		System.out.println("output files id: " + strID);
-		System.out.println("output files prefix: " + strList[0]);
+		System.out.println("output files prefix: " + name);
 		System.out.println("output files directory: " + path);
 	}
 	
 	/**
 	 * extracts an array list for parameter value from a file
 	 * @param reader the parameters file
-	 * @param comment comment lines start with
-	 * @param lineEnding the line ends with
-	 * @param assignment the assignment sign
+	 *
 	 */
-	private ArrayList<ArrayList<String>> getParamArray(BufferedReader reader, String comment, String lineEnding, String assignment){
+	private ArrayList<ArrayList<String>> getParamArray(BufferedReader reader){
 		ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>> ();
-		String[] buffer = new String[2];
+		String[] buffer;
 		ArrayList<String> param; 
 		    try{
-	            String text = null;
+	            String text;
 	            while ((text = reader.readLine()) != null)
 	            {
 	            	text=text.trim();
-	            	if(!text.isEmpty() && !text.startsWith(comment)){
-	            		if(text.endsWith(lineEnding)){
-	            			buffer = Utils.extractParameterFromCommandLine(text, assignment);
+	            	if(!text.isEmpty() && !text.startsWith(Constants.PARAMS_FILE_COMMENT_CHAR)){
+	            		if(text.endsWith(Constants.PARAMS_FILE_LINE_ENDING)){
+	            			buffer = Utils.extractParameterFromCommandLine(text, Constants.PARAMS_FILE_ASSIGNMENT_CHAR);
 	            			if(buffer.length==2 && !buffer[0].isEmpty()){
 	            				param = new ArrayList<String>();
 	            				param.add(buffer[0]);
@@ -583,19 +584,19 @@ public class InputParameters  implements Serializable{
 	            				result.add(param);
 	            			}
 	            		} else{
-	            			System.out.println("Error interpretting input line:"+text);
+	            			System.out.println("Error interpreting input line:"+text);
 	            		}
 	            	} 
 	            }
 	        } catch (Exception e) {
-	        	System.out.println(e.toString());
+	        	e.printStackTrace();
             } finally {
                 try{
                     if (reader != null){
                         reader.close();
                     }
                 } catch (IOException e){
-                	System.out.println(e.toString());
+                	e.printStackTrace();
                 }
            	}  
 		return result;
@@ -605,51 +606,43 @@ public class InputParameters  implements Serializable{
 	/**
 	 * sets a parameter
 	 */
-	public boolean setParameter(String name, String label, String description, String category,String value){
-		boolean found = false;
+	public void setParameter(String name, String label, String description, String category, String value){
 		//SIMULATION PARAMETERS
 		if(name.equals("STOP_TIME")){
 			this.STOP_TIME.value = Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.STOP_TIME.label = label;}
 			if(!description.isEmpty()){this.STOP_TIME.description = description;}
 			if(!category.isEmpty()){this.STOP_TIME.category = category;}
-			found = true;
 		} else if(name.equals("ENSEMBLE_SIZE")){
 			this.ENSEMBLE_SIZE.value =  Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.ENSEMBLE_SIZE.label = label;}
 			if(!description.isEmpty()){this.ENSEMBLE_SIZE.description = description;}
 			if(!category.isEmpty()){this.ENSEMBLE_SIZE.category = category;}
-			found = true;
 		} else if(name.equals("RANDOM_SEED")){
 			this.RANDOM_SEED.value =  Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.RANDOM_SEED.label = label;}
 			if(!description.isEmpty()){this.RANDOM_SEED.description = description;}
 			if(!category.isEmpty()){this.RANDOM_SEED.category = category;}
-			found = true;
 		} else if(name.equals("COMPUTED_AFFINITY_PRECISION")){
 			this.COMPUTED_AFFINITY_PRECISION.value = Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.COMPUTED_AFFINITY_PRECISION.label = label;}
 			if(!description.isEmpty()){this.COMPUTED_AFFINITY_PRECISION.description = description;}
 			if(!category.isEmpty()){this.COMPUTED_AFFINITY_PRECISION.category = category;}
-			found = true;
 		} else if(name.equals("DNA_SECTOR_SIZE")){
 			this.DNA_SECTOR_SIZE.value = Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.DNA_SECTOR_SIZE.label = label;}
 			if(!description.isEmpty()){this.DNA_SECTOR_SIZE.description = description;}
 			if(!category.isEmpty()){this.DNA_SECTOR_SIZE.category = category;}
-			found = true;
 		} else if(name.equals("EVENT_LIST_SUBGROUP_SIZE")){
 			this.EVENT_LIST_SUBGROUP_SIZE.value = Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.EVENT_LIST_SUBGROUP_SIZE.label = label;}
 			if(!description.isEmpty()){this.EVENT_LIST_SUBGROUP_SIZE.description = description;}
 			if(!category.isEmpty()){this.EVENT_LIST_SUBGROUP_SIZE.category = category;}
-			found = true;
 		} else if(name.equals("EVENT_LIST_USES_FR")){
 			this.EVENT_LIST_USES_FR.value = Utils.parseBoolean(value,false);
 			if(!label.isEmpty()){this.EVENT_LIST_USES_FR.label = label;}
 			if(!description.isEmpty()){this.EVENT_LIST_USES_FR.description = description;}
 			if(!category.isEmpty()){this.EVENT_LIST_USES_FR.category = category;}
-			found = true;
 		}
 		//SIMULATION-OUTPUT PARAMETERS
 		else if(name.equals("OUTPUT_FOLDER")){
@@ -657,97 +650,81 @@ public class InputParameters  implements Serializable{
 			if(!label.isEmpty()){this.OUTPUT_FOLDER.label = label;}
 			if(!description.isEmpty()){this.OUTPUT_FOLDER.description = description;}
 			if(!category.isEmpty()){this.OUTPUT_FOLDER.category = category;}
-			found = true;
 		} else if(name.equals("OUTPUT_FILENAME")){
 			this.OUTPUT_FILENAME.value = value;
 			if(!label.isEmpty()){this.OUTPUT_FILENAME.label = label;}
 			if(!description.isEmpty()){this.OUTPUT_FILENAME.description = description;}
 			if(!category.isEmpty()){this.OUTPUT_FILENAME.category = category;}
-			found = true;
 		} else if(name.equals("PRINT_INTERMEDIARY_RESULTS_AFTER")){
 			this.PRINT_INTERMEDIARY_RESULTS_AFTER.value = Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.PRINT_INTERMEDIARY_RESULTS_AFTER.label = label;}
 			if(!description.isEmpty()){this.PRINT_INTERMEDIARY_RESULTS_AFTER.description = description;}
 			if(!category.isEmpty()){this.PRINT_INTERMEDIARY_RESULTS_AFTER.category = category;}
-			found = true;
 		} else if(name.equals("PRINT_FINAL_OCCUPANCY")){
 			this.PRINT_FINAL_OCCUPANCY.value =  Utils.parseBoolean(value,false);
 			if(!label.isEmpty()){this.PRINT_FINAL_OCCUPANCY.label = label;}
 			if(!description.isEmpty()){this.PRINT_FINAL_OCCUPANCY.description = description;}
 			if(!category.isEmpty()){this.PRINT_FINAL_OCCUPANCY.category = category;}
-			found = true;
 		} else if(name.equals("DEBUG_MODE")){
 			this.DEBUG_MODE.value = Utils.parseBoolean(value,false);
 			if(!label.isEmpty()){this.DEBUG_MODE.label = label;}
 			if(!description.isEmpty()){this.DEBUG_MODE.description = description;}
 			if(!category.isEmpty()){this.DEBUG_MODE.category = category;}
-			found = true;
 		} else if(name.equals("OUTPUT_TF")){
 			this.OUTPUT_TF.value = value;
 			if(!label.isEmpty()){this.OUTPUT_TF.label = label;}
 			if(!description.isEmpty()){this.OUTPUT_TF.description = description;}
 			if(!category.isEmpty()){this.OUTPUT_TF.category = category;}
-			found = true;
 		} else if(name.equals("OUTPUT_TF_POINTS")){
 			this.OUTPUT_TF_POINTS.value = Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.OUTPUT_TF_POINTS.label = label;}
 			if(!description.isEmpty()){this.OUTPUT_TF_POINTS.description = description;}
 			if(!category.isEmpty()){this.OUTPUT_TF_POINTS.category = category;}
-			found = true;
 		} else if(name.equals("FOLLOW_TS")){
 			this.FOLLOW_TS.value = Utils.parseBoolean(value,false);
 			if(!label.isEmpty()){this.FOLLOW_TS.label = label;}
 			if(!description.isEmpty()){this.FOLLOW_TS.description = description;}
 			if(!category.isEmpty()){this.FOLLOW_TS.category = category;}
-			found = true;
 		} else if(name.equals("OUTPUT_AFFINITY_LANDSCAPE")){
 			this.OUTPUT_AFFINITY_LANDSCAPE.value = Utils.parseBoolean(value,false);
 			if(!label.isEmpty()){this.OUTPUT_AFFINITY_LANDSCAPE.label = label;}
 			if(!description.isEmpty()){this.OUTPUT_AFFINITY_LANDSCAPE.description = description;}
 			if(!category.isEmpty()){this.OUTPUT_AFFINITY_LANDSCAPE.category = category;}
-			found = true;
 		} else if(name.equals("OUTPUT_BINDING_ENERGY")){
 			this.OUTPUT_BINDING_ENERGY.value = Utils.parseBoolean(value,false);
 			if(!label.isEmpty()){this.OUTPUT_BINDING_ENERGY.label = label;}
 			if(!description.isEmpty()){this.OUTPUT_BINDING_ENERGY.description = description;}
 			if(!category.isEmpty()){this.OUTPUT_BINDING_ENERGY.category = category;}
-			found = true;
 		} else if(name.equals("OUTPUT_DNA_OCCUPANCY")){
 			this.OUTPUT_DNA_OCCUPANCY.value = Utils.parseBoolean(value,false);
 			if(!label.isEmpty()){this.OUTPUT_DNA_OCCUPANCY.label = label;}
 			if(!description.isEmpty()){this.OUTPUT_DNA_OCCUPANCY.description = description;}
 			if(!category.isEmpty()){this.OUTPUT_DNA_OCCUPANCY.category = category;}
-			found = true;
 		} else if(name.equals("DNA_OCCUPANCY_FULL_MOLECULE_SIZE")){
 			this.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.value = Utils.parseBoolean(value,false);
 			if(!label.isEmpty()){this.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.label = label;}
 			if(!description.isEmpty()){this.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.description = description;}
 			if(!category.isEmpty()){this.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.category = category;}
-			found = true;
 		} else if(name.equals("OUTPUT_SLIDING_LENGTHS")){
 			this.OUTPUT_SLIDING_LENGTHS.value = Utils.parseBoolean(value,false);
 			if(!label.isEmpty()){this.OUTPUT_SLIDING_LENGTHS.label = label;}
 			if(!description.isEmpty()){this.OUTPUT_SLIDING_LENGTHS.description = description;}
 			if(!category.isEmpty()){this.OUTPUT_SLIDING_LENGTHS.category = category;}
-			found = true;
 		} else if(name.equals("OUTPUT_REPRESSED_LENGTHS")){
 			this.OUTPUT_REPRESSED_LENGTHS.value = Utils.parseBoolean(value,false);
 			if(!label.isEmpty()){this.OUTPUT_REPRESSED_LENGTHS.label = label;}
 			if(!description.isEmpty()){this.OUTPUT_REPRESSED_LENGTHS.description = description;}
 			if(!category.isEmpty()){this.OUTPUT_REPRESSED_LENGTHS.category = category;}
-			found = true;
 		} else if(name.equals("WIG_STEP")){
 			this.WIG_STEP.value = Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.WIG_STEP.label = label;}
 			if(!description.isEmpty()){this.WIG_STEP.description = description;}
 			if(!category.isEmpty()){this.WIG_STEP.category = category;}
-			found = true;
 		} else if(name.equals("WIG_THRESHOLD")){
 			this.WIG_THRESHOLD.value = Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.WIG_THRESHOLD.label = label;}
 			if(!description.isEmpty()){this.WIG_THRESHOLD.description = description;}
 			if(!category.isEmpty()){this.WIG_THRESHOLD.category = category;}
-			found = true;
 		}
 		//TF PARAMETERS
 		else if(name.equals("TF_FILE")){
@@ -755,25 +732,21 @@ public class InputParameters  implements Serializable{
 			if(!label.isEmpty()){this.TF_FILE.label = label;}
 			if(!description.isEmpty()){this.TF_FILE.description = description;}
 			if(!category.isEmpty()){this.TF_FILE.category = category;}
-			found = true;
 		}  else if(name.equals("TF_COOPERATIVITY_FILE")){
 			this.TF_COOPERATIVITY_FILE.value = value;
 			if(!label.isEmpty()){this.TF_COOPERATIVITY_FILE.label = label;}
 			if(!description.isEmpty()){this.TF_COOPERATIVITY_FILE.description = description;}
 			if(!category.isEmpty()){this.TF_COOPERATIVITY_FILE.category = category;}
-			found = true;
 		}  else if(name.equals("TS_FILE")){
 			this.TS_FILE.value = value;
 			if(!label.isEmpty()){this.TS_FILE.label = label;}
 			if(!description.isEmpty()){this.TS_FILE.description = description;}
 			if(!category.isEmpty()){this.TS_FILE.category = category;}
-			found = true;
 		} else if(name.equals("SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE")){
 			this.SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE.value =  Utils.parseBoolean(value, true);
 			if(!label.isEmpty()){this.SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE.label = label;}
 			if(!description.isEmpty()){this.SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE.description = description;}
 			if(!category.isEmpty()){this.SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE.category = category;}
-			found = true;
 		}
 		//TF_RANDOM PARAMETERS
 		else if(name.equals("TF_DBD_LENGTH_MIN")){
@@ -781,157 +754,132 @@ public class InputParameters  implements Serializable{
 			if(!label.isEmpty()){this.TF_DBD_LENGTH_MIN.label = label;}
 			if(!description.isEmpty()){this.TF_DBD_LENGTH_MIN.description = description;}
 			if(!category.isEmpty()){this.TF_DBD_LENGTH_MIN.category = category;}
-			found = true;
 		} else if(name.equals("TF_DBD_LENGTH_MAX")){
 			this.TF_DBD_LENGTH_MAX.value =  Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_DBD_LENGTH_MAX.label = label;}
 			if(!description.isEmpty()){this.TF_DBD_LENGTH_MAX.description = description;}
 			if(!category.isEmpty()){this.TF_DBD_LENGTH_MAX.category = category;}
-			found = true;
 		} else if(name.equals("TF_SPECIES_COUNT")){
 			this.TF_SPECIES_COUNT.value =  Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_SPECIES_COUNT.label = label;}
 			if(!description.isEmpty()){this.TF_SPECIES_COUNT.description = description;}
 			if(!category.isEmpty()){this.TF_SPECIES_COUNT.category = category;}
-			found = true;
 		} else if(name.equals("TF_COPY_NUMBER_MIN")){
 			this.TF_COPY_NUMBER_MIN.value = Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_COPY_NUMBER_MIN.label = label;}
 			if(!description.isEmpty()){this.TF_COPY_NUMBER_MIN.description = description;}
 			if(!category.isEmpty()){this.TF_COPY_NUMBER_MIN.category = category;}
-			found = true;
 		} else if(name.equals("TF_COPY_NUMBER_MAX")){
 			this.TF_COPY_NUMBER_MAX.value = Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_COPY_NUMBER_MAX.label = label;}
 			if(!description.isEmpty()){this.TF_COPY_NUMBER_MAX.description = description;}
 			if(!category.isEmpty()){this.TF_COPY_NUMBER_MAX.category = category;}
-			found = true;
 		} else if(name.equals("TF_ES")){
 			this.TF_ES.value = Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_ES.label = label;}
 			if(!description.isEmpty()){this.TF_ES.description = description;}
 			if(!category.isEmpty()){this.TF_ES.category = category;}
-			found = true;
 		} else if(name.equals("TF_SIZE_LEFT")){
 			this.TF_SIZE_LEFT.value =  Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_SIZE_LEFT.label = label;}
 			if(!description.isEmpty()){this.TF_SIZE_LEFT.description = description;}
 			if(!category.isEmpty()){this.TF_SIZE_LEFT.category = category;}
-			found = true;
 		} else if(name.equals("TF_SIZE_RIGHT")){
 			this.TF_SIZE_RIGHT.value =  Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_SIZE_RIGHT.label = label;}
 			if(!description.isEmpty()){this.TF_SIZE_RIGHT.description = description;}
 			if(!category.isEmpty()){this.TF_SIZE_RIGHT.category = category;}
-			found = true;
 		} else if(name.equals("TF_ASSOC_RATE")){
 			this.TF_ASSOC_RATE.value =  Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_ASSOC_RATE.label = label;}
 			if(!description.isEmpty()){this.TF_ASSOC_RATE.description = description;}
 			if(!category.isEmpty()){this.TF_ASSOC_RATE.category = category;}
-			found = true;
 		} else if(name.equals("TF_READ_IN_BOTH_DIRECTIONS")){
 			this.TF_READ_IN_BOTH_DIRECTIONS.value =  Utils.parseBoolean(value, true);
 			if(!label.isEmpty()){this.TF_READ_IN_BOTH_DIRECTIONS.label = label;}
 			if(!description.isEmpty()){this.TF_READ_IN_BOTH_DIRECTIONS.description = description;}
 			if(!category.isEmpty()){this.TF_READ_IN_BOTH_DIRECTIONS.category = category;}
-			found = true;
 		} else if(name.equals("TF_PREBOUND_PROPORTION")){
 			this.TF_PREBOUND_PROPORTION.value =  Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_PREBOUND_PROPORTION.label = label;}
 			if(!description.isEmpty()){this.TF_PREBOUND_PROPORTION.description = description;}
 			if(!category.isEmpty()){this.TF_PREBOUND_PROPORTION.category = category;}
-			found = true;
 		} else if(name.equals("TF_PREBOUND_TO_HIGHEST_AFFINITY")){
 			this.TF_PREBOUND_TO_HIGHEST_AFFINITY.value =  Utils.parseBoolean(value, true);
 			if(!label.isEmpty()){this.TF_PREBOUND_TO_HIGHEST_AFFINITY.label = label;}
 			if(!description.isEmpty()){this.TF_PREBOUND_TO_HIGHEST_AFFINITY.description = description;}
 			if(!category.isEmpty()){this.TF_PREBOUND_TO_HIGHEST_AFFINITY.category = category;}
-			found = true;
 		} //TF REPRESSION PARAMETERS
-		else if(name.equals("TF_REPR_RATE")){
+		else if(name.equals("TF_REPRESSION_RATE")){
 			this.TF_REPRESSION_RATE.value =  Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_REPRESSION_RATE.label = label;}
 			if(!description.isEmpty()){this.TF_REPRESSION_RATE.description = description;}
 			if(!category.isEmpty()){this.TF_REPRESSION_RATE.category = category;}
-			found = true;
 		} else if(name.equals("TF_REPR_LEN_LEFT")){
 			this.TF_REPR_LEN_LEFT.value =  Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_REPR_LEN_LEFT.label = label;}
 			if(!description.isEmpty()){this.TF_REPR_LEN_LEFT.description = description;}
 			if(!category.isEmpty()){this.TF_REPR_LEN_LEFT.category = category;}
-			found = true;
 		} else if(name.equals("TF_REPR_LEN_RIGHT")){
 			this.TF_REPR_LEN_RIGHT.value =  Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_REPR_LEN_RIGHT.label = label;}
 			if(!description.isEmpty()){this.TF_REPR_LEN_RIGHT.description = description;}
 			if(!category.isEmpty()){this.TF_REPR_LEN_RIGHT.category = category;}
-			found = true;
 		} else if(name.equals("TF_DEREPRESSION_ATTENUATION_FACTOR")){
 			this.TF_DEREPRESSION_ATTENUATION_FACTOR.value =  Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_DEREPRESSION_ATTENUATION_FACTOR.label = label;}
 			if(!description.isEmpty()){this.TF_DEREPRESSION_ATTENUATION_FACTOR.description = description;}
 			if(!category.isEmpty()){this.TF_DEREPRESSION_ATTENUATION_FACTOR.category = category;}
-			found = true;
 		}
 
 		//DNA PARAMETERS
 		else if(name.equals("DNA_SEQUENCE_FILE")){
-				this.DNA_SEQUENCE_FILE.value = value;
-				if(!label.isEmpty()){this.DNA_SEQUENCE_FILE.label = label;}
-				if(!description.isEmpty()){this.DNA_SEQUENCE_FILE.description = description;}
-				if(!category.isEmpty()){this.DNA_SEQUENCE_FILE.category = category;}
-				found = true;
+			this.DNA_SEQUENCE_FILE.value = value;
+			if(!label.isEmpty()){this.DNA_SEQUENCE_FILE.label = label;}
+			if(!description.isEmpty()){this.DNA_SEQUENCE_FILE.description = description;}
+			if(!category.isEmpty()){this.DNA_SEQUENCE_FILE.category = category;}
 		} else if(name.equals("DNA_AVAILABILITY_FILE")){
 			this.DNA_AVAILABILITY_FILE.value = value;
 			if(!label.isEmpty()){this.DNA_AVAILABILITY_FILE.label = label;}
 			if(!description.isEmpty()){this.DNA_AVAILABILITY_FILE.description = description;}
 			if(!category.isEmpty()){this.DNA_AVAILABILITY_FILE.category = category;}
-			found = true;
 		} else if(name.equals("DNA_DEREPRESSION_RATE")){
 			this.DNA_DEREPRESSION_RATE.value = Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.DNA_DEREPRESSION_RATE.label = label;}
 			if(!description.isEmpty()){this.DNA_DEREPRESSION_RATE.description = description;}
 			if(!category.isEmpty()){this.DNA_DEREPRESSION_RATE.category = category;}
-			found = true;
 		} else if(name.equals("DNA_BOUNDARY_CONDITION")){
 			this.DNA_BOUNDARY_CONDITION.value = value;
 			if(!label.isEmpty()){this.DNA_BOUNDARY_CONDITION.label = label;}
 			if(!description.isEmpty()){this.DNA_BOUNDARY_CONDITION.description = description;}
 			if(!category.isEmpty()){this.DNA_BOUNDARY_CONDITION.category = category;}
-			found = true;
 		}
 		//DNA_RANDOM PARAMETERS
 		else if(name.equals("DNA_LENGTH")){
-				this.DNA_LENGTH.value = Utils.parseInteger(value, Constants.NONE);
-				if(!label.isEmpty()){this.DNA_LENGTH.label = label;}
-				if(!description.isEmpty()){this.DNA_LENGTH.description = description;}
-				if(!category.isEmpty()){this.DNA_LENGTH.category = category;}
-				found = true;
+			this.DNA_LENGTH.value = Utils.parseInteger(value, Constants.NONE);
+			if(!label.isEmpty()){this.DNA_LENGTH.label = label;}
+			if(!description.isEmpty()){this.DNA_LENGTH.description = description;}
+			if(!category.isEmpty()){this.DNA_LENGTH.category = category;}
 		} else if(name.equals("DNA_PROPORTION_OF_A")){
 			this.DNA_PROPORTION_OF_A.value =   Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.DNA_PROPORTION_OF_A.label = label;}
 			if(!description.isEmpty()){this.DNA_PROPORTION_OF_A.description = description;}
 			if(!category.isEmpty()){this.DNA_PROPORTION_OF_A.category = category;}
-			found = true;
 		} else if(name.equals("DNA_PROPORTION_OF_T")){
 			this.DNA_PROPORTION_OF_T.value =  Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.DNA_PROPORTION_OF_T.label = label;}
 			if(!description.isEmpty()){this.DNA_PROPORTION_OF_T.description = description;}
 			if(!category.isEmpty()){this.DNA_PROPORTION_OF_T.category = category;}
-			found = true;
 		} else if(name.equals("DNA_PROPORTION_OF_C")){
 			this.DNA_PROPORTION_OF_C.value = Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.DNA_PROPORTION_OF_C.label = label;}
 			if(!description.isEmpty()){this.DNA_PROPORTION_OF_C.description = description;}
 			if(!category.isEmpty()){this.DNA_PROPORTION_OF_C.category = category;}
-			found = true;
 		} else if(name.equals("DNA_PROPORTION_OF_G")){
 			this.DNA_PROPORTION_OF_G.value = Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.DNA_PROPORTION_OF_G.label = label;}
 			if(!description.isEmpty()){this.DNA_PROPORTION_OF_G.description = description;}
 			if(!category.isEmpty()){this.DNA_PROPORTION_OF_G.category = category;}
-			found = true;
 		}
 		//TF RANDOM WALK PARAMETERS
 		else if(name.equals("TF_IS_IMMOBILE")){
@@ -939,119 +887,99 @@ public class InputParameters  implements Serializable{
 			if(!label.isEmpty()){this.TF_IS_IMMOBILE.label = label;}
 			if(!description.isEmpty()){this.TF_IS_IMMOBILE.description = description;}
 			if(!category.isEmpty()){this.TF_IS_IMMOBILE.category = category;}
-			found = true;
 		} else if(name.equals("TF_UNBINDING_PROBABILITY")){
 			this.TF_UNBINDING_PROBABILITY.value =  Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_UNBINDING_PROBABILITY.label = label;}
 			if(!description.isEmpty()){this.TF_UNBINDING_PROBABILITY.description = description;}
 			if(!category.isEmpty()){this.TF_UNBINDING_PROBABILITY.category = category;}
-			found = true;
 		} else if(name.equals("TF_SLIDE_LEFT_PROBABILITY")){
 			this.TF_SLIDE_LEFT_PROBABILITY.value =   Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_SLIDE_LEFT_PROBABILITY.label = label;}
 			if(!description.isEmpty()){this.TF_SLIDE_LEFT_PROBABILITY.description = description;}
 			if(!category.isEmpty()){this.TF_SLIDE_LEFT_PROBABILITY.category = category;}
-			found = true;
 		} else if(name.equals("TF_SLIDE_RIGHT_PROBABILITY")){
 			this.TF_SLIDE_RIGHT_PROBABILITY.value =  Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_SLIDE_RIGHT_PROBABILITY.label = label;}
 			if(!description.isEmpty()){this.TF_SLIDE_RIGHT_PROBABILITY.description = description;}
 			if(!category.isEmpty()){this.TF_SLIDE_RIGHT_PROBABILITY.category = category;}
-			found = true;
 		} else if(name.equals("TF_JUMPING_PROBABILITY")){
 			this.TF_JUMPING_PROBABILITY.value = Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_JUMPING_PROBABILITY.label = label;}
 			if(!description.isEmpty()){this.TF_JUMPING_PROBABILITY.description = description;}
 			if(!category.isEmpty()){this.TF_JUMPING_PROBABILITY.category = category;}
-			found = true;
 		} else if(name.equals("TF_HOP_STD_DISPLACEMENT")){
 			this.TF_HOP_STD_DISPLACEMENT.value = Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_HOP_STD_DISPLACEMENT.label = label;}
 			if(!description.isEmpty()){this.TF_HOP_STD_DISPLACEMENT.description = description;}
 			if(!category.isEmpty()){this.TF_HOP_STD_DISPLACEMENT.category = category;}
-			found = true;
 		} else if(name.equals("TF_SPECIFIC_WAITING_TIME")){
 			this.TF_SPECIFIC_WAITING_TIME.value = Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_SPECIFIC_WAITING_TIME.label = label;}
 			if(!description.isEmpty()){this.TF_SPECIFIC_WAITING_TIME.description = description;}
 			if(!category.isEmpty()){this.TF_SPECIFIC_WAITING_TIME.category = category;}
-			found = true;
 		} else if(name.equals("TF_STEP_LEFT_SIZE")){
 			this.TF_STEP_LEFT_SIZE.value = Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_STEP_LEFT_SIZE.label = label;}
 			if(!description.isEmpty()){this.TF_STEP_LEFT_SIZE.description = description;}
 			if(!category.isEmpty()){this.TF_STEP_LEFT_SIZE.category = category;}
-			found = true;
 		} else if(name.equals("TF_STEP_RIGHT_SIZE")){
 			this.TF_STEP_RIGHT_SIZE.value = Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_STEP_RIGHT_SIZE.label = label;}
 			if(!description.isEmpty()){this.TF_STEP_RIGHT_SIZE.description = description;}
 			if(!category.isEmpty()){this.TF_STEP_RIGHT_SIZE.category = category;}
-			found = true;
 		} else if(name.equals("TF_UNCORRELATED_DISPLACEMENT_SIZE")){
 			this.TF_UNCORRELATED_DISPLACEMENT_SIZE.value = Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_UNCORRELATED_DISPLACEMENT_SIZE.label = label;}
 			if(!description.isEmpty()){this.TF_UNCORRELATED_DISPLACEMENT_SIZE.description = description;}
 			if(!category.isEmpty()){this.TF_UNCORRELATED_DISPLACEMENT_SIZE.category = category;}
-			found = true;
 		} else if(name.equals("TF_STALLS_IF_BLOCKED")){
 			this.TF_STALLS_IF_BLOCKED.value = Utils.parseBoolean(value, false);
 			if(!label.isEmpty()){this.TF_STALLS_IF_BLOCKED.label = label;}
 			if(!description.isEmpty()){this.TF_STALLS_IF_BLOCKED.description = description;}
 			if(!category.isEmpty()){this.TF_STALLS_IF_BLOCKED.category = category;}
-			found = true;
 		} else if(name.equals("TF_COLLISION_UNBIND_PROBABILITY")){
 			this.TF_COLLISION_UNBIND_PROBABILITY.value = Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_COLLISION_UNBIND_PROBABILITY.label = label;}
 			if(!description.isEmpty()){this.TF_COLLISION_UNBIND_PROBABILITY.description = description;}
 			if(!category.isEmpty()){this.TF_COLLISION_UNBIND_PROBABILITY.category = category;}
-			found = true;
 		} else if(name.equals("TF_AFFINITY_LANDSCAPE_ROUGHNESS")){
 			this.TF_AFFINITY_LANDSCAPE_ROUGHNESS.value = Utils.parseDouble(value, Constants.NONE);
 			if(!label.isEmpty()){this.TF_AFFINITY_LANDSCAPE_ROUGHNESS.label = label;}
 			if(!description.isEmpty()){this.TF_AFFINITY_LANDSCAPE_ROUGHNESS.description = description;}
 			if(!category.isEmpty()){this.TF_AFFINITY_LANDSCAPE_ROUGHNESS.category = category;}
-			found = true;
 		} else if(name.equals("CHECK_OCCUPANCY_ON_BINDING")){
 			this.CHECK_OCCUPANCY_ON_BINDING.value = Utils.parseBoolean(value, false);
 			if(!label.isEmpty()){this.CHECK_OCCUPANCY_ON_BINDING.label = label;}
 			if(!description.isEmpty()){this.CHECK_OCCUPANCY_ON_BINDING.description = description;}
 			if(!category.isEmpty()){this.CHECK_OCCUPANCY_ON_BINDING.category = category;}
-			found = true;
 		} else if(name.equals("CHECK_OCCUPANCY_ON_SLIDING")){
 			this.CHECK_OCCUPANCY_ON_SLIDING.value = Utils.parseBoolean(value, false);
 			if(!label.isEmpty()){this.CHECK_OCCUPANCY_ON_SLIDING.label = label;}
 			if(!description.isEmpty()){this.CHECK_OCCUPANCY_ON_SLIDING.description = description;}
 			if(!category.isEmpty()){this.CHECK_OCCUPANCY_ON_SLIDING.category = category;}
-			found = true;
 		} else if(name.equals("CHECK_OCCUPANCY_ON_REBINDING")){
 			this.CHECK_OCCUPANCY_ON_REBINDING.value = Utils.parseBoolean(value, false);
 			if(!label.isEmpty()){this.CHECK_OCCUPANCY_ON_REBINDING.label = label;}
 			if(!description.isEmpty()){this.CHECK_OCCUPANCY_ON_REBINDING.description = description;}
 			if(!category.isEmpty()){this.CHECK_OCCUPANCY_ON_REBINDING.category = category;}
-			found = true;
 		} else if(name.equals("IS_BIASED_RANDOM_WALK")){
 			this.IS_BIASED_RANDOM_WALK.value = Utils.parseBoolean(value, false);
 			if(!label.isEmpty()){this.IS_BIASED_RANDOM_WALK.label = label;}
 			if(!description.isEmpty()){this.IS_BIASED_RANDOM_WALK.description = description;}
 			if(!category.isEmpty()){this.IS_BIASED_RANDOM_WALK.category = category;}
-			found = true;
 		} else if(name.equals("IS_TWO_STATE_RANDOM_WALK")){
 			this.IS_TWO_STATE_RANDOM_WALK.value = Utils.parseBoolean(value, false);
 			if(!label.isEmpty()){this.IS_TWO_STATE_RANDOM_WALK.label = label;}
 			if(!description.isEmpty()){this.IS_TWO_STATE_RANDOM_WALK.description = description;}
 			if(!category.isEmpty()){this.IS_TWO_STATE_RANDOM_WALK.category = category;}
-			found = true;
 		} else if(name.equals("TF_SPECIFIC_ENERGY_THRESHOLD")){
 			this.TF_SPECIFIC_ENERGY_THRESHOLD.value = Utils.parseDouble(value, 0.0);
 			if(!label.isEmpty()){this.TF_SPECIFIC_ENERGY_THRESHOLD.label = label;}
 			if(!description.isEmpty()){this.TF_SPECIFIC_ENERGY_THRESHOLD.description = description;}
 			if(!category.isEmpty()){this.TF_SPECIFIC_ENERGY_THRESHOLD.category = category;}
-			found = true;
 		} else{
-			System.out.println(name+" not recognised.");
+			System.out.println(name+" is not recognised.");
 		}
 
-		return found;
 	}
 }

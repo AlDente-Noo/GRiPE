@@ -159,16 +159,16 @@ public class DNA implements Serializable {
             buffer[0] = description;
         }
 
-        if (buffer != null && buffer.length > 0 && !buffer[0].isEmpty()) {
+        if (buffer.length > 0 && !buffer[0].isEmpty()) {
             region = new DNAregion(buffer[0], "", 0, length, false, false);
         }
         subsequence = new DNAregion("", region.start, region.end);
 
 
-        if (buffer != null && buffer.length > 1) {
+        if (buffer.length > 1) {
             for (int i = 1; i < buffer.length; i++) {
                 params = Utils.extractParameterFromCommandLine(buffer[i] + ";", Constants.PARAMS_FILE_ASSIGNMENT_CHAR);
-                if (params != null && params.length == 2) {
+                if (params.length == 2) {
                     if (params[0].equalsIgnoreCase(Constants.DNA_FASTA_SUBSEQUENCE) && !params[1].isEmpty()) {
                         subsequence = new DNAregion(params[1], "", 0, length, false, false);
                     } else if (params[0].equalsIgnoreCase(Constants.DNA_FASTA_COPY_NUMBER) && !params[1].isEmpty()) {
@@ -236,7 +236,7 @@ public class DNA implements Serializable {
                 strBuff.append(Constants.DNA_FASTA_BOUNDARY_REFLEXIVE);
             } else if (this.isAbsorbing) {
                 strBuff.append(Constants.DNA_FASTA_BOUNDARY_ABSORBING);
-            } else if (this.isPeriodic) {
+            } else {
                 strBuff.append(Constants.DNA_FASTA_BOUNDARY_PERIODIC);
             }
         }
@@ -298,7 +298,7 @@ public class DNA implements Serializable {
 
     private void recomputeTFAffinityLandscapeForClosedRegions(int startPos, int endPos, int speciesID) {
         boolean stop = false;
-        int start = startPos, end = startPos;
+        int start = startPos, end;
         while (!stop) {
             while (start < endPos && closed[start] == Constants.BP_IS_OPEN) {
                 start++;
@@ -318,7 +318,7 @@ public class DNA implements Serializable {
 
     private void recomputeTFAffinityLandscapeForRepressedRegions(int startPos, int endPos, int speciesID) {
         boolean stop = false;
-        int start = startPos, end = startPos;
+        int start = startPos, end;
         while (!stop) {
             while (start < endPos && closed[start] != Constants.BP_IS_REPRESSED) {
                 start++;
@@ -412,12 +412,12 @@ public class DNA implements Serializable {
                         maxCol = Math.max(maxCol, TFspecies[i].landscapePosCol);
 
                         for (int k = TFspecies[i].landscapeEscapeLines; k < lines.size() && actualPos < this.strand.length; k++) {
-                            bufferValues = Utils.parseCSVline(lines.get(k), Constants.AFFINITY_CSV_FILE_DELIMITER,
-                                    Constants.NONE);
+                            bufferValues = Utils.parseCSVline(lines.get(k), Constants.AFFINITY_CSV_FILE_DELIMITER, Constants.NONE);
                             //Utils.containsValue(bufferValues, Constants.NONE) ||
                             if (bufferValues == null || bufferValues.length <= maxCol) {
                                 n.stopSimulation("error while parsing the affinity landscape file " + TFspecies[i].landscapeFile + ": could not parse line " + i + ": " + lines.get(k));
                             }
+                            assert bufferValues != null;
                             currentPos = (int) Math.round(bufferValues[TFspecies[i].landscapePosCol]);
                             actualPos = (int) (currentPos - this.subsequence.start);
                             if (actualPos >= 0 && actualPos < this.strand.length) {
@@ -611,19 +611,17 @@ public class DNA implements Serializable {
 
     /**
      * prints a string with the DNA sequence in letters
-     * @throws FileNotFoundException
      */
-    public void printDNAstrand(String path, String filename) throws FileNotFoundException {
+    public void printDNAstrand(String path, String filename) {
         CellUtils.printSequence(path, filename, generateDescriptionString(), strand);
     }
 
     /**
      * prints a string with the DNA  TF affinities
-     * @throws FileNotFoundException
      */
     public void printAffinities(String path, String filename, int start, int end, int TFreadDirections,
                                 TFSpecies[] tfs, boolean fullOccupancy, int wigStepSize, double wigThreshold,
-                                boolean printBindingEnergy) throws FileNotFoundException {
+                                boolean printBindingEnergy) {
 
 
         double[][][] bufferTFaffinity = new double[TFavgMoveRate.length][strand.length][this.TFdirections];
@@ -648,7 +646,7 @@ public class DNA implements Serializable {
                         max = Math.min(strand.length, j + TFsize[i]);
                     }
                     for (int k = j; k < max; k++) {
-                        if (k >= 0 && k < strand.length - TFsize[i] + 1) {
+                        if (k < strand.length - TFsize[i] + 1) {
                             if (printBindingEnergy) {
                                 bufferTFaffinity[i][k][dir] += CellUtils.computeBindingEnergy(tfs[i].specificWaitingTime, 1.0 / TFavgMoveRate[i][j][dir]);
                                 //System.out.println(bufferTFaffinity[i][k][dir]+"; "+tfs[i].specificWaitingTime+";
@@ -1484,7 +1482,7 @@ public class DNA implements Serializable {
         for (int i = 0; i < end && result == Constants.NONE; i++) {
             isFree = true;
             start = Math.max(0, i - spaceBefore);
-            for (int j = start; j < i + TFsize[TFspecies] - +spaceAfter && isFree; j++) {
+            for (int j = start; j < i + TFsize[TFspecies] - spaceAfter && isFree; j++) {
                 if (occupied[j] != Constants.NONE) {
                     isFree = false;
                 }
@@ -1570,11 +1568,9 @@ public class DNA implements Serializable {
 
     /**
      * prints a string with the DNA TF affinities
-     *
-     * @throws FileNotFoundException
      */
     public void printDNAoccupancy(String path, String filename, int start, int end, double totalTime,
-                                  boolean fullOccupancy, int wigStepSize, double wigThreshold) throws FileNotFoundException {
+                                  boolean fullOccupancy, int wigStepSize, double wigThreshold) {
 
         double[][][] bufferTFoccupancy = new double[effectiveTFOccupancy.length][strand.length][this.TFdirections];
 

@@ -36,8 +36,8 @@ public class SimulationParameters extends JPanel{
 	public SimulationParameters(InputParameters ip){
 		this.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH,GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT));
 		this.setLayout(new FlowLayout());
-		componentsStack = new JPanel(new GridLayout(0,1, GUIconstants.GRID_HGAP, GUIconstants.GRID_WGAP));
-		componentsStack.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT,GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH));
+		componentsStack = new JPanel(new GridLayout(0,1, GUIconstants.GRID_HGAP, GUIconstants.GRID_VGAP));
+		componentsStack.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH, GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT));
 		
 		
 		
@@ -51,11 +51,11 @@ public class SimulationParameters extends JPanel{
 
 		//simulation params
 		STOP_TIME = new LabelledDouble(ip.STOP_TIME.label,GUIconstants.TEXTAREA_WIDTH,ip.STOP_TIME.description,ip.STOP_TIME.value);	
-		ENSEMBLE_SIZE = new LabelledInteger(ip.ENSEMBLE_SIZE.label,GUIconstants.TEXTAREA_WIDTH,ip.ENSEMBLE_SIZE.description,ip.ENSEMBLE_SIZE.value.intValue());
-		RANDOM_SEED = new LabelledInteger(ip.RANDOM_SEED.label,GUIconstants.TEXTAREA_WIDTH,ip.RANDOM_SEED.description,ip.RANDOM_SEED.value.intValue());
-		COMPUTED_AFFINITY_PRECISION = new LabelledInteger(ip.COMPUTED_AFFINITY_PRECISION.label,GUIconstants.TEXTAREA_WIDTH,ip.COMPUTED_AFFINITY_PRECISION.description,ip.COMPUTED_AFFINITY_PRECISION.value.intValue());
-		DNA_SECTOR_SIZE = new LabelledInteger(ip.DNA_SECTOR_SIZE.label,GUIconstants.TEXTAREA_WIDTH,ip.DNA_SECTOR_SIZE.description,ip.DNA_SECTOR_SIZE.value.intValue());
-		EVENT_LIST_SUBGROUP_SIZE = new LabelledInteger(ip.EVENT_LIST_SUBGROUP_SIZE.label,GUIconstants.TEXTAREA_WIDTH,ip.EVENT_LIST_SUBGROUP_SIZE.description,ip.EVENT_LIST_SUBGROUP_SIZE.value.intValue());
+		ENSEMBLE_SIZE = new LabelledInteger(ip.ENSEMBLE_SIZE.label,GUIconstants.TEXTAREA_WIDTH,ip.ENSEMBLE_SIZE.description, ip.ENSEMBLE_SIZE.value);
+		RANDOM_SEED = new LabelledInteger(ip.RANDOM_SEED.label,GUIconstants.TEXTAREA_WIDTH,ip.RANDOM_SEED.description, ip.RANDOM_SEED.value);
+		COMPUTED_AFFINITY_PRECISION = new LabelledInteger(ip.COMPUTED_AFFINITY_PRECISION.label,GUIconstants.TEXTAREA_WIDTH,ip.COMPUTED_AFFINITY_PRECISION.description, ip.COMPUTED_AFFINITY_PRECISION.value);
+		DNA_SECTOR_SIZE = new LabelledInteger(ip.DNA_SECTOR_SIZE.label,GUIconstants.TEXTAREA_WIDTH,ip.DNA_SECTOR_SIZE.description, ip.DNA_SECTOR_SIZE.value);
+		EVENT_LIST_SUBGROUP_SIZE = new LabelledInteger(ip.EVENT_LIST_SUBGROUP_SIZE.label,GUIconstants.TEXTAREA_WIDTH,ip.EVENT_LIST_SUBGROUP_SIZE.description, ip.EVENT_LIST_SUBGROUP_SIZE.value);
 		EVENT_LIST_USES_FR = new LabelledCheckBox(ip.EVENT_LIST_USES_FR.label, ip.EVENT_LIST_USES_FR.description, ip.EVENT_LIST_USES_FR.value); 
 		
 		

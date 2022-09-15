@@ -15,8 +15,8 @@ import java.util.ArrayList;
 public class SimulatorCLI {
 
     /**
-     * @param args
-     * @throws FileNotFoundException
+     * @param args  (optional) parameters filename (*.grp), number of steps,
+     *              waiting time for creating simulation backup and stopAfterBackup flag
      */
     public static void main(String[] args) throws FileNotFoundException {
 
@@ -46,7 +46,7 @@ public class SimulatorCLI {
         }
 
         if (args.length > 3) {
-            stopAfterBackup = Utils.parseBoolean(args[3], stopAfterBackup);
+            stopAfterBackup = Utils.parseBoolean(args[3], false);
         }
 
 
@@ -68,9 +68,8 @@ public class SimulatorCLI {
                 //located the first backup file
                 if (file.startsWith("backup_") && file.endsWith(Constants.INFO_FILE_EXTENSION)) {
                     ArrayList<String> buffer = new ArrayList<String>();
-                    String thisLine = "";
-                    BufferedReader infoFile = null;
-                    canRestore = false;
+                    String thisLine;
+                    BufferedReader infoFile;
                     try {
                         infoFile = new BufferedReader(new FileReader(file));
                         while ((thisLine = infoFile.readLine()) != null) {
@@ -121,9 +120,9 @@ public class SimulatorCLI {
             }
         }
 
-        if (tmpBackupFile != null && !tmpBackupFile.isEmpty()) {
-            FileInputStream fis = null;
-            ObjectInputStream in = null;
+        if (!tmpBackupFile.isEmpty()) {
+            FileInputStream fis;
+            ObjectInputStream in;
             try {
                 fis = new FileInputStream(tmpBackupFile);
                 in = new ObjectInputStream(fis);
@@ -161,7 +160,7 @@ public class SimulatorCLI {
 
         ensembleSteps = steps * cell.ip.ENSEMBLE_SIZE.value;
 
-        String intermediaryFilename = cell.outputIntermediaryBackupFile;
+        String intermediaryFilename;
 
         //run intervals
         if (cell.totalStopTime > 0) {
@@ -189,8 +188,8 @@ public class SimulatorCLI {
                     System.out.println("backup started");
                     double currentTime = System.currentTimeMillis();
 
-                    FileOutputStream fos = null;
-                    ObjectOutputStream out = null;
+                    FileOutputStream fos;
+                    ObjectOutputStream out;
                     try {
                         intermediaryFilename = cell.outputIntermediaryBackupFile;
 
@@ -211,7 +210,7 @@ public class SimulatorCLI {
                         file.renameTo(new File(intermediaryFilename));
                         System.out.println("backup file created " + intermediaryFilename + "; ensemble: " + ensemble + "; step:" + i + "; total:" + steps);
 
-                        BufferedWriter infoFile = null;
+                        BufferedWriter infoFile;
                         try {
                             //Construct the BufferedWriter object
                             infoFile = new BufferedWriter(new FileWriter(cell.outputIntermediaryInfoFile));

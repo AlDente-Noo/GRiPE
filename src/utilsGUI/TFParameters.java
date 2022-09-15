@@ -51,8 +51,8 @@ public class TFParameters  extends JPanel{
 	public TFParameters(InputParameters ip){
 		this.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH,GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT));
 		this.setLayout(new FlowLayout());
-		componentsStack = new JPanel(new GridLayout(0,1, GUIconstants.GRID_HGAP, GUIconstants.GRID_WGAP));
-		componentsStack.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT,GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH));
+		componentsStack = new JPanel(new GridLayout(0,1, GUIconstants.GRID_HGAP, GUIconstants.GRID_VGAP));
+		componentsStack.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH, GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT));
 
 		JLabel label1, label2, label3;
 		label1 = new JLabel(GUIconstants.SIMULATION_AREA_TF_LOAD_PARAMATERS);
@@ -71,13 +71,13 @@ public class TFParameters  extends JPanel{
 		SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE = new LabelledCheckBox(ip.SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE.label, ip.SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE.description, ip.SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE.value);
 
 		//TF_RANDOM PARAMETERS
-		TF_DBD_LENGTH_MIN = new LabelledInteger(ip.TF_DBD_LENGTH_MIN.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_DBD_LENGTH_MIN.description,ip.TF_DBD_LENGTH_MIN.value.intValue());
-		TF_DBD_LENGTH_MAX = new LabelledInteger(ip.TF_DBD_LENGTH_MAX.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_DBD_LENGTH_MAX.description,ip.TF_DBD_LENGTH_MAX.value.intValue());
-		TF_SPECIES_COUNT = new LabelledInteger(ip.TF_SPECIES_COUNT.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_SPECIES_COUNT.description,ip.TF_SPECIES_COUNT.value.intValue());
-		TF_COPY_NUMBER_MIN = new LabelledInteger(ip.TF_COPY_NUMBER_MIN.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_COPY_NUMBER_MIN.description,ip.TF_COPY_NUMBER_MIN.value.intValue());
-		TF_COPY_NUMBER_MAX = new LabelledInteger(ip.TF_COPY_NUMBER_MAX.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_COPY_NUMBER_MAX.description,ip.TF_COPY_NUMBER_MAX.value.intValue());
-		TF_SIZE_LEFT = new LabelledInteger(ip.TF_SIZE_LEFT.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_SIZE_LEFT.description,ip.TF_SIZE_LEFT.value.intValue());
-		TF_SIZE_RIGHT = new LabelledInteger(ip.TF_SIZE_RIGHT.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_SIZE_RIGHT.description,ip.TF_SIZE_RIGHT.value.intValue());
+		TF_DBD_LENGTH_MIN = new LabelledInteger(ip.TF_DBD_LENGTH_MIN.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_DBD_LENGTH_MIN.description, ip.TF_DBD_LENGTH_MIN.value);
+		TF_DBD_LENGTH_MAX = new LabelledInteger(ip.TF_DBD_LENGTH_MAX.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_DBD_LENGTH_MAX.description, ip.TF_DBD_LENGTH_MAX.value);
+		TF_SPECIES_COUNT = new LabelledInteger(ip.TF_SPECIES_COUNT.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_SPECIES_COUNT.description, ip.TF_SPECIES_COUNT.value);
+		TF_COPY_NUMBER_MIN = new LabelledInteger(ip.TF_COPY_NUMBER_MIN.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_COPY_NUMBER_MIN.description, ip.TF_COPY_NUMBER_MIN.value);
+		TF_COPY_NUMBER_MAX = new LabelledInteger(ip.TF_COPY_NUMBER_MAX.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_COPY_NUMBER_MAX.description, ip.TF_COPY_NUMBER_MAX.value);
+		TF_SIZE_LEFT = new LabelledInteger(ip.TF_SIZE_LEFT.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_SIZE_LEFT.description, ip.TF_SIZE_LEFT.value);
+		TF_SIZE_RIGHT = new LabelledInteger(ip.TF_SIZE_RIGHT.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_SIZE_RIGHT.description, ip.TF_SIZE_RIGHT.value);
 		TF_ES = new LabelledDouble(ip.TF_ES.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_ES.description,ip.TF_ES.value);
 		TF_ASSOC_RATE = new LabelledDouble(ip.TF_ASSOC_RATE.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_ASSOC_RATE.description,ip.TF_ASSOC_RATE.value);
 		TF_PREBOUND_PROPORTION = new LabelledDouble(ip.TF_PREBOUND_PROPORTION.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_PREBOUND_PROPORTION.description,ip.TF_PREBOUND_PROPORTION.value);

@@ -6,7 +6,9 @@ META-INF/
 .DS_STORE
 out/
 .idea/
+.stfolder/
 results/
+results_example/
 figures/
 .vscode/
 biodata/
@@ -15,3 +17,4 @@ dataproc/
 *.bkp
 backup*
 tmp*
+*.sh

@@ -12,7 +12,6 @@ import environment.Cell;
 public class SimulatorThread extends Thread{
 	private Cell cell;
 	private int steps;
-	private double stopTime;
 	private double timeStep;
 	private double time;
 	public double elapsedTime;
@@ -29,7 +28,6 @@ public class SimulatorThread extends Thread{
 		this.currentFile = currentFile;
 		this.gui = gui;
 		this.steps = steps;
-
 		initialiseSystem();
 	}
 
@@ -39,27 +37,23 @@ public class SimulatorThread extends Thread{
 	 */
 	private void initialiseSystem(){
 		initialised = false;
-		
 		try {
 			cell =new Cell(currentFile,gui, false);
 			initialised = true;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-	    	stopTime = cell.getTotalStopTime();
-		timeStep = stopTime/steps;
+		double stopTime = cell.getTotalStopTime();
+		timeStep = stopTime /steps;
 		isPaused = false;
 		time = 0;
 		elapsedTime = 0;
 		estimatedTime = 0;
 		this.ensembleSteps = steps*cell.ip.ENSEMBLE_SIZE.value;
-
-		
 	}
 	
 	/**
 	 * checks whether the cell was initialised
-	 * @return
 	 */
 	public boolean isInitialised(){
 		return initialised;
@@ -68,7 +62,6 @@ public class SimulatorThread extends Thread{
 	
 	/**
 	 * pauses the current simulation
-	 * @throws InterruptedException 
 	 */
 	public void pauseSimulation(){
 		isPaused = true;
@@ -96,65 +89,60 @@ public class SimulatorThread extends Thread{
 	 * run
 	 */
     public void run() {
-
-    	
-    		if(cell.totalStopTime>0){
-    			int ensemble;
-			while(index<ensembleSteps && cell.cellTime<cell.totalStopTime && cell.ensemble < cell.ip.ENSEMBLE_SIZE.value){
+		if(cell.totalStopTime>0) {
+			int ensemble;
+			while(index<ensembleSteps && cell.cellTime<cell.totalStopTime && cell.ensemble < cell.ip.ENSEMBLE_SIZE.value) {
 				ensemble = cell.ensemble;
-					time+=timeStep;
-					try {
-						elapsedTime += cell.runInterval(time,elapsedTime);
-					} catch (FileNotFoundException e) {
-						
-					}
-					if(ensemble!=cell.ensemble){
-						time=0;
-					}
-					estimatedTime = steps*elapsedTime/(index+1) *cell.ip.ENSEMBLE_SIZE.value;
-					index++;
-					gui.updateProgress(index,elapsedTime,estimatedTime, cell.ip.ENSEMBLE_SIZE.value);
-	
-					if(index == ensembleSteps || cell.cellTime>=cell.totalStopTime && cell.ensemble >= cell.ip.ENSEMBLE_SIZE.value){
-						gui.finishedSimulations();
-					}
-					
-					synchronized (this) {
-		                while (isPaused) {
-		                    try {
-		                        wait();
-		                    } catch (Exception e) {
-		                    }
-		                }
-		            }
-			}
-    		} else{
-    			try {
-    				while(cell.ensemble < cell.ip.ENSEMBLE_SIZE.value){
-
-					cell.runUntilTSReached();
-
-
-					if(cell.ensemble >= cell.ip.ENSEMBLE_SIZE.value){
-						gui.finishedSimulations();
-					}
-					
-					synchronized (this) {
-		                while (isPaused) {
-		                    try {
-		                        wait();
-		                    } catch (Exception e) {
-		                    }
-		                }
-		            }
-				}
+				time+=timeStep;
+				try {
+					elapsedTime += cell.runInterval(time,elapsedTime);
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				}
-    		}
-    		
-    		
-    	
+				if(ensemble!=cell.ensemble) {
+					time=0;
+				}
+				estimatedTime = steps*elapsedTime/(index+1) *cell.ip.ENSEMBLE_SIZE.value;
+				index++;
+				gui.updateProgress(index,elapsedTime,estimatedTime, cell.ip.ENSEMBLE_SIZE.value);
+
+				if(index == ensembleSteps || cell.cellTime>=cell.totalStopTime && cell.ensemble >= cell.ip.ENSEMBLE_SIZE.value) {
+					gui.finishedSimulations();
+				}
+
+				synchronized (this) {
+					while (isPaused) {
+						try {
+							wait();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		} else {
+			try {
+				while(cell.ensemble < cell.ip.ENSEMBLE_SIZE.value){
+					cell.runUntilTSReached();
+					if(cell.ensemble >= cell.ip.ENSEMBLE_SIZE.value){
+						gui.finishedSimulations();
+					}
+					synchronized (this) {
+						while (isPaused) {
+							try {
+								wait();
+							} catch (Exception e) {
+							}
+						}
+					}
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+
+
+
     }
    
     

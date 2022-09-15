@@ -20,6 +20,7 @@ import java.util.*;
  *
  * @author n.r.zabet@gen.cam.ac.uk
  */
+@SuppressWarnings("ALL")
 public class Cell implements Serializable {
 
     private static final long serialVersionUID = 5826964812877420521L;
@@ -115,9 +116,8 @@ public class Cell implements Serializable {
      * generate output filename
      *
      * @param paramsFilename the filename of the params
-     * @throws FileNotFoundException
      */
-    private void generateOutputFilenames(File paramsFilename) throws FileNotFoundException {
+    private void generateOutputFilenames(File paramsFilename) {
         this.outputStatusFile =
                 paramsFilename.getName().replaceAll("params", "status").replaceAll(Constants.PARAMETR_FILE_EXTENSION, Constants.STATUS_FILE_EXTENSION);
         this.outputDNAOccupancyFile =
@@ -142,10 +142,8 @@ public class Cell implements Serializable {
 
     /**
      * initialises the internal parameters
-     *
-     * @throws FileNotFoundException
      */
-    private void initialiseInternalParameters() throws FileNotFoundException {
+    private void initialiseInternalParameters() {
 
         //create the random number generator
         createRandomNumberGenerator();
@@ -234,10 +232,8 @@ public class Cell implements Serializable {
 
     /**
      * generates the TFs to follows based on a string
-     *
-     * @throws FileNotFoundException
      */
-    private void getTFsToFollow() throws FileNotFoundException {
+    private void getTFsToFollow() {
         areTFstoFollow = false;
         double avgStep = 1.0, bufferStep;
 
@@ -313,11 +309,8 @@ public class Cell implements Serializable {
 
     /**
      * generates the Target Sites to follow file based on a string
-     *
-     * @throws RuntimeException
      */
-    private void initTargetSitesToFollow() throws RuntimeException {
-
+    private void initTargetSitesToFollow() {
         if (this.ip.ENSEMBLE_SIZE.value == 1 && this.ip.FOLLOW_TS.value) {
             BufferedWriter bufferFile = null;
             try {
@@ -339,12 +332,9 @@ public class Cell implements Serializable {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-
             TargetSiteFollowLines = new ArrayList<String>();
         } else if (this.ip.FOLLOW_TS.value) {
-            String errStr = "Ensemble size is larger than 1 (" + ip.ENSEMBLE_SIZE.value + ") but FOLLOW_TS is true";
-            this.printDebugInfo("Ensemble size is larger than 1, cannot follow TS (donno why).");
-            throw new RuntimeException(errStr);
+            this.printDebugInfo("Ensemble size is bigger than 1, TS cannot be followed.");
         }
     }
 

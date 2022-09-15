@@ -24,6 +24,7 @@ public class Constants {
 	public static final String PARAMS_FILE_COMMENT_CHAR = "#";
 	public static final String PARAMS_FILE_LINE_ENDING = ";";
 	public static final String PARAMS_FILE_ASSIGNMENT_CHAR = "=";
+	public static final String PARAMS_FILE_PREFIX = "params_";
 	
 	public static final String[] PARSER_DINUCLEOTIDE_CSV_FILE_HEADER = {"DINUCLEOTIDE", "PROPELLLERTWISTFACTOR", "SLIDEFACTOR"};
 

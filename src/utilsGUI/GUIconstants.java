@@ -61,7 +61,7 @@ public class GUIconstants {
 	public static final int TEXTAREA_WIDTH = 20;
 
 	public static final int GRID_HGAP = 1;
-	public static final int GRID_WGAP = 5;
+	public static final int GRID_VGAP = 5;
 	
 	public static final String SIMULATION_AREA_SIMULATION_PARAMATERS="Simulation";
 	public static final String SIMULATION_AREA_SIMULATION_GENERAL_PARAMATERS="Simulation Parameters";

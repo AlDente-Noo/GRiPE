@@ -38,8 +38,8 @@ public class DNAParameters  extends JPanel{
 	public DNAParameters(InputParameters ip){
 		this.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH,GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT));
 		this.setLayout(new FlowLayout());
-		componentsStack = new JPanel(new GridLayout(0,1, GUIconstants.GRID_HGAP, GUIconstants.GRID_WGAP));
-		componentsStack.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT,GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH));
+		componentsStack = new JPanel(new GridLayout(0,1, GUIconstants.GRID_HGAP, GUIconstants.GRID_VGAP));
+		componentsStack.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH, GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT));
 
 		JLabel label1, label2;
 		label1 = new JLabel(GUIconstants.SIMULATION_AREA_DNA_LOAD_PARAMATERS);
@@ -53,7 +53,7 @@ public class DNAParameters  extends JPanel{
 		DNA_DEREPRESSION_RATE = new LabelledDouble(ip.DNA_DEREPRESSION_RATE.label,GUIconstants.TEXTAREA_WIDTH,ip.DNA_DEREPRESSION_RATE.description,ip.DNA_DEREPRESSION_RATE.value);
 
 		//DNA_RANDOM PARAMETERS
-		DNA_LENGTH = new LabelledInteger(ip.DNA_LENGTH.label,GUIconstants.TEXTAREA_WIDTH,ip.DNA_LENGTH.description,ip.DNA_LENGTH.value.intValue());
+		DNA_LENGTH = new LabelledInteger(ip.DNA_LENGTH.label,GUIconstants.TEXTAREA_WIDTH,ip.DNA_LENGTH.description, ip.DNA_LENGTH.value);
 		DNA_PROPORTION_OF_A = new LabelledDouble(ip.DNA_PROPORTION_OF_A.label,GUIconstants.TEXTAREA_WIDTH,ip.DNA_PROPORTION_OF_A.description,ip.DNA_PROPORTION_OF_A.value);	
 		DNA_PROPORTION_OF_T = new LabelledDouble(ip.DNA_PROPORTION_OF_T.label,GUIconstants.TEXTAREA_WIDTH,ip.DNA_PROPORTION_OF_T.description,ip.DNA_PROPORTION_OF_T.value);	
 		DNA_PROPORTION_OF_C = new LabelledDouble(ip.DNA_PROPORTION_OF_C.label,GUIconstants.TEXTAREA_WIDTH,ip.DNA_PROPORTION_OF_C.description,ip.DNA_PROPORTION_OF_C.value);	

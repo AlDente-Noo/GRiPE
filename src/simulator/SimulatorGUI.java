@@ -30,12 +30,12 @@ import utilsGUI.*;
  * @author n.r.zabet@gen.cam.ac.uk, modified by fedor.garbuzov@gmail.com
  *
  */
+@SuppressWarnings("ALL")
 public class SimulatorGUI {
 	private JFrame frame;
 	private JPanel setupArea;
 	private JScrollPane setupAreaScroll;
 
-	private JTabbedPane setupAreaTabbedPane;
 	private JPanel simulationArea;
 	private JButton simulationsStart;
 	private JButton simulationsLoad;
@@ -50,13 +50,13 @@ public class SimulatorGUI {
 	private JTextArea statusTextArea;
 	private JScrollPane statusAreaScroll;
 
-	private SimulationParameters simulationParamaters;
-	private OutputParameters outputParamaters;
+	private SimulationParameters simulationParameters;
+	private OutputParameters outputParameters;
 	private TFParameters TFParameters;
 	private DNAParameters DNAParameters;
 	private TFRandomWalkParameters TFRandomWalkParameters;
 	
-	private InputParameters ip;
+	private final InputParameters ip;
 	
 	private String currentFile;
 	private JFileChooser fc;
@@ -68,7 +68,7 @@ public class SimulatorGUI {
 	
 	private ImageIcon logoImg;
 
-	DateFormat df;
+	final DateFormat df;
 	
 	/**
 	 * class constructor
@@ -88,7 +88,7 @@ public class SimulatorGUI {
 	}
 	
 	
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		
 		SimulatorGUI gui;
 		String filename="";
@@ -123,6 +123,7 @@ public class SimulatorGUI {
 	    File logoImgFile = new File(GUIconstants.LOGO_IMAGE);
 		if(!logoImgFile.exists()){
 			in = this.getClass().getClassLoader().getResourceAsStream(GUIconstants.LOGO_IMAGE);
+			assert in != null;
 			try {
 				if(in.available() >0){
 					logoImg = new ImageIcon(ImageIO.read(in));
@@ -136,10 +137,12 @@ public class SimulatorGUI {
 		}
 		frame.setIconImage(logoImg.getImage());
 		
-		makeSimulationArea(contentPane);
-		makeSetupArea(contentPane);
-		makeStatusArea(contentPane);
-		statusAreaScroll.setVisible(false);
+		makeSimulationArea();
+		makeSetupArea();
+		makeStatusArea();
+
+		contentPane.add(simulationArea, BorderLayout.SOUTH);
+		contentPane.add(setupAreaScroll, BorderLayout.CENTER);
 
 		makeMenuBar(frame);
 		
@@ -150,7 +153,7 @@ public class SimulatorGUI {
 	}
 	
 	
-	public void makeSimulationArea(Container contentPane){
+	public void makeSimulationArea(){
 		//simulation area
 		simulationArea = new JPanel();
 		simulationArea.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
@@ -163,6 +166,7 @@ public class SimulatorGUI {
 	    File buttonLoadImgFile = new File(GUIconstants.LOAD_IMAGE);
 		if(!buttonLoadImgFile.exists()){
 			in = this.getClass().getClassLoader().getResourceAsStream(GUIconstants.LOAD_IMAGE);
+			assert in != null;
 			try {
 				if(in.available() >0){
 					buttonLoadImg = new ImageIcon(ImageIO.read(in));
@@ -179,6 +183,7 @@ public class SimulatorGUI {
 	    File buttonUnloadImgFile = new File(GUIconstants.UNLOAD_IMAGE);
 		if(!buttonUnloadImgFile.exists()){
 			in = this.getClass().getClassLoader().getResourceAsStream(GUIconstants.UNLOAD_IMAGE);
+			assert in != null;
 			try {
 				if(in.available() >0){
 					buttonUnloadImg = new ImageIcon(ImageIO.read(in));
@@ -207,6 +212,7 @@ public class SimulatorGUI {
 	    File buttonPlayImgFile = new File(GUIconstants.PLAY_IMAGE);
 		if(!buttonPlayImgFile.exists()){
 			in = this.getClass().getClassLoader().getResourceAsStream(GUIconstants.PLAY_IMAGE);
+			assert in != null;
 			try {
 				if(in.available() >0){
 					buttonPlayImg = new ImageIcon(ImageIO.read(in));
@@ -223,6 +229,7 @@ public class SimulatorGUI {
 	    File buttonPauseImgFile = new File(GUIconstants.PAUSE_IMAGE);
 		if(!buttonPauseImgFile.exists()){
 			in = this.getClass().getClassLoader().getResourceAsStream(GUIconstants.PAUSE_IMAGE);
+			assert in != null;
 			try {
 				if(in.available() >0){
 					buttonPauseImg = new ImageIcon(ImageIO.read(in));
@@ -263,22 +270,22 @@ public class SimulatorGUI {
         timeLabel.setEnabled(false);
 		simulationArea.add(timeLabel);
 
-		contentPane.add(simulationArea, BorderLayout.SOUTH);
+		//contentPane.add(simulationArea, BorderLayout.SOUTH);
 	}
 	
 
-	public void makeSetupArea(Container contentPane){
+	public void makeSetupArea(){
 		//setup area
 		setupArea = new JPanel();
-		setupAreaTabbedPane = new JTabbedPane();
+		JTabbedPane setupAreaTabbedPane = new JTabbedPane();
 		setupAreaTabbedPane.setPreferredSize(new Dimension(GUIconstants.SETUP_AREA_WIDTH-GUIconstants.SCROLLBAR_SIZE,GUIconstants.SETUP_AREA_HIGHT-GUIconstants.SCROLLBAR_SIZE));
 		setupArea.setLayout(new FlowLayout());
 
-		simulationParamaters = new SimulationParameters(ip);
-		setupAreaTabbedPane.addTab(GUIconstants.SIMULATION_AREA_SIMULATION_PARAMATERS, null, simulationParamaters, null);
+		simulationParameters = new SimulationParameters(ip);
+		setupAreaTabbedPane.addTab(GUIconstants.SIMULATION_AREA_SIMULATION_PARAMATERS, null, simulationParameters, null);
 		
-		outputParamaters = new OutputParameters(ip);
-		setupAreaTabbedPane.addTab(GUIconstants.SIMULATION_AREA_OUTPUT_PARAMATERS, null, outputParamaters, null);
+		outputParameters = new OutputParameters(ip);
+		setupAreaTabbedPane.addTab(GUIconstants.SIMULATION_AREA_OUTPUT_PARAMATERS, null, outputParameters, null);
 		
 		TFParameters = new TFParameters(ip);
 		setupAreaTabbedPane.addTab(GUIconstants.SIMULATION_AREA_TF_PARAMATERS, null, TFParameters, null);
@@ -293,27 +300,25 @@ public class SimulatorGUI {
 		
 		setupAreaScroll = new JScrollPane(setupArea);
 		setupAreaScroll.setPreferredSize(new Dimension(GUIconstants.SETUP_AREA_WIDTH,GUIconstants.SETUP_AREA_HIGHT));
-		contentPane.add(setupAreaScroll,BorderLayout.CENTER);
+		//contentPane.add(setupAreaScroll,BorderLayout.CENTER);
 	}
 	
 
 	/**
 	 * constructs the status area
-	 * @param contentPane
 	 */
-	public void makeStatusArea(Container contentPane){	
+	public void makeStatusArea(){
 		statusTextArea= new AutoScrollingTextArea();
 		statusTextArea.setSize(new Dimension(GUIconstants.SETUP_AREA_WIDTH,GUIconstants.SETUP_AREA_HIGHT));
 		statusTextArea.setEditable(false);
 		
 		statusAreaScroll = new JScrollPane(statusTextArea);
 		statusAreaScroll.setPreferredSize(new Dimension(GUIconstants.SETUP_AREA_WIDTH,GUIconstants.SETUP_AREA_HIGHT));
-		contentPane.add(statusAreaScroll,BorderLayout.NORTH);
+		//contentPane.add(statusAreaScroll,BorderLayout.CENTER);
 	}
 	
 	/**
 	 * create the menu bar
-	 * @param frame
 	 */
 	public void makeMenuBar(JFrame frame){
 		JMenuBar menubar = new JMenuBar();
@@ -339,13 +344,13 @@ public class SimulatorGUI {
 		});
 		fileMenu.add(saveItem);
 
-		JMenuItem saveasItem = new JMenuItem(GUIconstants.MENU_FILE_SAVE_AS);
-		saveasItem.addActionListener(new ActionListener(){
+		JMenuItem saveAsItem = new JMenuItem(GUIconstants.MENU_FILE_SAVE_AS);
+		saveAsItem.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				saveFile(e);
 			}
 		});
-		fileMenu.add(saveasItem);
+		fileMenu.add(saveAsItem);
 		
 		JMenuItem closeItem = new JMenuItem(GUIconstants.MENU_FILE_CLOSE);
 		closeItem.addActionListener(new ActionListener(){
@@ -370,7 +375,6 @@ public class SimulatorGUI {
 
 	/**
 	 * writes a line in the status area
-	 * @param line
 	 */
 	public void printlnStatusArea(String line){
 		statusTextArea.append(line+"\n");
@@ -399,14 +403,11 @@ public class SimulatorGUI {
 	/**
 	 * save a file
 	 */
-	private boolean saveFile(ActionEvent e){
-		boolean result=false;
-		
+	private void saveFile(ActionEvent e){
 		if(e!=null && e.getActionCommand().equalsIgnoreCase(GUIconstants.MENU_FILE_SAVE_AS)){
 			currentFile="";
 		}
-		
-		if(currentFile==""){
+		if(currentFile.equals("")){
 			int returnVal = fc.showSaveDialog(setupArea);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 	            File file = fc.getSelectedFile();
@@ -416,14 +417,8 @@ public class SimulatorGUI {
 	            }
 			}
 		}
-		
-		if(currentFile!=""){
-			//This is where a real application would save the file.
-			result = true;
-			saveModel(currentFile);
-		}
-		
-		return result;
+		//This is where a real application would save the file.
+		saveModel(currentFile);
 	}
 	
 	/**
@@ -453,31 +448,31 @@ public class SimulatorGUI {
 	 */
 	private void getInputParameters(){
 		//SIMULATION PARAMETERS
-		ip.STOP_TIME.value= simulationParamaters.STOP_TIME.getValue();	
-		ip.ENSEMBLE_SIZE.value= simulationParamaters.ENSEMBLE_SIZE.getValue();
-		ip.RANDOM_SEED.value= simulationParamaters.RANDOM_SEED.getValue();	
-		ip.COMPUTED_AFFINITY_PRECISION.value= simulationParamaters.COMPUTED_AFFINITY_PRECISION.getValue();	
-		ip.DNA_SECTOR_SIZE.value= simulationParamaters.DNA_SECTOR_SIZE.getValue();	
-		ip.EVENT_LIST_SUBGROUP_SIZE.value= simulationParamaters.EVENT_LIST_SUBGROUP_SIZE.getValue();	
-		ip.EVENT_LIST_USES_FR.value= simulationParamaters.EVENT_LIST_USES_FR.getValue();
+		ip.STOP_TIME.value= simulationParameters.STOP_TIME.getValue();
+		ip.ENSEMBLE_SIZE.value= simulationParameters.ENSEMBLE_SIZE.getValue();
+		ip.RANDOM_SEED.value= simulationParameters.RANDOM_SEED.getValue();
+		ip.COMPUTED_AFFINITY_PRECISION.value= simulationParameters.COMPUTED_AFFINITY_PRECISION.getValue();
+		ip.DNA_SECTOR_SIZE.value= simulationParameters.DNA_SECTOR_SIZE.getValue();
+		ip.EVENT_LIST_SUBGROUP_SIZE.value= simulationParameters.EVENT_LIST_SUBGROUP_SIZE.getValue();
+		ip.EVENT_LIST_USES_FR.value= simulationParameters.EVENT_LIST_USES_FR.getValue();
 		
 		//SIMULATION-OUTPUT PARAMETERS
-		ip.OUTPUT_FOLDER.value= outputParamaters.OUTPUT_FOLDER.getValue();	
-		ip.OUTPUT_FILENAME.value= outputParamaters.OUTPUT_FILENAME.getValue();	
-		ip.PRINT_INTERMEDIARY_RESULTS_AFTER.value= outputParamaters.PRINT_INTERMEDIARY_RESULTS_AFTER.getValue();	
-		ip.PRINT_FINAL_OCCUPANCY.value= outputParamaters.PRINT_FINAL_OCCUPANCY.getValue();	
-		ip.DEBUG_MODE.value= outputParamaters.DEBUG_MODE.getValue();		
-		ip.OUTPUT_TF.value= outputParamaters.OUTPUT_TF.getValue();	
-		ip.OUTPUT_TF_POINTS.value= outputParamaters.OUTPUT_TF_POINTS.getValue();	
-		ip.FOLLOW_TS.value= outputParamaters.FOLLOW_TS.getValue();
-		ip.OUTPUT_AFFINITY_LANDSCAPE.value= outputParamaters.OUTPUT_AFFINITY_LANDSCAPE.getValue();
-		ip.OUTPUT_BINDING_ENERGY.value= outputParamaters.OUTPUT_BINDING_ENERGY.getValue();
-		ip.OUTPUT_DNA_OCCUPANCY.value= outputParamaters.OUTPUT_DNA_OCCUPANCY.getValue();	
-		ip.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.value= outputParamaters.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.getValue();	
-		ip.OUTPUT_SLIDING_LENGTHS.value= outputParamaters.OUTPUT_SLIDING_LENGTHS.getValue();
-		ip.OUTPUT_REPRESSED_LENGTHS.value= outputParamaters.OUTPUT_REPRESSED_LENGTHS.getValue();
-		ip.WIG_STEP.value= outputParamaters.WIG_STEP.getValue();	
-		ip.WIG_THRESHOLD.value= outputParamaters.WIG_THRESHOLD.getValue();	
+		ip.OUTPUT_FOLDER.value= outputParameters.OUTPUT_FOLDER.getValue();
+		ip.OUTPUT_FILENAME.value= outputParameters.OUTPUT_FILENAME.getValue();
+		ip.PRINT_INTERMEDIARY_RESULTS_AFTER.value= outputParameters.PRINT_INTERMEDIARY_RESULTS_AFTER.getValue();
+		ip.PRINT_FINAL_OCCUPANCY.value= outputParameters.PRINT_FINAL_OCCUPANCY.getValue();
+		ip.DEBUG_MODE.value= outputParameters.DEBUG_MODE.getValue();
+		ip.OUTPUT_TF.value= outputParameters.OUTPUT_TF.getValue();
+		ip.OUTPUT_TF_POINTS.value= outputParameters.OUTPUT_TF_POINTS.getValue();
+		ip.FOLLOW_TS.value= outputParameters.FOLLOW_TS.getValue();
+		ip.OUTPUT_AFFINITY_LANDSCAPE.value= outputParameters.OUTPUT_AFFINITY_LANDSCAPE.getValue();
+		ip.OUTPUT_BINDING_ENERGY.value= outputParameters.OUTPUT_BINDING_ENERGY.getValue();
+		ip.OUTPUT_DNA_OCCUPANCY.value= outputParameters.OUTPUT_DNA_OCCUPANCY.getValue();
+		ip.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.value= outputParameters.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.getValue();
+		ip.OUTPUT_SLIDING_LENGTHS.value= outputParameters.OUTPUT_SLIDING_LENGTHS.getValue();
+		ip.OUTPUT_REPRESSED_LENGTHS.value= outputParameters.OUTPUT_REPRESSED_LENGTHS.getValue();
+		ip.WIG_STEP.value= outputParameters.WIG_STEP.getValue();
+		ip.WIG_THRESHOLD.value= outputParameters.WIG_THRESHOLD.getValue();
 
 		//TF PARAMETERS
 		ip.TF_FILE.value= TFParameters.TF_FILE.getValue();
@@ -548,31 +543,31 @@ public class SimulatorGUI {
 	private void setInputParameters(){
 		
 		//SIMULATION PARAMETERS
-		simulationParamaters.STOP_TIME.setValue(ip.STOP_TIME.value);
-		simulationParamaters.ENSEMBLE_SIZE.setValue(ip.ENSEMBLE_SIZE.value);
-		simulationParamaters.RANDOM_SEED.setValue(ip.RANDOM_SEED.value);
-		simulationParamaters.COMPUTED_AFFINITY_PRECISION.setValue(ip.COMPUTED_AFFINITY_PRECISION.value);
-		simulationParamaters.DNA_SECTOR_SIZE.setValue(ip.DNA_SECTOR_SIZE.value);
-		simulationParamaters.EVENT_LIST_SUBGROUP_SIZE.setValue(ip.EVENT_LIST_SUBGROUP_SIZE.value);
-		simulationParamaters.EVENT_LIST_USES_FR.setValue(ip.EVENT_LIST_USES_FR.value);
+		simulationParameters.STOP_TIME.setValue(ip.STOP_TIME.value);
+		simulationParameters.ENSEMBLE_SIZE.setValue(ip.ENSEMBLE_SIZE.value);
+		simulationParameters.RANDOM_SEED.setValue(ip.RANDOM_SEED.value);
+		simulationParameters.COMPUTED_AFFINITY_PRECISION.setValue(ip.COMPUTED_AFFINITY_PRECISION.value);
+		simulationParameters.DNA_SECTOR_SIZE.setValue(ip.DNA_SECTOR_SIZE.value);
+		simulationParameters.EVENT_LIST_SUBGROUP_SIZE.setValue(ip.EVENT_LIST_SUBGROUP_SIZE.value);
+		simulationParameters.EVENT_LIST_USES_FR.setValue(ip.EVENT_LIST_USES_FR.value);
 		
 		//SIMULATION-OUTPUT PARAMETERS
-		outputParamaters.OUTPUT_FOLDER.setValue(ip.OUTPUT_FOLDER.value);
-		outputParamaters.OUTPUT_FILENAME.setValue(ip.OUTPUT_FILENAME.value);
-		outputParamaters.PRINT_INTERMEDIARY_RESULTS_AFTER.setValue(ip.PRINT_INTERMEDIARY_RESULTS_AFTER.value);
-		outputParamaters.PRINT_FINAL_OCCUPANCY.setValue(ip.PRINT_FINAL_OCCUPANCY.value);
-		outputParamaters.DEBUG_MODE.setValue(ip.DEBUG_MODE.value);
-		outputParamaters.OUTPUT_TF.setValue(ip.OUTPUT_TF.value);
-		outputParamaters.OUTPUT_TF_POINTS.setValue(ip.OUTPUT_TF_POINTS.value);
-		outputParamaters.FOLLOW_TS.setValue(ip.FOLLOW_TS.value);
-		outputParamaters.OUTPUT_AFFINITY_LANDSCAPE.setValue(ip.OUTPUT_AFFINITY_LANDSCAPE.value);
-		outputParamaters.OUTPUT_BINDING_ENERGY.setValue(ip.OUTPUT_BINDING_ENERGY.value);
-		outputParamaters.OUTPUT_DNA_OCCUPANCY.setValue(ip.OUTPUT_DNA_OCCUPANCY.value);
-		outputParamaters.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.setValue(ip.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.value);
-		outputParamaters.OUTPUT_SLIDING_LENGTHS.setValue(ip.OUTPUT_SLIDING_LENGTHS.value);
-		outputParamaters.OUTPUT_REPRESSED_LENGTHS.setValue(ip.OUTPUT_REPRESSED_LENGTHS.value);
-		outputParamaters.WIG_STEP.setValue(ip.WIG_STEP.value);
-		outputParamaters.WIG_THRESHOLD.setValue(ip.WIG_THRESHOLD.value);
+		outputParameters.OUTPUT_FOLDER.setValue(ip.OUTPUT_FOLDER.value);
+		outputParameters.OUTPUT_FILENAME.setValue(ip.OUTPUT_FILENAME.value);
+		outputParameters.PRINT_INTERMEDIARY_RESULTS_AFTER.setValue(ip.PRINT_INTERMEDIARY_RESULTS_AFTER.value);
+		outputParameters.PRINT_FINAL_OCCUPANCY.setValue(ip.PRINT_FINAL_OCCUPANCY.value);
+		outputParameters.DEBUG_MODE.setValue(ip.DEBUG_MODE.value);
+		outputParameters.OUTPUT_TF.setValue(ip.OUTPUT_TF.value);
+		outputParameters.OUTPUT_TF_POINTS.setValue(ip.OUTPUT_TF_POINTS.value);
+		outputParameters.FOLLOW_TS.setValue(ip.FOLLOW_TS.value);
+		outputParameters.OUTPUT_AFFINITY_LANDSCAPE.setValue(ip.OUTPUT_AFFINITY_LANDSCAPE.value);
+		outputParameters.OUTPUT_BINDING_ENERGY.setValue(ip.OUTPUT_BINDING_ENERGY.value);
+		outputParameters.OUTPUT_DNA_OCCUPANCY.setValue(ip.OUTPUT_DNA_OCCUPANCY.value);
+		outputParameters.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.setValue(ip.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.value);
+		outputParameters.OUTPUT_SLIDING_LENGTHS.setValue(ip.OUTPUT_SLIDING_LENGTHS.value);
+		outputParameters.OUTPUT_REPRESSED_LENGTHS.setValue(ip.OUTPUT_REPRESSED_LENGTHS.value);
+		outputParameters.WIG_STEP.setValue(ip.WIG_STEP.value);
+		outputParameters.WIG_THRESHOLD.setValue(ip.WIG_THRESHOLD.value);
 		
 		//TF PARAMETERS
 		TFParameters.TF_FILE.setValue(ip.TF_FILE.value);
@@ -647,18 +642,22 @@ public class SimulatorGUI {
 	 * load the simulations and first save the file
 	 */
 	private void loadSimulation(){
-		
+
 		if(simulatorThread!=null){
 			simulatorThread = null;
 		}
-		
+
+		Container contentPane = frame.getContentPane();
+
 		if(!loaded){
-			disableSetupArea();
+			contentPane.remove(setupAreaScroll);
+			contentPane.add(statusAreaScroll, BorderLayout.CENTER);
+			contentPane.repaint();
 			this.simulationsLoad.setEnabled(false);
 			simulationsProgress.setString(GUIconstants.SIMULATION_PROGRESS_INIT);
 			saveModel("");
 					
-			double stopTimeValue = simulationParamaters.STOP_TIME.getValue();
+			double stopTimeValue = simulationParameters.STOP_TIME.getValue();
 			if(stopTimeValue/this.steps > GUIconstants.SIMULATION_PROGRESS_MAX_STEP){
 				this.steps = (int) Math.ceil(stopTimeValue /GUIconstants.SIMULATION_PROGRESS_MAX_STEP);
 			} else{
@@ -677,13 +676,17 @@ public class SimulatorGUI {
 				this.simulationsStart.setEnabled(true);
 				this.timeLabel.setEnabled(true);
 			} else{
-				enableSetupArea();
+				contentPane.remove(statusAreaScroll);
+				contentPane.add(setupAreaScroll, BorderLayout.CENTER);
+				contentPane.repaint();
 				this.simulationsLoad.setEnabled(true);
 				  JOptionPane.showMessageDialog(frame, GUIconstants.MESSAGE_NOT_INITIALISED, GUIconstants.MENU_HELP_ABOUT, JOptionPane.INFORMATION_MESSAGE, logoImg);
 			}
 			simulationsProgress.setString("");
 		} else{
-			enableSetupArea();
+			contentPane.remove(statusAreaScroll);
+			contentPane.add(setupAreaScroll, BorderLayout.CENTER);
+			contentPane.repaint();
 			loaded = false;
 			this.simulationsLoad.setIcon(this.buttonLoadImg);
 			this.simulationsLoad.setText(GUIconstants.LOAD_BUTTON);
@@ -717,6 +720,9 @@ public class SimulatorGUI {
 				this.timeLabel.setEnabled(true);
 				simulatorThread.start();
 			}else{
+				// TODO fix synchronization on a non-final field (Zabet legacy).
+				// Seems like multithreading is not possible for the single Markov chain simulation,
+				// however it can be done to parallelize simulation of an ensemble.
 				synchronized (simulatorThread){
 					simulatorThread.resumeSimulation();
 				}
@@ -740,9 +746,6 @@ public class SimulatorGUI {
 
 	/**
 	 * generates the printed text on the time label
-	 * @param elapsedTime
-	 * @param estimatedTime
-	 * @return
 	 */
 	private String getTimeString(double elapsedTime, double estimatedTime){
 		return GUIconstants.TIME_ELAPSED+" "+formatTime(elapsedTime)+"  / "+GUIconstants.TIME_ESTIMATED+" "+formatTime(estimatedTime)+"";
@@ -755,31 +758,12 @@ public class SimulatorGUI {
 
 	/**
 	* updates simulation progress
-	* @param i step
-	* @param elapsedTime
-	* @param estimatedTime
 	*/
-	public void updateProgress(int i, double elapsedTime, double estimatedTime, int ensemble){
-		double value = Utils.roundTwoDecimals((double)(i*GUIconstants.SIMULATION_PROGRESS_MAX)/(this.steps*ensemble));
+	public void updateProgress(int step, double elapsedTime, double estimatedTime, int ensemble){
+		double value = Utils.roundTwoDecimals((double)(step*GUIconstants.SIMULATION_PROGRESS_MAX)/(this.steps*ensemble));
 		simulationsProgress.setString(value+" %");
-		simulationsProgress.setValue(i);
+		simulationsProgress.setValue(step);
 		timeLabel.setText(getTimeString(elapsedTime,estimatedTime));
-	}
-
-	/**
-	* disables the setup area
-	*/
-	private void disableSetupArea(){
-	 setupAreaTabbedPane.setVisible(false);
-	 statusAreaScroll.setVisible(true);
-	}
-
-	/**
-	* enables the setup area
-	*/
-	private void enableSetupArea(){
-	 setupAreaTabbedPane.setVisible(true);
-	 statusAreaScroll.setVisible(false);
 	}
 
 	/**
@@ -798,11 +782,4 @@ public class SimulatorGUI {
 	 this.timeLabel.setEnabled(false);
 	}
 
-	/**
-	* enables the simulation start button
-	* @param enabled
-	*/
-	public void setEnableSimulationStart(boolean enabled){
-		 simulationsStart.setEnabled(enabled);
-	 }
 }

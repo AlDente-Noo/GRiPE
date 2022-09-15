@@ -39,8 +39,8 @@ public class OutputParameters extends JPanel{
 	public OutputParameters(InputParameters ip){
 		this.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH,GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT));
 		this.setLayout(new FlowLayout());
-		componentsStack = new JPanel(new GridLayout(0,1, GUIconstants.GRID_HGAP, GUIconstants.GRID_WGAP));
-		componentsStack.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT,GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH));
+		componentsStack = new JPanel(new GridLayout(0,1, GUIconstants.GRID_HGAP, GUIconstants.GRID_VGAP));
+		componentsStack.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH, GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT));
 		
 		
 		
@@ -60,7 +60,7 @@ public class OutputParameters extends JPanel{
 		PRINT_FINAL_OCCUPANCY = new LabelledCheckBox(ip.PRINT_FINAL_OCCUPANCY.label, ip.PRINT_FINAL_OCCUPANCY.description, ip.PRINT_FINAL_OCCUPANCY.value); 
 		DEBUG_MODE = new LabelledCheckBox(ip.DEBUG_MODE.label, ip.DEBUG_MODE.description, ip.DEBUG_MODE.value); 
 		OUTPUT_TF = new LabelledText(ip.OUTPUT_TF.label, GUIconstants.TEXTAREA_WIDTH, ip.OUTPUT_TF.description, ip.OUTPUT_TF.value); 
-		OUTPUT_TF_POINTS = new LabelledInteger(ip.OUTPUT_TF_POINTS.label,GUIconstants.TEXTAREA_WIDTH,ip.OUTPUT_TF_POINTS.description,ip.OUTPUT_TF_POINTS.value.intValue());
+		OUTPUT_TF_POINTS = new LabelledInteger(ip.OUTPUT_TF_POINTS.label,GUIconstants.TEXTAREA_WIDTH,ip.OUTPUT_TF_POINTS.description, ip.OUTPUT_TF_POINTS.value);
 		FOLLOW_TS = new LabelledCheckBox(ip.FOLLOW_TS.label, ip.FOLLOW_TS.description, ip.FOLLOW_TS.value); 
 		OUTPUT_AFFINITY_LANDSCAPE = new LabelledCheckBox(ip.OUTPUT_AFFINITY_LANDSCAPE.label, ip.OUTPUT_AFFINITY_LANDSCAPE.description, ip.OUTPUT_AFFINITY_LANDSCAPE.value);
 		OUTPUT_BINDING_ENERGY = new LabelledCheckBox(ip.OUTPUT_BINDING_ENERGY.label, ip.OUTPUT_BINDING_ENERGY.description, ip.OUTPUT_BINDING_ENERGY.value);
@@ -68,7 +68,7 @@ public class OutputParameters extends JPanel{
 		DNA_OCCUPANCY_FULL_MOLECULE_SIZE = new LabelledCheckBox(ip.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.label, ip.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.description, ip.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.value); 
 		OUTPUT_SLIDING_LENGTHS = new LabelledCheckBox(ip.OUTPUT_SLIDING_LENGTHS.label, ip.OUTPUT_SLIDING_LENGTHS.description, ip.OUTPUT_SLIDING_LENGTHS.value);
 		OUTPUT_REPRESSED_LENGTHS = new LabelledCheckBox(ip.OUTPUT_REPRESSED_LENGTHS.label, ip.OUTPUT_REPRESSED_LENGTHS.description, ip.OUTPUT_REPRESSED_LENGTHS.value);
-		WIG_STEP = new LabelledInteger(ip.WIG_STEP.label,GUIconstants.TEXTAREA_WIDTH,ip.WIG_STEP.description,ip.WIG_STEP.value.intValue());
+		WIG_STEP = new LabelledInteger(ip.WIG_STEP.label,GUIconstants.TEXTAREA_WIDTH,ip.WIG_STEP.description, ip.WIG_STEP.value);
 		WIG_THRESHOLD = new LabelledDouble(ip.WIG_THRESHOLD.label,GUIconstants.TEXTAREA_WIDTH,ip.WIG_THRESHOLD.description,ip.WIG_THRESHOLD.value);	
 
 		

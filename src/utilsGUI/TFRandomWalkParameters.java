@@ -50,8 +50,8 @@ public class TFRandomWalkParameters extends JPanel{
 	public TFRandomWalkParameters(InputParameters ip){
 		this.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH,GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT));
 		this.setLayout(new FlowLayout());
-		componentsStack = new JPanel(new GridLayout(0,1, GUIconstants.GRID_HGAP, GUIconstants.GRID_WGAP));
-		componentsStack.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT,GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH));
+		componentsStack = new JPanel(new GridLayout(0,1, GUIconstants.GRID_HGAP, GUIconstants.GRID_VGAP));
+		componentsStack.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH, GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT));
 
 		JLabel label1,label2;
 		label1 = new JLabel(GUIconstants.SIMULATION_AREA_TF_RANDOM_WALK_GENERAL_PARAMATERS);
@@ -74,9 +74,9 @@ public class TFRandomWalkParameters extends JPanel{
 		TF_AFFINITY_LANDSCAPE_ROUGHNESS = new LabelledDouble(ip.TF_AFFINITY_LANDSCAPE_ROUGHNESS.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_AFFINITY_LANDSCAPE_ROUGHNESS.description,ip.TF_AFFINITY_LANDSCAPE_ROUGHNESS.value);	
 		TF_HOP_STD_DISPLACEMENT = new LabelledDouble(ip.TF_HOP_STD_DISPLACEMENT.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_HOP_STD_DISPLACEMENT.description,ip.TF_HOP_STD_DISPLACEMENT.value);	
 
-		TF_STEP_LEFT_SIZE = new LabelledInteger(ip.TF_STEP_LEFT_SIZE.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_STEP_LEFT_SIZE.description,ip.TF_STEP_LEFT_SIZE.value.intValue());
-		TF_STEP_RIGHT_SIZE = new LabelledInteger(ip.TF_STEP_RIGHT_SIZE.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_STEP_RIGHT_SIZE.description,ip.TF_STEP_RIGHT_SIZE.value.intValue());
-		TF_UNCORRELATED_DISPLACEMENT_SIZE = new LabelledInteger(ip.TF_UNCORRELATED_DISPLACEMENT_SIZE.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_UNCORRELATED_DISPLACEMENT_SIZE.description,ip.TF_UNCORRELATED_DISPLACEMENT_SIZE.value.intValue());
+		TF_STEP_LEFT_SIZE = new LabelledInteger(ip.TF_STEP_LEFT_SIZE.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_STEP_LEFT_SIZE.description, ip.TF_STEP_LEFT_SIZE.value);
+		TF_STEP_RIGHT_SIZE = new LabelledInteger(ip.TF_STEP_RIGHT_SIZE.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_STEP_RIGHT_SIZE.description, ip.TF_STEP_RIGHT_SIZE.value);
+		TF_UNCORRELATED_DISPLACEMENT_SIZE = new LabelledInteger(ip.TF_UNCORRELATED_DISPLACEMENT_SIZE.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_UNCORRELATED_DISPLACEMENT_SIZE.description, ip.TF_UNCORRELATED_DISPLACEMENT_SIZE.value);
 
 		TF_STALLS_IF_BLOCKED = new LabelledCheckBox(ip.TF_STALLS_IF_BLOCKED.label, ip.TF_STALLS_IF_BLOCKED.description, ip.TF_STALLS_IF_BLOCKED.value); 
 		TF_IS_IMMOBILE = new LabelledCheckBox(ip.TF_IS_IMMOBILE.label, ip.TF_IS_IMMOBILE.description, ip.TF_IS_IMMOBILE.value);
