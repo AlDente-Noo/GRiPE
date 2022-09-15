@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -19,8 +21,6 @@ public class TFParameters  extends JPanel{
 
 	private static final long serialVersionUID = 1L;
 
-	private JPanel componentsStack;
-
 
 	//TF PARAMETERS
 	public LabelledFileChooser TF_FILE;
@@ -28,6 +28,7 @@ public class TFParameters  extends JPanel{
 	public LabelledFileChooser TS_FILE;
 
 	//TF_RANDOM PARAMETERS
+	public LabelledCheckBox RANDOM_TFS;
 	public LabelledInteger TF_DBD_LENGTH_MIN;
 	public LabelledInteger TF_DBD_LENGTH_MAX;
 	public LabelledInteger TF_SPECIES_COUNT;
@@ -51,7 +52,7 @@ public class TFParameters  extends JPanel{
 	public TFParameters(InputParameters ip){
 		this.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH,GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT));
 		this.setLayout(new FlowLayout());
-		componentsStack = new JPanel(new GridLayout(0,1, GUIconstants.GRID_HGAP, GUIconstants.GRID_VGAP));
+		JPanel componentsStack = new JPanel(new GridLayout(0, 1, GUIconstants.GRID_HGAP, GUIconstants.GRID_VGAP));
 		componentsStack.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH, GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT));
 
 		JLabel label1, label2, label3;
@@ -64,13 +65,14 @@ public class TFParameters  extends JPanel{
 
 		//TF PARAMETERS
 		TF_FILE = new LabelledFileChooser(ip.TF_FILE.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_FILE.description,ip.TF_FILE.value, true, true);
-		TF_COOPERATIVITY_FILE = new LabelledFileChooser(ip.TF_COOPERATIVITY_FILE.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_COOPERATIVITY_FILE.description,ip.TF_COOPERATIVITY_FILE.value, true, true);
 		TS_FILE = new LabelledFileChooser(ip.TS_FILE.label,GUIconstants.TEXTAREA_WIDTH,ip.TS_FILE.description,ip.TS_FILE.value, true, true);
+		TF_COOPERATIVITY_FILE = new LabelledFileChooser(ip.TF_COOPERATIVITY_FILE.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_COOPERATIVITY_FILE.description,ip.TF_COOPERATIVITY_FILE.value, true, true);
 
 		TF_READ_IN_BOTH_DIRECTIONS = new LabelledCheckBox(ip.TF_READ_IN_BOTH_DIRECTIONS.label, ip.TF_READ_IN_BOTH_DIRECTIONS.description, ip.TF_READ_IN_BOTH_DIRECTIONS.value);
 		SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE = new LabelledCheckBox(ip.SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE.label, ip.SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE.description, ip.SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE.value);
 
 		//TF_RANDOM PARAMETERS
+		RANDOM_TFS = new LabelledCheckBox("Randomly generate TFs?", "When checked, the default random TF parameters become editable and the TF files are deleted.", false);
 		TF_DBD_LENGTH_MIN = new LabelledInteger(ip.TF_DBD_LENGTH_MIN.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_DBD_LENGTH_MIN.description, ip.TF_DBD_LENGTH_MIN.value);
 		TF_DBD_LENGTH_MAX = new LabelledInteger(ip.TF_DBD_LENGTH_MAX.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_DBD_LENGTH_MAX.description, ip.TF_DBD_LENGTH_MAX.value);
 		TF_SPECIES_COUNT = new LabelledInteger(ip.TF_SPECIES_COUNT.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_SPECIES_COUNT.description, ip.TF_SPECIES_COUNT.value);
@@ -90,12 +92,30 @@ public class TFParameters  extends JPanel{
 
 		resetLabelsWidth();
 
+		setRandomParInputsStatus(RANDOM_TFS.getValue());
+
+		RANDOM_TFS.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setRandomParInputsStatus(RANDOM_TFS.getValue());
+				TF_FILE.setEnable(!RANDOM_TFS.getValue());
+				TS_FILE.setEnable(!RANDOM_TFS.getValue());
+				if (RANDOM_TFS.getValue()) {
+					TF_FILE.setValue("");
+					TS_FILE.setValue("");
+				} else {
+					TF_FILE.setValue(ip.TF_FILE.value);
+					TS_FILE.setValue(ip.TS_FILE.value);
+				}
+			}
+		});
+
 
 		//TF PARAMETERS
 		componentsStack.add(label1);
 		componentsStack.add(TF_FILE);
-		componentsStack.add(TF_COOPERATIVITY_FILE);
 		componentsStack.add(TS_FILE);
+		componentsStack.add(TF_COOPERATIVITY_FILE);
 
 		componentsStack.add(label3);
 		componentsStack.add(TF_READ_IN_BOTH_DIRECTIONS);
@@ -103,6 +123,7 @@ public class TFParameters  extends JPanel{
 
 		//TF_RANDOM PARAMETERS
 		componentsStack.add(label2);
+		componentsStack.add(RANDOM_TFS);
 		componentsStack.add(TF_SPECIES_COUNT);
 		componentsStack.add(TF_COPY_NUMBER_MIN);
 		componentsStack.add(TF_COPY_NUMBER_MAX);
@@ -122,6 +143,23 @@ public class TFParameters  extends JPanel{
 		this.add(componentsStack);
 	}
 
+	private void setRandomParInputsStatus(boolean status) {
+		TF_DBD_LENGTH_MIN.setEditable(status);
+		TF_DBD_LENGTH_MAX.setEditable(status);
+		TF_SPECIES_COUNT.setEditable(status);
+		TF_COPY_NUMBER_MIN.setEditable(status);
+		TF_COPY_NUMBER_MAX.setEditable(status);
+		TF_SIZE_LEFT.setEditable(status);
+		TF_SIZE_RIGHT.setEditable(status);
+		TF_ES.setEditable(status);
+		TF_ASSOC_RATE.setEditable(status);
+		TF_PREBOUND_PROPORTION.setEditable(status);
+		TF_PREBOUND_TO_HIGHEST_AFFINITY.setEnable(status);
+		TF_REPR_LEN_LEFT.setEditable(status);
+		TF_REPR_LEN_RIGHT.setEditable(status);
+		TF_REPRESSION_RATE.setEditable(status);
+		TF_DEREPRESSION_ATTENUATION_FACTOR.setEditable(status);
+	}
 
 	/**
 	 * resets the labels width

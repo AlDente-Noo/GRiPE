@@ -22,10 +22,8 @@ public class InputParameters  implements Serializable{
 	public Parameter<Double> STOP_TIME;
 	public Parameter<Integer> ENSEMBLE_SIZE;
 	public Parameter<Integer> RANDOM_SEED;
-	public Parameter<Integer> COMPUTED_AFFINITY_PRECISION;
 	public Parameter<Integer> DNA_SECTOR_SIZE;
 	public Parameter<Integer> EVENT_LIST_SUBGROUP_SIZE;
-	public Parameter<Boolean> EVENT_LIST_USES_FR;
 	
 	//SIMULATION-OUTPUT PARAMETERS
 	public Parameter<String> OUTPUT_FOLDER;
@@ -157,7 +155,6 @@ public class InputParameters  implements Serializable{
 		this.STOP_TIME = new Parameter<Double>("", "", "", "", 0.0);
 		this.ENSEMBLE_SIZE = new Parameter<Integer>("", "", "", "", 0);
 		this.RANDOM_SEED = new Parameter<Integer>("", "", "", "", 0);
-		this.COMPUTED_AFFINITY_PRECISION = new Parameter<Integer>("", "", "", "", 0);
 		this.DNA_SECTOR_SIZE = new Parameter<Integer>("", "", "", "", 0);
 		this.EVENT_LIST_SUBGROUP_SIZE = new Parameter<Integer>("", "", "", "", 0);
 		
@@ -170,7 +167,6 @@ public class InputParameters  implements Serializable{
 		this.OUTPUT_TF = new Parameter<String>("", "", "", "", "");
 		this.OUTPUT_TF_POINTS = new Parameter<Integer>("", "", "", "", 0);
 		this.FOLLOW_TS = new Parameter<Boolean>("", "", "", "", false);
-		this.EVENT_LIST_USES_FR = new Parameter<Boolean>("", "", "", "", false);
 		this.OUTPUT_AFFINITY_LANDSCAPE = new Parameter<Boolean>("", "", "", "", false);
 		this.OUTPUT_BINDING_ENERGY = new Parameter<Boolean>("", "", "", "", false);
 		this.OUTPUT_DNA_OCCUPANCY = new Parameter<Boolean>("", "", "", "", false);
@@ -383,17 +379,13 @@ public class InputParameters  implements Serializable{
 			out.write("ENSEMBLE_SIZE = "+this.ENSEMBLE_SIZE.value+";\n\n");
 			out.write("#"+this.RANDOM_SEED.description+"\n");
 			out.write("RANDOM_SEED = "+this.RANDOM_SEED.value+";\n\n");
-			out.write("#"+this.OUTPUT_FOLDER.description+"\n");
-			out.write("#"+this.COMPUTED_AFFINITY_PRECISION.description+"\n");
-			out.write("COMPUTED_AFFINITY_PRECISION = "+this.COMPUTED_AFFINITY_PRECISION.value+";\n\n");
 			out.write("#"+this.DNA_SECTOR_SIZE.description+"\n");
 			out.write("DNA_SECTOR_SIZE = "+this.DNA_SECTOR_SIZE.value+";\n\n");
 			out.write("#"+this.EVENT_LIST_SUBGROUP_SIZE.description+"\n");
 			out.write("EVENT_LIST_SUBGROUP_SIZE = "+this.EVENT_LIST_SUBGROUP_SIZE.value+";\n\n");
-			out.write("#"+this.EVENT_LIST_USES_FR.description+"\n");
-			out.write("EVENT_LIST_USES_FR = "+this.EVENT_LIST_USES_FR.value+";\n\n");
 
 			//SIMULATION-OUTPUT PARAMETERS
+			out.write("#"+this.OUTPUT_FOLDER.description+"\n");
 			out.write("OUTPUT_FOLDER = \""+this.OUTPUT_FOLDER.value+"\";\n\n");
 			out.write("#"+this.OUTPUT_FILENAME.description+"\n");
 			out.write("OUTPUT_FILENAME = \""+this.OUTPUT_FILENAME.value+"\";\n\n");
@@ -623,11 +615,6 @@ public class InputParameters  implements Serializable{
 			if(!label.isEmpty()){this.RANDOM_SEED.label = label;}
 			if(!description.isEmpty()){this.RANDOM_SEED.description = description;}
 			if(!category.isEmpty()){this.RANDOM_SEED.category = category;}
-		} else if(name.equals("COMPUTED_AFFINITY_PRECISION")){
-			this.COMPUTED_AFFINITY_PRECISION.value = Utils.parseInteger(value, Constants.NONE);
-			if(!label.isEmpty()){this.COMPUTED_AFFINITY_PRECISION.label = label;}
-			if(!description.isEmpty()){this.COMPUTED_AFFINITY_PRECISION.description = description;}
-			if(!category.isEmpty()){this.COMPUTED_AFFINITY_PRECISION.category = category;}
 		} else if(name.equals("DNA_SECTOR_SIZE")){
 			this.DNA_SECTOR_SIZE.value = Utils.parseInteger(value, Constants.NONE);
 			if(!label.isEmpty()){this.DNA_SECTOR_SIZE.label = label;}
@@ -638,11 +625,6 @@ public class InputParameters  implements Serializable{
 			if(!label.isEmpty()){this.EVENT_LIST_SUBGROUP_SIZE.label = label;}
 			if(!description.isEmpty()){this.EVENT_LIST_SUBGROUP_SIZE.description = description;}
 			if(!category.isEmpty()){this.EVENT_LIST_SUBGROUP_SIZE.category = category;}
-		} else if(name.equals("EVENT_LIST_USES_FR")){
-			this.EVENT_LIST_USES_FR.value = Utils.parseBoolean(value,false);
-			if(!label.isEmpty()){this.EVENT_LIST_USES_FR.label = label;}
-			if(!description.isEmpty()){this.EVENT_LIST_USES_FR.description = description;}
-			if(!category.isEmpty()){this.EVENT_LIST_USES_FR.category = category;}
 		}
 		//SIMULATION-OUTPUT PARAMETERS
 		else if(name.equals("OUTPUT_FOLDER")){

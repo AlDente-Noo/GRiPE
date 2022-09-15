@@ -286,12 +286,12 @@ public class SimulatorGUI {
 		
 		outputParameters = new OutputParameters(ip);
 		setupAreaTabbedPane.addTab(GUIconstants.SIMULATION_AREA_OUTPUT_PARAMATERS, null, outputParameters, null);
-		
-		TFParameters = new TFParameters(ip);
-		setupAreaTabbedPane.addTab(GUIconstants.SIMULATION_AREA_TF_PARAMATERS, null, TFParameters, null);
 
 		DNAParameters = new DNAParameters(ip);
 		setupAreaTabbedPane.addTab(GUIconstants.SIMULATION_AREA_DNA_PARAMATERS, null, DNAParameters, null);
+
+		TFParameters = new TFParameters(ip);
+		setupAreaTabbedPane.addTab(GUIconstants.SIMULATION_AREA_TF_PARAMATERS, null, TFParameters, null);
 
 		TFRandomWalkParameters = new TFRandomWalkParameters(ip);
 		setupAreaTabbedPane.addTab(GUIconstants.SIMULATION_AREA_TF_RANDOM_WALK_PARAMATERS, null, TFRandomWalkParameters, null);
@@ -451,11 +451,9 @@ public class SimulatorGUI {
 		ip.STOP_TIME.value= simulationParameters.STOP_TIME.getValue();
 		ip.ENSEMBLE_SIZE.value= simulationParameters.ENSEMBLE_SIZE.getValue();
 		ip.RANDOM_SEED.value= simulationParameters.RANDOM_SEED.getValue();
-		ip.COMPUTED_AFFINITY_PRECISION.value= simulationParameters.COMPUTED_AFFINITY_PRECISION.getValue();
 		ip.DNA_SECTOR_SIZE.value= simulationParameters.DNA_SECTOR_SIZE.getValue();
 		ip.EVENT_LIST_SUBGROUP_SIZE.value= simulationParameters.EVENT_LIST_SUBGROUP_SIZE.getValue();
-		ip.EVENT_LIST_USES_FR.value= simulationParameters.EVENT_LIST_USES_FR.getValue();
-		
+
 		//SIMULATION-OUTPUT PARAMETERS
 		ip.OUTPUT_FOLDER.value= outputParameters.OUTPUT_FOLDER.getValue();
 		ip.OUTPUT_FILENAME.value= outputParameters.OUTPUT_FILENAME.getValue();
@@ -546,11 +544,9 @@ public class SimulatorGUI {
 		simulationParameters.STOP_TIME.setValue(ip.STOP_TIME.value);
 		simulationParameters.ENSEMBLE_SIZE.setValue(ip.ENSEMBLE_SIZE.value);
 		simulationParameters.RANDOM_SEED.setValue(ip.RANDOM_SEED.value);
-		simulationParameters.COMPUTED_AFFINITY_PRECISION.setValue(ip.COMPUTED_AFFINITY_PRECISION.value);
 		simulationParameters.DNA_SECTOR_SIZE.setValue(ip.DNA_SECTOR_SIZE.value);
 		simulationParameters.EVENT_LIST_SUBGROUP_SIZE.setValue(ip.EVENT_LIST_SUBGROUP_SIZE.value);
-		simulationParameters.EVENT_LIST_USES_FR.setValue(ip.EVENT_LIST_USES_FR.value);
-		
+
 		//SIMULATION-OUTPUT PARAMETERS
 		outputParameters.OUTPUT_FOLDER.setValue(ip.OUTPUT_FOLDER.value);
 		outputParameters.OUTPUT_FILENAME.setValue(ip.OUTPUT_FILENAME.value);

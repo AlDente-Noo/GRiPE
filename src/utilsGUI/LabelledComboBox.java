@@ -10,12 +10,11 @@ import javax.swing.JPanel;
 
 public class LabelledComboBox  extends JPanel{
 	private static final long serialVersionUID = 1L;
-	private JLabel label;
-    private JComboBox component;
+	private final JLabel label;
+    private final JComboBox component;
     
     /**
      * @param lab text to go in the label
-     * @param chars - the size of the text input area
      */
     public LabelledComboBox(String lab, String toolTipText, String[] values, String defaultValue) {
         super();
@@ -48,7 +47,6 @@ public class LabelledComboBox  extends JPanel{
     
     /**
      * returns the typed text
-     * @return
      */
     public String getValue(){
     	return (String) component.getSelectedItem();
@@ -56,7 +54,6 @@ public class LabelledComboBox  extends JPanel{
     
     /**
      * sets the displayed value
-     * @param text
      */
     public void setValue(String value){
     		component.setSelectedItem(value);
@@ -66,7 +63,6 @@ public class LabelledComboBox  extends JPanel{
     
     /**
      * adds an listener
-     * @param e
      */
     public void addActionListener(ActionListener e){
     	component.addActionListener(e);

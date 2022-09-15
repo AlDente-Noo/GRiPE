@@ -1,5 +1,7 @@
 package utils;
 
+import javax.swing.*;
+
 /**
  * general constants used in the application
  * @author n.r.zabet@gen.cam.ac.uk
@@ -13,9 +15,8 @@ public class Constants {
 	public static final char CSV_FILE_TEXT_DELIMITER = '\"'; // char that wrapps text in a cell
 	public static final char[] CSV_FILE_CELL_DELIMTER = {',',';'}; // delimiters that separate cells
 	
-	
-
-
+	// FG
+	public static final int MAX_STRAND_LEN_TO_PRINT_STRAND_STATE_ARRAYS = 50;
 	
 	// default parameters file
 	public static final String DEFAULT_PARAMS_FILE = "system.ini";

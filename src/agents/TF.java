@@ -280,8 +280,6 @@ public class TF extends DBP implements Serializable {
 
     /**
      * once a TF moves if it releases a cooperativity site then update the move rate
-     *
-     * @param n
      */
     public void setCooperativityArea(Cell n, double time) {
         if (n.TFspecies[this.speciesID].isCooperativeSite(this.position, this.direction)) {
@@ -315,8 +313,6 @@ public class TF extends DBP implements Serializable {
 
     /**
      * once a TF moves if it releases a cooperativity site then update the move rate
-     *
-     * @param n
      */
     public void resetCooperativityArea(Cell n, double time) {
         if (n.TFspecies[this.speciesID].isCooperativeSite(this.position, this.direction)) {
@@ -350,8 +346,6 @@ public class TF extends DBP implements Serializable {
 
     /**
      * once a TF moves if it releases a cooperativity site then update the move rate
-     *
-     * @param n
      */
     public void setCooperativityRight(Cell n, double time) {
         if (this.rightNeighbour != Constants.NONE && this.stickToRight == Constants.NONE) {
@@ -397,8 +391,6 @@ public class TF extends DBP implements Serializable {
 
     /**
      * once a TF moves if it releases a cooperativity site then update the move rate
-     *
-     * @param n
      */
     public void setCooperativityLeft(Cell n, double time) {
         if (this.leftNeighbour != Constants.NONE && this.stickToLeft == Constants.NONE) {
@@ -445,7 +437,7 @@ public class TF extends DBP implements Serializable {
      */
     public boolean unbindMolecule(Cell n, double time) {
 
-        boolean unbound = false;
+        boolean unbound;
 
         // FG: schedule derepression event if the unbound molecule is repressing the DNA region
         if (n.dbp[this.ID].repressesDNA) {
@@ -455,7 +447,6 @@ public class TF extends DBP implements Serializable {
         }
 
         unbound = n.dna.unbindMolecule(n, this.ID, this.position, this.size);
-        assert unbound; // FG: seems like unbinding cannot fail
 
         //if in debug mode print status
         if (n.isInDebugMode()) {
@@ -466,6 +457,8 @@ public class TF extends DBP implements Serializable {
                         "from the DNA at position " + this.position);
             }
         }
+
+        assert unbound; // FG: seems like unbinding cannot fail
 
         if (unbound) {
             //count event type
@@ -510,13 +503,13 @@ public class TF extends DBP implements Serializable {
      */
     public int slideRightMolecule(Cell n, double time, int newPosition, boolean isHopEvent, boolean isReflected) {
 
-        int bound = Constants.NONE;
+        int bound;
 
         //attempt to slide right the molecule on the DNA
         if (this.rightNeighbour != Constants.NONE) {
             bound = this.rightNeighbour;
         } else {
-            bound = n.dna.slideRight(n, this.ID, this.position, this.size, newPosition - this.position,
+            bound = n.dna.slideRight(this.ID, this.position, this.size, newPosition - this.position,
                     n.ip.CHECK_OCCUPANCY_ON_SLIDING.value);
         }
 
@@ -618,7 +611,7 @@ public class TF extends DBP implements Serializable {
      * attempts to slide the TF to the left
      */
     public int slideLeftMolecule(Cell n, double time, int newPosition, boolean isHopEvent, boolean isReflected) {
-        int bound = Constants.NONE;
+        int bound;
 
         if (this.leftNeighbour != Constants.NONE) { // FG: unnecessary check (legacy)
             bound = this.leftNeighbour;
@@ -819,9 +812,9 @@ public class TF extends DBP implements Serializable {
      * attempts to bind a TF to the DNA
      */
     public int bindMolecule(Cell n, double time, int newPosition) {
-        int bound = Constants.NONE;
+        int bound;
 
-        bound = n.dna.bindMolecule(n, ID, newPosition, size, n.ip.CHECK_OCCUPANCY_ON_BINDING.value);
+        bound = n.dna.bindMolecule(ID, newPosition, size, n.ip.CHECK_OCCUPANCY_ON_BINDING.value);
         if (bound != ID) {
             bound = Constants.NONE;
         } else {
@@ -883,9 +876,9 @@ public class TF extends DBP implements Serializable {
      * attempts to bind a TF to the DNA
      */
     public int bindMolecule(Cell n, double time, int newPosition, int direction) {
-        int bound = Constants.NONE;
+        int bound;
 
-        bound = n.dna.bindMolecule(n, ID, newPosition, size, n.ip.CHECK_OCCUPANCY_ON_BINDING.value);
+        bound = n.dna.bindMolecule(ID, newPosition, size, n.ip.CHECK_OCCUPANCY_ON_BINDING.value);
         if (bound != ID) {
             bound = Constants.NONE;
         } else {

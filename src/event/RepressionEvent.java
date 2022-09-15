@@ -40,8 +40,6 @@ public class RepressionEvent extends Event {
             actionStr = "Derepression";
         }
         stateStr += actionStr + " by TF " + proteinID + " from position " + boundaryLeft + " to " + boundaryRight;
-        //stateStr += " through an event of type " + nextAction;
-        //stateStr += " (triggered by TF " + proteinID + ")";
         return stateStr;
     }
 

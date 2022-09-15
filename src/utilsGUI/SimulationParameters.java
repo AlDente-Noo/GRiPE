@@ -18,25 +18,18 @@ import objects.InputParameters;
 public class SimulationParameters extends JPanel{
 	private static final long serialVersionUID = 1L;
 
-	private JPanel componentsStack;
-	
 	//SIMULATION PARAMATERS
 	public LabelledDouble STOP_TIME;
 	public LabelledInteger ENSEMBLE_SIZE;
 	public LabelledInteger RANDOM_SEED;
-	public LabelledInteger COMPUTED_AFFINITY_PRECISION;
 	public LabelledInteger DNA_SECTOR_SIZE;
 	public LabelledInteger EVENT_LIST_SUBGROUP_SIZE;
-	public LabelledCheckBox EVENT_LIST_USES_FR;
-
-	
-
 
 	
 	public SimulationParameters(InputParameters ip){
 		this.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH,GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT));
 		this.setLayout(new FlowLayout());
-		componentsStack = new JPanel(new GridLayout(0,1, GUIconstants.GRID_HGAP, GUIconstants.GRID_VGAP));
+		JPanel componentsStack = new JPanel(new GridLayout(0, 1, GUIconstants.GRID_HGAP, GUIconstants.GRID_VGAP));
 		componentsStack.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH, GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT));
 		
 		
@@ -53,29 +46,19 @@ public class SimulationParameters extends JPanel{
 		STOP_TIME = new LabelledDouble(ip.STOP_TIME.label,GUIconstants.TEXTAREA_WIDTH,ip.STOP_TIME.description,ip.STOP_TIME.value);	
 		ENSEMBLE_SIZE = new LabelledInteger(ip.ENSEMBLE_SIZE.label,GUIconstants.TEXTAREA_WIDTH,ip.ENSEMBLE_SIZE.description, ip.ENSEMBLE_SIZE.value);
 		RANDOM_SEED = new LabelledInteger(ip.RANDOM_SEED.label,GUIconstants.TEXTAREA_WIDTH,ip.RANDOM_SEED.description, ip.RANDOM_SEED.value);
-		COMPUTED_AFFINITY_PRECISION = new LabelledInteger(ip.COMPUTED_AFFINITY_PRECISION.label,GUIconstants.TEXTAREA_WIDTH,ip.COMPUTED_AFFINITY_PRECISION.description, ip.COMPUTED_AFFINITY_PRECISION.value);
 		DNA_SECTOR_SIZE = new LabelledInteger(ip.DNA_SECTOR_SIZE.label,GUIconstants.TEXTAREA_WIDTH,ip.DNA_SECTOR_SIZE.description, ip.DNA_SECTOR_SIZE.value);
 		EVENT_LIST_SUBGROUP_SIZE = new LabelledInteger(ip.EVENT_LIST_SUBGROUP_SIZE.label,GUIconstants.TEXTAREA_WIDTH,ip.EVENT_LIST_SUBGROUP_SIZE.description, ip.EVENT_LIST_SUBGROUP_SIZE.value);
-		EVENT_LIST_USES_FR = new LabelledCheckBox(ip.EVENT_LIST_USES_FR.label, ip.EVENT_LIST_USES_FR.description, ip.EVENT_LIST_USES_FR.value); 
-		
-		
-		
+
 		resetLabelsWidth();
 		
 		//simulation params
 		componentsStack.add(STOP_TIME);
 		componentsStack.add(ENSEMBLE_SIZE);
 		componentsStack.add(RANDOM_SEED);
-		componentsStack.add(COMPUTED_AFFINITY_PRECISION);
 		componentsStack.add(DNA_SECTOR_SIZE);
 		componentsStack.add(EVENT_LIST_SUBGROUP_SIZE);
-		componentsStack.add(EVENT_LIST_USES_FR);
-		
-		
 
-		
 		this.add(componentsStack);
-		
 	}
 	
 	
@@ -92,11 +75,6 @@ public class SimulationParameters extends JPanel{
 		
 		if(ENSEMBLE_SIZE.getLabelWidth() > max){
 			max = ENSEMBLE_SIZE.getLabelWidth();
-		}	
-		
-	
-		if(COMPUTED_AFFINITY_PRECISION.getLabelWidth() > max){
-			max = COMPUTED_AFFINITY_PRECISION.getLabelWidth();
 		}
 		
 		if(DNA_SECTOR_SIZE.getLabelWidth() > max){
@@ -118,8 +96,7 @@ public class SimulationParameters extends JPanel{
 		//SIMULATION PARAMATERS
 		STOP_TIME.setLabelWidth(max);
 		ENSEMBLE_SIZE.setLabelWidth(max);
-		RANDOM_SEED.setLabelWidth(max);	
-		COMPUTED_AFFINITY_PRECISION.setLabelWidth(max);	
+		RANDOM_SEED.setLabelWidth(max);
 		DNA_SECTOR_SIZE.setLabelWidth(max);	
 		EVENT_LIST_SUBGROUP_SIZE.setLabelWidth(max);	
 

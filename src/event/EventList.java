@@ -25,20 +25,14 @@ public class EventList implements Serializable {
         TFBindingEventQueue = new TFBindingEventQueue(n);
 
         // TF random walk event list 1D diffusion
-        if (n.ip.EVENT_LIST_USES_FR.value) {
-            if (n.ip.EVENT_LIST_SUBGROUP_SIZE.value >= 0 && n.ip.EVENT_LIST_SUBGROUP_SIZE.value < n.dbp.length) {
-                //TFRandomWalkEventQueue =  new TFRandomWalkEventQueueFRopt(n);
-                n.printDebugInfo("Warning: Optimal First Reaction method is not implemented, " +
-                        "switching to simple First Reaction");
-            } //else{
-            TFRandomWalkEventQueue = new TFRandomWalkEventQueueFR(n);
-            TFRepressionEventQueue = new TFRepressionEventQueueFR();
-            //}
-        } else {
-            n.printDebugInfo("Warning: Direct Method is not implemented, switching to First Reaction");
-            TFRandomWalkEventQueue = new TFRandomWalkEventQueueFR(n);
-            TFRepressionEventQueue = new TFRepressionEventQueueFR();
-        }
+        if (n.ip.EVENT_LIST_SUBGROUP_SIZE.value >= 0 && n.ip.EVENT_LIST_SUBGROUP_SIZE.value < n.dbp.length) {
+            //TFRandomWalkEventQueue =  new TFRandomWalkEventQueueFRopt(n);
+            n.printDebugInfo("Warning: Optimal First Reaction method is not implemented, " +
+                    "switching to simple First Reaction");
+        } //else{
+        TFRandomWalkEventQueue = new TFRandomWalkEventQueueFR(n);
+        TFRepressionEventQueue = new TFRepressionEventQueueFR();
+        //}
     }
 
     /**
@@ -108,7 +102,6 @@ public class EventList implements Serializable {
                 e = this.popNextTFRepressionEvent();
                 break;
             default:
-                e = null;
         }
 
         return e;
@@ -146,16 +139,20 @@ public class EventList implements Serializable {
         if (n.freeTFmoleculesTotal > 0 && propensity > 0) {
 
             //generate next reaction time
-            double nextTime = Gillespie.computeNextReactionTime(this.TFBindingEventQueue.proteinBindingPropensitySum, n.randomGenerator);
+            double nextTime = Gillespie.computeNextReactionTime(
+                    this.TFBindingEventQueue.proteinBindingPropensitySum, n.randomGenerator);
 
             //find next reaction (FG: randomly choose a TF specie to bind)
-            int nextTFspecies = Gillespie.getNextReaction(this.TFBindingEventQueue.proteinBindingPropensitySum * n.randomGenerator.nextDouble(), this.TFBindingEventQueue.proteinBindingPropensity);
+            int nextTFspecies = Gillespie.getNextReaction(
+                    this.TFBindingEventQueue.proteinBindingPropensitySum * n.randomGenerator.nextDouble(),
+                    this.TFBindingEventQueue.proteinBindingPropensity);
 
             if (nextTFspecies > Constants.NONE && nextTFspecies < n.TFspecies.length) {
                 int TFID = n.getFreeTFmolecule(nextTFspecies);
                 assert (TFID != Constants.NONE);
                 int position = Constants.NONE;
-                this.TFBindingEventQueue.add(new ProteinEvent(time + nextTime, TFID, position, true, Constants.EVENT_TF_BINDING, false, propensity));
+                this.TFBindingEventQueue.add(new ProteinEvent(time + nextTime, TFID, position, true,
+                        Constants.EVENT_TF_BINDING, false, propensity));
             }
         }
     }
@@ -169,9 +166,8 @@ public class EventList implements Serializable {
         if (n.isInDebugMode() && TFRandomWalkEventQueue instanceof TFRandomWalkEventQueueFR) {
             for (ProteinEvent proteinEvent : ((TFRandomWalkEventQueueFR) this.TFRandomWalkEventQueue).randomWalkEvents) {
                 if (proteinEvent.proteinID == moleculeID) {
-                    n.printDebugInfo("Error: attempted to schedule the event for the protein " + moleculeID
+                    n.stopSimulation("Error: attempted to schedule the event for the protein " + moleculeID
                             + " of type " + n.TFspecies[n.dbp[moleculeID].speciesID].name + ", but it is already scheduled.");
-                    System.exit(1);
                 }
             }
         }

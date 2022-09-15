@@ -18,8 +18,6 @@ import objects.InputParameters;
 public class TFRandomWalkParameters extends JPanel{
 	private static final long serialVersionUID = 1L;
 
-	private JPanel componentsStack;
-	
 	//TF RANDOM WALK PARAMATERS
 	public LabelledCheckBox CHECK_OCCUPANCY_ON_BINDING;
 	public LabelledCheckBox CHECK_OCCUPANCY_ON_SLIDING;
@@ -50,7 +48,7 @@ public class TFRandomWalkParameters extends JPanel{
 	public TFRandomWalkParameters(InputParameters ip){
 		this.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH,GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT));
 		this.setLayout(new FlowLayout());
-		componentsStack = new JPanel(new GridLayout(0,1, GUIconstants.GRID_HGAP, GUIconstants.GRID_VGAP));
+		JPanel componentsStack = new JPanel(new GridLayout(0, 1, GUIconstants.GRID_HGAP, GUIconstants.GRID_VGAP));
 		componentsStack.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH, GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT));
 
 		JLabel label1,label2;

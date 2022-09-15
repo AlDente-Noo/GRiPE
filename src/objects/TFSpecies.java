@@ -201,7 +201,7 @@ public class TFSpecies implements Serializable {
         this.isCognate = false;
 
         this.dbd = new byte[0];
-        int sizeInBP = 0;
+        int sizeInBP;
         pfm = null;
         this.landscapeFile = "";
         this.seqsFile = "";
@@ -314,7 +314,7 @@ public class TFSpecies implements Serializable {
         } else if (dbd.startsWith(Constants.DBD_TYPE_LANDSCAPE)) {
             String buffer = dbd.replaceAll(Constants.DBD_TYPE_LANDSCAPE, "");
             this.dbdFile = dbd;
-            if (buffer != null && !buffer.isEmpty() && buffer.contains(Constants.DBD_TYPE_SEPARATOR)) {
+            if (buffer.contains(Constants.DBD_TYPE_SEPARATOR)) {
 
                 String[] bufferStr = buffer.split(Constants.DBD_TYPE_SEPARATOR);
 
@@ -377,15 +377,11 @@ public class TFSpecies implements Serializable {
                 n.stopSimulation("Could not load the affinity landscape " + dbd + ": could not split the text by " + Constants.DBD_TYPE_SEPARATOR);
             }
 
-            //if(!isLandscapeSpecificationCorrect){
-            //	n.stopSimulation("Could not load the affinity landscape: "+dbd);
-            //}
-
         } else if (dbd.startsWith(Constants.DBD_TYPE_SEQS)) {
             String buffer = dbd.replaceAll(Constants.DBD_TYPE_SEQS, "");
             this.dbdFile = dbd;
 
-            if (buffer != null && !buffer.isEmpty() && buffer.contains(Constants.DBD_TYPE_SEPARATOR)) {
+            if (buffer.contains(Constants.DBD_TYPE_SEPARATOR)) {
 
                 String[] bufferStr = buffer.split(Constants.DBD_TYPE_SEPARATOR);
 
@@ -641,11 +637,6 @@ public class TFSpecies implements Serializable {
 
     /**
      * returns the id of the cooperativity for a right neighbour
-     *
-     * @param speciesID1
-     * @param direction0
-     * @param direction1
-     * @return
      */
     public TFcooperativity getDirectCooperativityRight(int speciesID1, int direction0, int direction1) {
         TFcooperativity result = null;
@@ -663,11 +654,6 @@ public class TFSpecies implements Serializable {
 
     /**
      * returns the id of the cooperativity for a left neighbour
-     *
-     * @param speciesID1
-     * @param direction0
-     * @param direction1
-     * @return
      */
     public TFcooperativity getDirectCooperativityLeft(int speciesID1, int direction0, int direction1) {
         TFcooperativity result = null;

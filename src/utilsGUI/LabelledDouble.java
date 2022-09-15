@@ -22,14 +22,10 @@ public class LabelledDouble  extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private JLabel label;
-	private JFormattedTextField component;
+	private final JLabel label;
+	private final JFormattedTextField component;
 	
-	
-    /**
-     * @param lab text to go in the label
-     * @param chars - the size of the text input area
-     */
+
     public LabelledDouble(String lab, int columns, String toolTipText, double value) {
         super();
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
@@ -76,14 +72,12 @@ public class LabelledDouble  extends JPanel {
     
     /**
      * sets the displayed value
-     * @param text
      */
     public void setValue(double value){
-    	component.setValue(new Double(value));
+    	component.setValue(value);
     }
     /**
-     * sets the enable status
-     * @param e
+     * sets the enabled status
      */
     public void setEditable(boolean e){
     	component.setEditable(e);
@@ -92,7 +86,6 @@ public class LabelledDouble  extends JPanel {
     
     /**
      * adds an listener
-     * @param e
      */
     public void addActionListener(ActionListener e){
     	component.addActionListener(e);

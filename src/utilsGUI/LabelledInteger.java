@@ -20,13 +20,9 @@ public class LabelledInteger extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private JLabel label;
-	private JFormattedTextField component;
-    
-    /**
-     * @param lab text to go in the label
-     * @param chars - the size of the text input area
-     */
+	private final JLabel label;
+	private final JFormattedTextField component;
+
     public LabelledInteger(String lab, int columns, String toolTipText, int value) {
         super();
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
@@ -60,7 +56,6 @@ public class LabelledInteger extends JPanel {
     
     /**
      * returns the typed int
-     * @return
      */
     public int getValue(){
     		return ((Number)component.getValue()).intValue();
@@ -68,15 +63,13 @@ public class LabelledInteger extends JPanel {
     
     /**
      * sets the displayed value
-     * @param text
      */
     public void setValue(int value){
-    	component.setValue(new Integer(value));
+    	component.setValue(value);
     }
     
     /**
      * sets the enable status
-     * @param e
      */
     public void setEditable(boolean e){
     	component.setEditable(e);
@@ -84,7 +77,6 @@ public class LabelledInteger extends JPanel {
     
     /**
      * adds an listener
-     * @param e
      */
     public void addActionListener(ActionListener e){
     	component.addActionListener(e);

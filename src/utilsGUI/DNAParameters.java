@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -20,14 +22,13 @@ public class DNAParameters  extends JPanel{
 
 	private static final long serialVersionUID = 1L;
 
-	private JPanel componentsStack;
-
 	//DNA PARAMETERS
 	public LabelledFileChooser DNA_SEQUENCE_FILE;
 	public LabelledFileChooser DNA_AVAILABILITY_FILE;
 	public LabelledDouble DNA_DEREPRESSION_RATE;
 	
 	//DNA_RANDOM PARAMETERS
+	public LabelledCheckBox RANDOM_DNA;
 	public LabelledInteger DNA_LENGTH;
 	public LabelledDouble DNA_PROPORTION_OF_A;
 	public LabelledDouble DNA_PROPORTION_OF_T;
@@ -38,7 +39,7 @@ public class DNAParameters  extends JPanel{
 	public DNAParameters(InputParameters ip){
 		this.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH,GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT));
 		this.setLayout(new FlowLayout());
-		componentsStack = new JPanel(new GridLayout(0,1, GUIconstants.GRID_HGAP, GUIconstants.GRID_VGAP));
+		JPanel componentsStack = new JPanel(new GridLayout(0, 1, GUIconstants.GRID_HGAP, GUIconstants.GRID_VGAP));
 		componentsStack.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH, GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT));
 
 		JLabel label1, label2;
@@ -53,6 +54,7 @@ public class DNAParameters  extends JPanel{
 		DNA_DEREPRESSION_RATE = new LabelledDouble(ip.DNA_DEREPRESSION_RATE.label,GUIconstants.TEXTAREA_WIDTH,ip.DNA_DEREPRESSION_RATE.description,ip.DNA_DEREPRESSION_RATE.value);
 
 		//DNA_RANDOM PARAMETERS
+		RANDOM_DNA = new LabelledCheckBox("Randomly generate DNA?", "When checked, the default random DNA parameters become editable and the DNA files are deleted.", false);
 		DNA_LENGTH = new LabelledInteger(ip.DNA_LENGTH.label,GUIconstants.TEXTAREA_WIDTH,ip.DNA_LENGTH.description, ip.DNA_LENGTH.value);
 		DNA_PROPORTION_OF_A = new LabelledDouble(ip.DNA_PROPORTION_OF_A.label,GUIconstants.TEXTAREA_WIDTH,ip.DNA_PROPORTION_OF_A.description,ip.DNA_PROPORTION_OF_A.value);	
 		DNA_PROPORTION_OF_T = new LabelledDouble(ip.DNA_PROPORTION_OF_T.label,GUIconstants.TEXTAREA_WIDTH,ip.DNA_PROPORTION_OF_T.description,ip.DNA_PROPORTION_OF_T.value);	
@@ -63,7 +65,24 @@ public class DNAParameters  extends JPanel{
 		DNA_BOUNDARY_CONDITION = new LabelledComboBox(ip.DNA_BOUNDARY_CONDITION.label,ip.DNA_BOUNDARY_CONDITION.description,boundaryConditions ,Constants.DNA_FASTA_BOUNDARY_REFLEXIVE);
 
 		resetLabelsWidth();
-		
+
+		setRandomParInputsStatus(RANDOM_DNA.getValue());
+
+		RANDOM_DNA.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setRandomParInputsStatus(RANDOM_DNA.getValue());
+				DNA_SEQUENCE_FILE.setEnable(!RANDOM_DNA.getValue());
+				DNA_AVAILABILITY_FILE.setEnable(!RANDOM_DNA.getValue());
+				if (RANDOM_DNA.getValue()) {
+					DNA_SEQUENCE_FILE.setValue("");
+					DNA_AVAILABILITY_FILE.setValue("");
+				} else {
+					DNA_SEQUENCE_FILE.setValue(ip.TF_FILE.value);
+					DNA_AVAILABILITY_FILE.setValue(ip.TS_FILE.value);
+				}
+			}
+		});
 
 		//DNA PARAMETERS
 		componentsStack.add(label1);
@@ -73,6 +92,7 @@ public class DNAParameters  extends JPanel{
 		
 		//DNA_RANDOM PARAMETERS
 		componentsStack.add(label2);
+		componentsStack.add(RANDOM_DNA);
 		componentsStack.add(DNA_LENGTH);
 		componentsStack.add(DNA_PROPORTION_OF_A);
 		componentsStack.add(DNA_PROPORTION_OF_T);
@@ -80,6 +100,14 @@ public class DNAParameters  extends JPanel{
 		componentsStack.add(DNA_PROPORTION_OF_G);
 		componentsStack.add(DNA_BOUNDARY_CONDITION);
 		this.add(componentsStack);
+	}
+
+	private void setRandomParInputsStatus(boolean status) {
+		DNA_LENGTH.setEditable(status);
+		DNA_PROPORTION_OF_A.setEditable(status);
+		DNA_PROPORTION_OF_T.setEditable(status);
+		DNA_PROPORTION_OF_C.setEditable(status);
+		DNA_PROPORTION_OF_G.setEditable(status);
 	}
 	
 	

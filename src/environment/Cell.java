@@ -48,7 +48,6 @@ public class Cell implements Serializable {
     public double totalSimulatedTime;
     public double totalElapsedTime;
     public boolean isPartialSimulation;
-    public double smallestDouble;
     public EventList eventQueue;
     public long eventsCount;
     public int targetSitesReached;
@@ -154,7 +153,6 @@ public class Cell implements Serializable {
         this.totalElapsedTime = 0;
         this.isPartialSimulation = false;
         this.lastPrintResultsAfter = 0;
-        this.smallestDouble = Math.pow(10, -this.ip.COMPUTED_AFFINITY_PRECISION.value);
         this.eventsCount = 0;
         this.TFreadingDirection = 1;
         if (this.ip.TF_READ_IN_BOTH_DIRECTIONS.value) {
@@ -346,10 +344,10 @@ public class Cell implements Serializable {
         DNA bufferDNA = DNAFilesParser.fastaFileParser(this.ip.DNA_SEQUENCE_FILE.value);
         String errStr = "";
         if (bufferDNA != null && bufferDNA.strand != null && bufferDNA.strand.length > 0) {
-            dna = new DNA(this, bufferDNA);
+            dna = new DNA(bufferDNA);
         } else {
             //generate the DNA strand randomly
-            dna = new DNA(this, randomGenerator, this.ip.DNA_LENGTH.value, this.ip.DNA_PROPORTION_OF_A.value,
+            dna = new DNA(randomGenerator, this.ip.DNA_LENGTH.value, this.ip.DNA_PROPORTION_OF_A.value,
                     this.ip.DNA_PROPORTION_OF_T.value, this.ip.DNA_PROPORTION_OF_C.value,
                     this.ip.DNA_PROPORTION_OF_G.value, this.ip.DNA_BOUNDARY_CONDITION.value);
         }
@@ -483,8 +481,8 @@ public class Cell implements Serializable {
                                 this.ip.TF_REPRESSION_RATE.value, this.ip.TF_DEREPRESSION_ATTENUATION_FACTOR.value,
                                 this.ip.TF_REPR_LEN_LEFT.value, this.ip.TF_REPR_LEN_RIGHT.value);
                         moleculesCopyNumber += TFspecies[i].copyNumber;
-                        i++;
                         tsg.addGroup(this, pos, i);
+                        i++;
                     }
                 }
             } else {
@@ -641,7 +639,11 @@ public class Cell implements Serializable {
         int newPosition;
         double random = randomGenerator.nextDouble();
 
-        if (this.dbp[moleculeID].wasBound() || TFspecies[speciesID].relInitialDrop == null || (TFspecies[speciesID].relInitialDrop.start <= 0 && TFspecies[speciesID].relInitialDrop.end >= this.dna.strand.length - 1) || (this.randomGenerator.nextDouble() > TFspecies[speciesID].initialDrop.probability)) {
+        if (this.dbp[moleculeID].wasBound() || TFspecies[speciesID].relInitialDrop == null
+                || (TFspecies[speciesID].relInitialDrop.start <= 0
+                && TFspecies[speciesID].relInitialDrop.end >= this.dna.strand.length - 1)
+                || (this.randomGenerator.nextDouble() > TFspecies[speciesID].initialDrop.probability))
+        {
             newPosition = Gillespie.getNextPositionToBind(random * dna.effectiveTFavailabilitySum[speciesID],
                     dna.effectiveTFavailability[speciesID], dna.effectiveTFsectorsAvailabilitySum[speciesID],
                     dna.DNAsectorSize);
@@ -672,7 +674,7 @@ public class Cell implements Serializable {
      * returns the available site with the highest score.
      *
      * @param speciesID the TF species
-     * @return the position or -1 if none
+     * @return the position or Constants.NONE if none
      */
     public int[] getStrongestAvailableSite(int speciesID) {
         int direction = Constants.NONE;
@@ -731,8 +733,7 @@ public class Cell implements Serializable {
         createRemodeller();
 
         //compute TF affinity landscape
-        dna.computeTFaffinityLandscape(this, this.randomGenerator, TFspecies,
-                this.ip.COMPUTED_AFFINITY_PRECISION.value, this.ip.TF_SPECIFIC_WAITING_TIME.value,
+        dna.computeTFaffinityLandscape(this, this.randomGenerator, TFspecies, this.ip.TF_SPECIFIC_WAITING_TIME.value,
                 this.TFreadingDirection, this.ip.DNA_SECTOR_SIZE.value, this.ip.PRINT_FINAL_OCCUPANCY.value);
 
         createMolecules();
@@ -835,16 +836,24 @@ public class Cell implements Serializable {
 
         this.printDebugInfo("the model was saved in file: " + this.outputParamsFile);
         this.printDebugInfo("the status was saved in file: " + this.outputStatusFile);
-        this.printDebugInfo("the DNA sequence was saved in file: " + this.outputDNASequenceFile);
-        this.printDebugInfo("the DNA affinity landscape was saved in file: " + this.outputAffinityLandscapeFile);
-        this.printDebugInfo("the DNA occupancy was saved in file: " + this.outputDNAOccupancyFile);
+        if (this.dna.isRandom || this.dna.useSubSequence) {
+            this.printDebugInfo("the DNA sequence was saved in file: " + this.outputDNASequenceFile);
+        }
+        if (this.ip.OUTPUT_AFFINITY_LANDSCAPE.value) {
+            this.printDebugInfo("the DNA affinity landscape was saved in file: " + this.outputAffinityLandscapeFile);
+        }
+        if (this.ip.OUTPUT_DNA_OCCUPANCY.value) {
+            this.printDebugInfo("the DNA occupancy was saved in file: " + this.outputDNAOccupancyFile);
+        }
         this.printDebugInfo("the target site information was saved in file: " + this.outputTargetSiteFile);
-
-        this.printDebugInfo("the TF information was saved in file: " + this.outputTFFile);
+        if (this.ip.FOLLOW_TS.value) {
+            this.printDebugInfo("the TF information was saved in file: " + this.outputTFFile);
+        }
 
         if (this.areTFstoFollow) {
             for (int i : this.TFstoFollowID) {
-                this.printDebugInfo(" information on mRNA " + this.TFstoFollow.get(i) + " was saved in file: " + this.TFstoFollowFiles.get(i));
+                this.printDebugInfo(" information on mRNA " + this.TFstoFollow.get(i)
+                        + " was saved in file: " + this.TFstoFollowFiles.get(i));
             }
         }
     }
@@ -871,8 +880,8 @@ public class Cell implements Serializable {
             if (this.outputPath.isEmpty()) {
                 statusBuffer = new BufferedWriter(new FileWriter(this.outputStatusFile, true));
             } else {
-                statusBuffer = new BufferedWriter(new FileWriter(new File(this.outputPath, this.outputStatusFile),
-                        true));
+                statusBuffer = new BufferedWriter(new FileWriter(
+                        new File(this.outputPath, this.outputStatusFile), true));
             }
 
             statusBuffer.write(str);
@@ -904,8 +913,8 @@ public class Cell implements Serializable {
                 if (this.outputPath.isEmpty()) {
                     statusBuffer = new BufferedWriter(new FileWriter(this.outputTargetSiteFollowFile, true));
                 } else {
-                    statusBuffer = new BufferedWriter(new FileWriter(new File(this.outputPath,
-                            this.outputTargetSiteFollowFile), true));
+                    statusBuffer = new BufferedWriter(new FileWriter(
+                            new File(this.outputPath, this.outputTargetSiteFollowFile), true));
                 }
                 for (int i = 0; i < (this.TargetSiteFollowLines.size() - 1); i++) {
                     statusBuffer.write(this.TargetSiteFollowLines.get(i));
@@ -935,8 +944,8 @@ public class Cell implements Serializable {
             createRandomNumberGenerator();
         }
 
-        this.isPartialSimulation =
-                this.ip.STOP_TIME.value != this.totalStopTime || (this.ip.STOP_TIME.value == this.totalStopTime && this.cellTime != 0);
+        this.isPartialSimulation = (this.ip.STOP_TIME.value != this.totalStopTime)
+                || (this.ip.STOP_TIME.value == this.totalStopTime && this.cellTime != 0);
 
         if (this.isPartialSimulation && !this.isInDebugMode() && this.cellTime == 0 && this.ensemble == 0) {
             printDebugInfo("#sample, cellTime, elapsedTimeSec");
@@ -970,7 +979,9 @@ public class Cell implements Serializable {
             }
 
             // print intermediary simulation time points
-            if (!this.isPartialSimulation && !this.isInDebugMode() && nextPercent < 100 * this.cellTime / this.totalStopTime) {
+            if (!this.isPartialSimulation && !this.isInDebugMode()
+                    && nextPercent < 100 * this.cellTime / this.totalStopTime)
+            {
                 // compute real time of simulation
                 elapsedTimeSec = this.computeElapsedTime(curTime);
                 this.printDebugInfo(nextPercent + "% finished in " + elapsedTimeSec + " seconds");
@@ -978,7 +989,10 @@ public class Cell implements Serializable {
             }
 
             //print intermediary steady state results
-            if (this.ip.PRINT_INTERMEDIARY_RESULTS_AFTER.value > 0 && !isEndOfSimulation(this.cellTime) && this.cellTime >= this.lastPrintResultsAfter + this.ip.PRINT_INTERMEDIARY_RESULTS_AFTER.value && this.totalStopTime > this.lastPrintResultsAfter + 2 * this.ip.PRINT_INTERMEDIARY_RESULTS_AFTER.value) {
+            if (this.ip.PRINT_INTERMEDIARY_RESULTS_AFTER.value > 0 && !isEndOfSimulation(this.cellTime)
+                    && this.cellTime >= this.lastPrintResultsAfter + this.ip.PRINT_INTERMEDIARY_RESULTS_AFTER.value
+                    && this.totalStopTime > this.lastPrintResultsAfter + 2 * this.ip.PRINT_INTERMEDIARY_RESULTS_AFTER.value)
+            {
                 this.lastPrintResultsAfter += this.ip.PRINT_INTERMEDIARY_RESULTS_AFTER.value;
                 printSteadyStates(this.lastPrintResultsAfter);
             }
@@ -1055,7 +1069,7 @@ public class Cell implements Serializable {
             this.printTargetSiteToFollowInfo();
         }
 
-        //count collisions.
+        //count collisions
         this.dna.collisionsCountTotal = Utils.computeSum(this.dna.collisionsCount);
     }
 
@@ -1117,9 +1131,9 @@ public class Cell implements Serializable {
 
         // FG: print the key arrays, which describe DNA-TFs state, if they are not too big
         int strandLength = this.dna.strand.length;
-        if (this.isInDebugMode() && strandLength < 50) {
-            StringBuilder arrayPos = new StringBuilder("position: ");
-            StringBuilder arrayClosed = new StringBuilder("closed:   ");
+        if (this.isInDebugMode() && strandLength < Constants.MAX_STRAND_LEN_TO_PRINT_STRAND_STATE_ARRAYS) {
+            StringBuilder arrayPos      = new StringBuilder("position: ");
+            StringBuilder arrayClosed   = new StringBuilder("closed:   ");
             StringBuilder arrayOccupied = new StringBuilder("occupied: ");
             StringBuilder arrayTFavail;
             for (int i = 0; i < strandLength; i++) {
@@ -1170,7 +1184,8 @@ public class Cell implements Serializable {
                 }
             }
 
-            this.printDebugInfo("sample " + this.ensemble + ", time " + this.cellTime + " simulated in " + elapsedTimeSec + " seconds");
+            this.printDebugInfo("sample " + this.ensemble + ", time " + this.cellTime
+                    + " simulated in " + elapsedTimeSec + " seconds");
             elapsedTimeSec = this.computeElapsedTime(curTime);
             this.computeDNABoundTime();
             performEndSampleActions(elapsedTimeSec);
@@ -1224,7 +1239,7 @@ public class Cell implements Serializable {
             }
             if (this.ip.OUTPUT_AFFINITY_LANDSCAPE.value) {
                 dna.printAffinities(this.outputPath, this.outputAffinityLandscapeFile, start, end,
-                        this.TFreadingDirection, this.TFspecies, this.ip.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.value,
+                        this.TFspecies, this.ip.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.value,
                         this.ip.WIG_STEP.value, this.ip.WIG_THRESHOLD.value, this.ip.OUTPUT_BINDING_ENERGY.value);
             }
 
@@ -1251,7 +1266,7 @@ public class Cell implements Serializable {
                 if (!isEndOfSimulation(time)) {
                     filename = filename.replaceAll("occupancy", "occupancy_" + time + "s");
                 }
-                dna.printDNAoccupancy(this.outputPath, filename, start, end, this.totalStopTime,
+                dna.printDNAoccupancy(this.outputPath, filename, start, end,
                         this.ip.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.value, this.ip.WIG_STEP.value,
                         this.ip.WIG_THRESHOLD.value);
             }
@@ -1264,7 +1279,7 @@ public class Cell implements Serializable {
                 }
                 dna.printFinalPosition(this.outputPath, filename, start, end,
                         this.ip.DNA_OCCUPANCY_FULL_MOLECULE_SIZE.value, this.ip.WIG_STEP.value,
-                        this.ip.WIG_THRESHOLD.value, this);
+                        this.ip.WIG_THRESHOLD.value);
             }
 
             //print the sliding lengths
@@ -1405,8 +1420,7 @@ public class Cell implements Serializable {
                 if (this.outputPath.isEmpty()) {
                     bufferFile = new BufferedWriter(new FileWriter(this.outputTargetSiteFile));
                 } else {
-                    bufferFile = new BufferedWriter(new FileWriter(new File(this.outputPath,
-                            this.outputTargetSiteFile)));
+                    bufferFile = new BufferedWriter(new FileWriter(new File(this.outputPath, this.outputTargetSiteFile)));
                 }
                 //header
                 String str = "\"targetSite\", \"firstReached\", \"timesReached\", \"timeOccupied\"";
@@ -1445,7 +1459,9 @@ public class Cell implements Serializable {
         printDebugInfo("collisions: " + this.dna.collisionsCountTotal + " ");
         printDebugInfo("=====================================================");
 
-        this.printDebugInfo("The simulator performed " + this.eventsCount + " events in " + (this.totalElapsedTime + elapsedTimeSec) + " seconds, which means it performs " + (this.eventsCount / (this.totalElapsedTime + elapsedTimeSec)) + "events/s ");
+        this.printDebugInfo("The simulator performed " + this.eventsCount + " events in "
+                + (this.totalElapsedTime + elapsedTimeSec) + " seconds, which means it performs "
+                + (this.eventsCount / (this.totalElapsedTime + elapsedTimeSec)) + " events/s ");
 
         this.printSteadyStates(this.cellTime);
         this.printOutputFiles();
@@ -1514,12 +1530,15 @@ public class Cell implements Serializable {
             }
             TFspecies[j].timeBoundAvg /= (TFspecies[j].copyNumber * this.totalSimulatedTime);
             TFspecies[j].slidingEventsPerBinding =
-                    (double) (TFspecies[j].countTFSlideLeftEvents + TFspecies[j].countTFSlideRightEvents) / (TFspecies[j].countTFHoppingEvents + TFspecies[j].countTFBindingEvents);
+                    ((double) (TFspecies[j].countTFSlideLeftEvents + TFspecies[j].countTFSlideRightEvents)
+                            / (TFspecies[j].countTFHoppingEvents + TFspecies[j].countTFBindingEvents));
             TFspecies[j].slidingLengthPerBinding = Math.sqrt(2 * TFspecies[j].slidingEventsPerBinding);
             TFspecies[j].observedSlidingLengthPerBinding =
-                    Math.sqrt(2 * (double) (TFspecies[j].countTFSlideLeftEvents + TFspecies[j].countTFSlideRightEvents + TFspecies[j].countTFHoppingEvents) / (TFspecies[j].countTFBindingEvents));
+                    Math.sqrt(2 * (double) (TFspecies[j].countTFSlideLeftEvents + TFspecies[j].countTFSlideRightEvents
+                            + TFspecies[j].countTFHoppingEvents) / (TFspecies[j].countTFBindingEvents));
             TFspecies[j].residenceTimePerBinding =
-                    (TFspecies[j].timeBoundAvg * this.totalSimulatedTime) / ((double) TFspecies[j].countTFBindingEvents / TFspecies[j].copyNumber);
+                    ((TFspecies[j].timeBoundAvg * this.totalSimulatedTime)
+                            / ((double) TFspecies[j].countTFBindingEvents / TFspecies[j].copyNumber));
         }
 
     }

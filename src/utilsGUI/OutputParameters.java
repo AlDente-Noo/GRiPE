@@ -13,8 +13,6 @@ import objects.InputParameters;
 public class OutputParameters extends JPanel{
 	private static final long serialVersionUID = 1L;
 
-	private JPanel componentsStack;
-
 
 	//SIMULATION-OUTPUT PARAMATERS
 	public LabelledFileChooser OUTPUT_FOLDER;
@@ -39,7 +37,7 @@ public class OutputParameters extends JPanel{
 	public OutputParameters(InputParameters ip){
 		this.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH,GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT));
 		this.setLayout(new FlowLayout());
-		componentsStack = new JPanel(new GridLayout(0,1, GUIconstants.GRID_HGAP, GUIconstants.GRID_VGAP));
+		JPanel componentsStack = new JPanel(new GridLayout(0, 1, GUIconstants.GRID_HGAP, GUIconstants.GRID_VGAP));
 		componentsStack.setMaximumSize(new Dimension(GUIconstants.SIMULATION_PARAMETERS_SIZE_WIDTH, GUIconstants.SIMULATION_PARAMETERS_SIZE_HIGHT));
 		
 		

@@ -14,12 +14,11 @@ import javax.swing.JPanel;
  */
 public class LabelledFileChooser extends JPanel{
 	private static final long serialVersionUID = 1L;
-	private JLabel label;
-    private TextAreaFileChooser component;
+	private final JLabel label;
+    private final TextAreaFileChooser component;
     
     /**
      * @param lab text to go in the label
-     * @param chars - the size of the text input area
      */
     public LabelledFileChooser(String lab, int columns, String toolTipText, String value, boolean isFile, boolean withClear) {
         super();
@@ -52,7 +51,6 @@ public class LabelledFileChooser extends JPanel{
     
     /**
      * returns the typed text
-     * @return
      */
     public String getValue(){
     	return component.getValue();
@@ -60,24 +58,21 @@ public class LabelledFileChooser extends JPanel{
     
     /**
      * sets the displayed value
-     * @param text
      */
     public void setValue(String text){
     	component.setValue(text);
     }
     
     /**
-     * sets the enable status
-     * @param e
+     * sets the status
      */
     public void setEnable(boolean e){
-    	component.setEnabled(e);
+    	component.setEnable(e);
     }
     
     
     /**
      * adds an listener
-     * @param e
      */
     public void addActionListener(ActionListener e){
     	component.addActionListener(e);

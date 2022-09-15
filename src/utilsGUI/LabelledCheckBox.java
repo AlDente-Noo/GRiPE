@@ -17,11 +17,10 @@ public class LabelledCheckBox extends JPanel{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private JCheckBox component;
+	private final JCheckBox component;
     
     /**
      * @param lab text to go in the label
-     * @param chars - the size of the text input area
      */
     public LabelledCheckBox(String lab, String toolTipText, boolean value) {
         super();
@@ -49,17 +48,14 @@ public class LabelledCheckBox extends JPanel{
     }
     
     /**
-     * returns true whether the check box is checked or false otherwise 
-     * @return
+     * returns true whether the checkbox is checked or false otherwise
      */
     public boolean getValue(){
-    	
     	return component.isSelected();
     }
     
     /**
-     *  sets true whether the check box is checked or false otherwise 
-     * @param text
+     *  sets true whether the check box is checked or false otherwise
      */
     public void setValue(boolean value){
     	component.setSelected(value);
@@ -67,7 +63,6 @@ public class LabelledCheckBox extends JPanel{
     
     /**
      * sets the enable status
-     * @param e
      */
     public void setEnable(boolean e){
     	component.setEnabled(e);
@@ -76,7 +71,6 @@ public class LabelledCheckBox extends JPanel{
     
     /**
      * adds an listener
-     * @param e
      */
     public void addActionListener(ActionListener e){
     	component.addActionListener(e);

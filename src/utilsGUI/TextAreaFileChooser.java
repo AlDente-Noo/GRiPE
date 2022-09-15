@@ -24,10 +24,9 @@ import javax.swing.JTextField;
  */
 public class TextAreaFileChooser extends JPanel{
 	private static final long serialVersionUID = 1L;
-	private JTextField path;
-	private JButton select;
-	private JButton clear;
-	private boolean isFile;
+	private final JTextField path;
+	private final JButton select;
+	private final boolean isFile;
     JFileChooser chooser;
 
 	
@@ -54,6 +53,7 @@ public class TextAreaFileChooser extends JPanel{
 	    File buttonSelectImgImgFile = new File(GUIconstants.OPEN_IMAGE);
 		if(!buttonSelectImgImgFile.exists()){
 			in = this.getClass().getClassLoader().getResourceAsStream(GUIconstants.OPEN_IMAGE);
+			assert in != null;
 			try {
 				if(in.available() >0){
 					buttonSelectImg = new ImageIcon(ImageIO.read(in));
@@ -77,6 +77,7 @@ public class TextAreaFileChooser extends JPanel{
 			File buttonTrashImgFile = new File(GUIconstants.TRASH_IMAGE);
 			if(!buttonTrashImgFile.exists()){
 				in = this.getClass().getClassLoader().getResourceAsStream(GUIconstants.TRASH_IMAGE);
+				assert in != null;
 				try {
 					if(in.available() >0){
 						buttonTrashImg = new ImageIcon(ImageIO.read(in));
@@ -87,10 +88,10 @@ public class TextAreaFileChooser extends JPanel{
 				}
 			} else{
 				buttonTrashImg= new ImageIcon(GUIconstants.TRASH_IMAGE);
-			}		
-			
-			
-			clear = new JButton(buttonTrashImg);
+			}
+
+
+			JButton clear = new JButton(buttonTrashImg);
 			clear.setBackground(Color.white);
 			clear.setMaximumSize(new Dimension(buttonTrashImg.getIconWidth(), buttonTrashImg.getIconHeight()));
 			addActionListener(clear, this.isFile, false);
@@ -142,7 +143,6 @@ public class TextAreaFileChooser extends JPanel{
 
 	/**
 	 * sets a value of this component
-	 * @param path
 	 */
 	public void setValue(String path){
 		this.path.setText(path);
@@ -178,7 +178,6 @@ public class TextAreaFileChooser extends JPanel{
 	
     /**
      * sets the enable status
-     * @param e
      */
     public void setEnable(boolean e){
     	select.setEnabled(e);
@@ -186,7 +185,6 @@ public class TextAreaFileChooser extends JPanel{
     
     /**
      * adds an listener
-     * @param e
      */
     public void addActionListener(ActionListener e){
     	select.addActionListener(e);

@@ -69,7 +69,8 @@ public class ProteinEvent extends Event {
     }
 
     public boolean isEmpty() {
-        return time == Double.MAX_VALUE && nextAction == Constants.NONE && proteinID == Constants.NONE && propensity == 0.0;
+        return time == Double.MAX_VALUE && nextAction == Constants.NONE
+                && proteinID == Constants.NONE && propensity == 0.0;
     }
 
 }

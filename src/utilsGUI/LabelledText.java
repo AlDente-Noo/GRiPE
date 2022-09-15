@@ -12,12 +12,11 @@ import java.awt.event.ActionListener;
  */
 public class LabelledText extends JPanel{
 	private static final long serialVersionUID = 1L;
-	private JLabel label;
-    private JTextField component;
+	private final JLabel label;
+    private final JTextField component;
     
     /**
      * @param lab text to go in the label
-     * @param chars - the size of the text input area
      */
     public LabelledText(String lab, int columns, String toolTipText, String value) {
         super();
@@ -50,7 +49,6 @@ public class LabelledText extends JPanel{
     
     /**
      * returns the typed text
-     * @return
      */
     public String getValue(){
     	return component.getText();
@@ -58,20 +56,15 @@ public class LabelledText extends JPanel{
     
     /**
      * sets the displayed value
-     * @param text
      */
     public void setValue(String text){
     	component.setText(text);
     }
     
-    
-    
     /**
      * adds an listener
-     * @param e
      */
     public void addActionListener(ActionListener e){
     	component.addActionListener(e);
     }
-    
 }
