@@ -9,8 +9,8 @@ import java.io.Serializable;
 /**
  * class that contains the event list
  *
- * @author n.r.zabet@gen.cam.ac.uk
- * @author fedor.garbuzov@mail.ioffe.ru
+ * @author n.r.zabet@gen.cam.ac.uk (original contributor)
+ * @author fedor.garbuzov@mail.ioffe.ru (modified the code)
  */
 public class EventList implements Serializable {
 
@@ -27,8 +27,8 @@ public class EventList implements Serializable {
         // TF random walk event list 1D diffusion
         if (n.ip.EVENT_LIST_SUBGROUP_SIZE.value >= 0 && n.ip.EVENT_LIST_SUBGROUP_SIZE.value < n.dbp.length) {
             //TFRandomWalkEventQueue =  new TFRandomWalkEventQueueFRopt(n);
-            n.printDebugInfo("Warning: Optimal First Reaction method is not implemented, " +
-                    "switching to simple First Reaction");
+            n.printDebugInfo("Warning: clustered (optimal) First Reaction method is not implemented, " +
+                    "simple First Reaction method will be used");
         } //else{
         TFRandomWalkEventQueue = new TFRandomWalkEventQueueFR(n);
         TFRepressionEventQueue = new TFRepressionEventQueueFR();

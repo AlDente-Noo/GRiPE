@@ -125,7 +125,7 @@ public class Utils {
 	 * @return the 2 decimal double number
 	 */
 	public static double roundTwoDecimals(double d) {
-        	DecimalFormat twoDForm = new DecimalFormat("#.##");
+		DecimalFormat twoDForm = new DecimalFormat("#.##");
 		return Double.parseDouble(twoDForm.format(d));
 	}
 	

@@ -285,10 +285,10 @@ public class Cell implements Serializable {
                             ex.printStackTrace();
                         }
                     } else {
-                        this.printDebugInfo("There is no molecule of TF " + buffer + ".");
+                        this.printDebugInfo("There is no molecule of TF " + buffer);
                     }
                 } else {
-                    this.printDebugInfo("TF " + buffer + " to follow was not find.");
+                    this.printDebugInfo("TF " + buffer + " to follow was not find");
                 }
             }
         }
@@ -342,7 +342,6 @@ public class Cell implements Serializable {
      */
     private void createDNAstrand() {
         DNA bufferDNA = DNAFilesParser.fastaFileParser(this.ip.DNA_SEQUENCE_FILE.value);
-        String errStr = "";
         if (bufferDNA != null && bufferDNA.strand != null && bufferDNA.strand.length > 0) {
             dna = new DNA(bufferDNA);
         } else {
@@ -351,9 +350,9 @@ public class Cell implements Serializable {
                     this.ip.DNA_PROPORTION_OF_T.value, this.ip.DNA_PROPORTION_OF_C.value,
                     this.ip.DNA_PROPORTION_OF_G.value, this.ip.DNA_BOUNDARY_CONDITION.value);
         }
-        errStr += DNAFilesParser.btrackFileParser(this.ip.DNA_AVAILABILITY_FILE.value, dna.closed);
-        if (!errStr.equals("")) {
-            printDebugInfo("Error: " + errStr + ". The btrack file is ignored.");
+        String str = DNAFilesParser.btrackFileParser(this.ip.DNA_AVAILABILITY_FILE.value, dna.closed);
+        if (!str.equals("")) {
+            printDebugInfo("Warning: " + str + "; the dnase accessibility (btrack) file is ignored");
         }
     }
 
@@ -412,7 +411,7 @@ public class Cell implements Serializable {
                     if (TFcooperativityParser.data != null && !TFcooperativityParser.data.isEmpty()) {
 
                         TFcooperativity buffer;
-                        this.printDebugInfo("Cooperativity data loaded from file " + this.ip.TF_COOPERATIVITY_FILE.value);
+                        this.printDebugInfo("Cooperativity data is loaded from the file " + this.ip.TF_COOPERATIVITY_FILE.value);
 
                         for (int i = 0; i < TFcooperativityParser.data.size(); i++) {
                             //rescale region 1 and region 0 to remove the size of the TF
@@ -432,7 +431,8 @@ public class Cell implements Serializable {
                             }
                         }
                     } else {
-                        this.printDebugInfo("Did not find any valid cooperativity data in file " + this.ip.TF_COOPERATIVITY_FILE.value);
+                        this.printDebugInfo("Could not find any valid cooperativity data in file "
+                                + "'" + this.ip.TF_COOPERATIVITY_FILE.value + "'");
                     }
                 }
             }
@@ -443,7 +443,7 @@ public class Cell implements Serializable {
                 tsg = TSfileParser.tsg;
             }
         } else {
-            this.printDebugInfo("The file is not parsed " + this.ip.TF_COOPERATIVITY_FILE.value);
+            this.printDebugInfo("The file '" + this.ip.TF_COOPERATIVITY_FILE.value + "' is not parsed");
         }
 
         // if could not load them then generate TF species randomly
@@ -486,7 +486,8 @@ public class Cell implements Serializable {
                     }
                 }
             } else {
-                this.printDebugInfo("TF species cannot have even at least 1 molecule. None were created!");
+                //this.printDebugInfo("TF species cannot have even at least 1 molecule. None were created!");
+                this.printDebugInfo("Molecules of this TF species have not been created");
             }
         }
     }
@@ -745,15 +746,14 @@ public class Cell implements Serializable {
      * print init information to status file
      */
     private void printInitInfo() {
-
-        printDebugInfo("parameters printed to file: " + this.outputParamsFile, true);
+        printDebugInfo("The model parameters were saved to the file: " + this.outputParamsFile, true);
 
         if (this.ip.RANDOM_SEED.value > 0) {
-            this.printDebugInfo("random numbers use a common seed");
+            this.printDebugInfo("The specific seed is provided for the random numbers");
         } else {
-            this.printDebugInfo("random numbers use a different seed");
+            this.printDebugInfo("The specific seed is not provided for the random numbers");
         }
-        printDebugInfo("To simulate " + this.ip.STOP_TIME.value + " seconds");
+        printDebugInfo("Cell simulation time: " + this.ip.STOP_TIME.value + " seconds");
         printDebugInfo("=====================================================");
     }
 
@@ -834,26 +834,26 @@ public class Cell implements Serializable {
      */
     private void printOutputFiles() {
 
-        this.printDebugInfo("the model was saved in file: " + this.outputParamsFile);
-        this.printDebugInfo("the status was saved in file: " + this.outputStatusFile);
+        this.printDebugInfo("The model parameters were saved in the file: " + this.outputParamsFile);
+        this.printDebugInfo("The status mesages were saved in the file: " + this.outputStatusFile);
         if (this.dna.isRandom || this.dna.useSubSequence) {
-            this.printDebugInfo("the DNA sequence was saved in file: " + this.outputDNASequenceFile);
+            this.printDebugInfo("The DNA sequence was saved in the file: " + this.outputDNASequenceFile);
         }
         if (this.ip.OUTPUT_AFFINITY_LANDSCAPE.value) {
-            this.printDebugInfo("the DNA affinity landscape was saved in file: " + this.outputAffinityLandscapeFile);
+            this.printDebugInfo("The DNA affinity landscape was saved in the file: " + this.outputAffinityLandscapeFile);
         }
         if (this.ip.OUTPUT_DNA_OCCUPANCY.value) {
-            this.printDebugInfo("the DNA occupancy was saved in file: " + this.outputDNAOccupancyFile);
+            this.printDebugInfo("The DNA occupancy was saved in the file: " + this.outputDNAOccupancyFile);
         }
-        this.printDebugInfo("the target site information was saved in file: " + this.outputTargetSiteFile);
+        this.printDebugInfo("The target site information was saved in the file: " + this.outputTargetSiteFile);
         if (this.ip.FOLLOW_TS.value) {
-            this.printDebugInfo("the TF information was saved in file: " + this.outputTFFile);
+            this.printDebugInfo("The TF information was saved in the file: " + this.outputTFFile);
         }
 
         if (this.areTFstoFollow) {
             for (int i : this.TFstoFollowID) {
-                this.printDebugInfo(" information on mRNA " + this.TFstoFollow.get(i)
-                        + " was saved in file: " + this.TFstoFollowFiles.get(i));
+                this.printDebugInfo("The information about the following TFs (" + this.TFstoFollow.get(i)
+                        + ") was saved in file: " + this.TFstoFollowFiles.get(i));
             }
         }
     }
@@ -1124,7 +1124,7 @@ public class Cell implements Serializable {
             }
         } else {
             if (!canTFMoleculeBind()) {
-                printDebugInfo("hm... no more events at time " + (this.cellTime + this.totalSimulatedTime) + "!");
+                printDebugInfo("Hm... no more events at time " + (this.cellTime + this.totalSimulatedTime));
                 result = false;
             }
         }
@@ -1454,14 +1454,14 @@ public class Cell implements Serializable {
      */
     private void printFinalDebugInfo(double elapsedTimeSec) {
         printDebugInfo("=====================================================");
-        printDebugInfo("elapsed time: " + (this.totalElapsedTime + elapsedTimeSec) + " sec");
+        printDebugInfo("Elapsed time: " + Utils.roundTwoDecimals(this.totalElapsedTime + elapsedTimeSec) + " sec");
         printDebugInfo("=====================================================");
-        printDebugInfo("collisions: " + this.dna.collisionsCountTotal + " ");
+        printDebugInfo("Collisions: " + this.dna.collisionsCountTotal + " ");
         printDebugInfo("=====================================================");
 
         this.printDebugInfo("The simulator performed " + this.eventsCount + " events in "
-                + (this.totalElapsedTime + elapsedTimeSec) + " seconds, which means it performs "
-                + (this.eventsCount / (this.totalElapsedTime + elapsedTimeSec)) + " events/s ");
+                + Utils.roundTwoDecimals(this.totalElapsedTime + elapsedTimeSec) + " seconds, which means it performs "
+                + Utils.roundTwoDecimals(this.eventsCount / (this.totalElapsedTime + elapsedTimeSec)) + " events/s ");
 
         this.printSteadyStates(this.cellTime);
         this.printOutputFiles();

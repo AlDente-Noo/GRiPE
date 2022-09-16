@@ -72,8 +72,8 @@ public class PFM  implements Serializable{
                                 }
 
                                 if(bufferPFM.size()!=motifSize){
-                                    isCorrect =false;
-                                    n.printDebugInfo("pfm " +str+ " various size rows pfm");
+                                    isCorrect = false;
+                                    n.printDebugInfo("PFM " + str + " has rows of different size");
                                 }
 
                                 pfm.add(bufferPFM);
@@ -141,10 +141,9 @@ public class PFM  implements Serializable{
 
     /**
      * generates a string description of the class
-     * @return
      */
     public String toString(double[] bpFreq){
-        StringBuffer str= new StringBuffer("");
+        StringBuilder str= new StringBuilder("");
         str.append(Constants.DBD_TYPE_PWM);
         for(int i=0;i<this.pfm.size();i++){
             str.append(CellUtils.bps.bps[i]);

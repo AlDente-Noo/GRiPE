@@ -11,8 +11,8 @@ import java.io.Serializable;
 /**
  * class that describe a Transcription Factor which is just an instantiation of DBP
  *
- * @author n.r.zabet@gen.cam.ac.uk
- * @author fedor.garbuzov@mail.ioffe.ru
+ * @author n.r.zabet@gen.cam.ac.uk (original contributor)
+ * @author fedor.garbuzov@mail.ioffe.ru (modified the code)
  */
 public class TF extends DBP implements Serializable {
 
@@ -75,19 +75,14 @@ public class TF extends DBP implements Serializable {
                 unbindMolecule(n, pe.time);
             } else {
                 if (this.isRepressed(n)) {
+                    if (n.isInDebugMode()) {
+                        n.printDebugInfo(pe.time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name
+                                + " attempted to move (slide or hop)"
+                                + " from position " + position + " to " + pe.position
+                                + ", but the TF is repressing or is being repressed");
+                    }
                     if (!n.TFspecies[speciesID].stallsIfBlocked) {
-                        if (n.isInDebugMode()) {
-                            n.printDebugInfo(pe.time + ": attempted to move (via sliding or hop) TF " + this.ID + " of type " +
-                                    n.TFspecies[speciesID].name + " from position " + position + " to " + pe.position +
-                                    ", but the TF is repressing or repressed, therefore the TF is released in the cytoplasm.");
-                        }
                         unbindMolecule(n, pe.time);
-                    } else {
-                        if (n.isInDebugMode()) {
-                            n.printDebugInfo(pe.time + ": attempted to move (via sliding or hop) TF " + this.ID + " of type " +
-                                    n.TFspecies[speciesID].name + " from position " + position + " to " + pe.position +
-                                    ", but the TF is repressing or repressed, the TF is stalled.");
-                        }
                     }
                 } else {
                     if (pe.nextAction == Constants.EVENT_TF_RANDOM_WALK_HOP) {
@@ -111,15 +106,15 @@ public class TF extends DBP implements Serializable {
                         if (n.dna.isAbsorbing && pe.position < 0) {
                             // absorbing boundary conditions cause unbinding when DNA end is reached
                             if (n.isInDebugMode()) {
-                                n.printDebugInfo(pe.time + " TF " + this.ID + " reached left limit and, due to absorbing " +
-                                        "boundary condition, it will unbind!");
+                                n.printDebugInfo(pe.time + " TF " + this.ID + " reached left DNA border and "
+                                        + "unbound due to the absorbing boundary condition");
                             }
                             unbindMolecule(n, pe.time);
                         } else if (n.dna.isPeriodic && pe.position < 0) {
                             // periodic b.c. cause the movement of the molecule to the opposite end of DNA when a DNA end is reached
                             if (n.isInDebugMode()) {
-                                n.printDebugInfo(pe.time + " TF " + this.ID + " reached left limit and, due to periodic " +
-                                        "boundary condition, it will attempt to bind at the end!");
+                                n.printDebugInfo(pe.time + " TF " + this.ID + " reached left DNA border and "
+                                        + "attempted to bind at the right border due to the periodic boundary condition");
                             }
                             hopMolecule(n, pe.time, n.dna.strand.length - this.size - 1);
                         } else {
@@ -129,8 +124,8 @@ public class TF extends DBP implements Serializable {
                             } else {
                                 // reflective b.c. prevent movement of the molecule outside of DNA
                                 if (n.isInDebugMode()) {
-                                    n.printDebugInfo(pe.time + ": attempted to slide left TF " + this.ID +
-                                            " of type " + n.TFspecies[speciesID].name + " from position " + position +
+                                    n.printDebugInfo(pe.time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name
+                                            + " attempted to slide left from position " + position +
                                             ", but the left border is reached");
                                 }
                                 resetPosition(pe.time);
@@ -146,14 +141,14 @@ public class TF extends DBP implements Serializable {
                         assert (this.position != Constants.NONE);
                         if (n.dna.isAbsorbing && pe.position >= (n.dna.strand.length - this.size)) {
                             if (n.isInDebugMode()) {
-                                n.printDebugInfo(pe.time + " TF " + this.ID + " reached right limit and, due to absorbing" +
-                                        " boundary condition, it will unbind!");
+                                n.printDebugInfo(pe.time + " TF " + this.ID + " reached right DNA border and "
+                                        + "unbound due to the absorbing boundary condition");
                             }
                             unbindMolecule(n, pe.time);
                         } else if (n.dna.isPeriodic && pe.position >= (n.dna.strand.length - this.size)) {
                             if (n.isInDebugMode()) {
-                                n.printDebugInfo(pe.time + " TF " + this.ID + " reached right limit and, due to periodic " +
-                                        "boundary condition, it will attempt to bind at the start!");
+                                n.printDebugInfo(pe.time + " TF " + this.ID + " reached right DNA border and "
+                                        + "attempted to bind at the left border due to the periodic boundary condition");
                             }
                             hopMolecule(n, pe.time, 0);
                         } else {
@@ -161,8 +156,8 @@ public class TF extends DBP implements Serializable {
                                 slideRightMolecule(n, pe.time, pe.position, pe.isHoppingEvent, false);
                             } else {
                                 if (n.isInDebugMode()) {
-                                    n.printDebugInfo(pe.time + ": attempted to slide right TF " + this.ID +
-                                            " of type " + n.TFspecies[speciesID].name + " from position " + position +
+                                    n.printDebugInfo(pe.time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name
+                                            + " attempted to slide right from position " + position +
                                             ", but the right border is reached");
                                 }
                                 resetPosition(pe.time);
@@ -178,7 +173,7 @@ public class TF extends DBP implements Serializable {
 
         assert !isRepressed(n) || position == Constants.NONE;
 
-        double timeBound = 0;
+        double timeBound;
         // update bound time
         if (this.lastPosition != Constants.NONE) {
             timeBound = this.timeOfLastPositionChange - previousTimeOfLastPositionChange;
@@ -203,7 +198,7 @@ public class TF extends DBP implements Serializable {
      */
     public String toString() {
         return "TF " + ID + " of type " + speciesID + " at position " + position + " (" + directionToString() + ")" +
-				" previously at " + lastPosition + " has the time of last  change " + timeOfLastPositionChange +
+				" previously at " + lastPosition + " has the time of last change " + timeOfLastPositionChange +
 				" and size " + size;
     }
 
@@ -230,10 +225,9 @@ public class TF extends DBP implements Serializable {
         if (blockingMolecule == Constants.NONE) {
             str += "outside of the strand or repressed or closed";
         } else {
-            str += "blocked by molecule " + blockingMolecule;
-            str += " (TF " + n.TFspecies[n.dbp[blockingMolecule].speciesID].name + ")";
+            str += "blocked by TF " + blockingMolecule;
+            str += " of type " + n.TFspecies[n.dbp[blockingMolecule].speciesID].name;
         }
-
         return str;
     }
 
@@ -296,7 +290,8 @@ public class TF extends DBP implements Serializable {
 
                     if (bufferCoop.isReversible) {
                         boundMolecule = n.dna.getBoundMolecule(i);
-                        if (boundMolecule != Constants.NONE && n.dbp[boundMolecule].speciesID == bufferCoop.species1ID && n.dbp[boundMolecule].direction == j) {
+                        if (boundMolecule != Constants.NONE && n.dbp[boundMolecule].speciesID == bufferCoop.species1ID
+                                && n.dbp[boundMolecule].direction == j) {
                             n.dbp[boundMolecule].setMoveRate(n);
                             n.eventQueue.TFRandomWalkEventQueue.updateNextEvent(n, boundMolecule, time);
                         }
@@ -304,7 +299,11 @@ public class TF extends DBP implements Serializable {
                 }
             }
             if (n.isInDebugMode()) {
-                n.printDebugInfo("The affinity of the TF " + n.TFspecies[bufferCoop.species1ID].name + " for site " + bufferCoop.region1 + " was increased by " + bufferCoop.affinityIncrease + " due to the binding of TF " + n.TFspecies[bufferCoop.species0ID].name + " to site" + bufferCoop.region0);
+                n.printDebugInfo("The affinity of TF " + n.TFspecies[bufferCoop.species1ID].name
+                        + " for the site " + bufferCoop.region1
+                        + " was increased by " + bufferCoop.affinityIncrease
+                        + " due to the binding of TF " + n.TFspecies[bufferCoop.species0ID].name
+                        + " to the site" + bufferCoop.region0);
             }
 
         }
@@ -339,7 +338,10 @@ public class TF extends DBP implements Serializable {
             }
 
             if (n.isInDebugMode()) {
-                n.printDebugInfo("The affinity of the TF " + n.TFspecies[bufferCoop.species1ID].name + " for site " + bufferCoop.region1 + " was reset due to the unbinding of TF " + n.TFspecies[bufferCoop.species0ID].name + " from site" + bufferCoop.region0);
+                n.printDebugInfo("The affinity of TF " + n.TFspecies[bufferCoop.species1ID].name
+                        + " for the site " + bufferCoop.region1
+                        + " was reset due to the unbinding of TF " + n.TFspecies[bufferCoop.species0ID].name
+                        + " from the site" + bufferCoop.region0);
             }
         }
     }
@@ -366,7 +368,7 @@ public class TF extends DBP implements Serializable {
                 n.eventQueue.TFRandomWalkEventQueue.updateNextEvent(n, this.rightNeighbour, time);
 
                 if (n.isInDebugMode()) {
-                    n.printDebugInfo(time + ": TF molecule " + this.ID + " become cooperative to TF molecule " + this.rightNeighbour);
+                    n.printDebugInfo(time + ": TF " + this.ID + " became cooperative to TF " + this.rightNeighbour);
                 }
             }
 
@@ -410,7 +412,7 @@ public class TF extends DBP implements Serializable {
                 n.eventQueue.TFRandomWalkEventQueue.updateNextEvent(n, this.leftNeighbour, time);
 
                 if (n.isInDebugMode()) {
-                    n.printDebugInfo(time + ": TF molecule " + this.ID + " become cooperative to TF molecule " + this.leftNeighbour);
+                    n.printDebugInfo(time + ": TF " + this.ID + " became cooperative to TF " + this.leftNeighbour);
                 }
             }
         }
@@ -451,10 +453,12 @@ public class TF extends DBP implements Serializable {
         //if in debug mode print status
         if (n.isInDebugMode()) {
             if (!unbound) {
-                n.printDebugInfo(time + ": attempted to unbind TF " + this.ID + " of type " + n.TFspecies[speciesID].name + " which was bound to the DNA at position " + this.position);
+                n.printDebugInfo(time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name
+                        + " which was bound to the DNA at position " + this.position
+                        + " attempted to unbind but failed.");
             } else {
-                n.printDebugInfo(time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name + " unbound " +
-                        "from the DNA at position " + this.position);
+                n.printDebugInfo(time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name
+                        + " unbound from the DNA at position " + this.position);
             }
         }
 
@@ -520,9 +524,13 @@ public class TF extends DBP implements Serializable {
                 slideTxt = "hop";
             }
             if (bound != this.ID) {
-                n.printDebugInfo(time + ": attempted to " + slideTxt + " right TF " + this.ID + " of type " + n.TFspecies[speciesID].name + " from position " + position + " by " + (newPosition - position) + " bp, but this is " + moleculeBlockingString(n, bound));
+                n.printDebugInfo(time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name
+                        + " attempted to " + slideTxt + " right"
+                        + " from position " + position + " by " + (newPosition - position) + " bp,"
+                        + " but it is " + moleculeBlockingString(n, bound));
             } else {
-                n.printDebugInfo(time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name + " " + slideTxt + " right from position " + position + " by " + (newPosition - position) + " bp");
+                n.printDebugInfo(time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name
+                        + " " + slideTxt + " right from position " + position + " by " + (newPosition - position) + " bp");
             }
         }
 
@@ -547,7 +555,7 @@ public class TF extends DBP implements Serializable {
                 // FG: unbind if failed
                 if (bound != ID) {
                     if (n.isInDebugMode()) {
-                        n.printDebugInfo(time + ": failed to slide (or hop) in both directions, the TF is released.");
+                        n.printDebugInfo(time + ": the TF failed to slide (or hop) in both directions.");
                     }
                     this.unbindMolecule(n, time);
                     return bound;
@@ -627,9 +635,13 @@ public class TF extends DBP implements Serializable {
                 slideTxt = "hop";
             }
             if (bound != this.ID) {
-                n.printDebugInfo(time + ": attempted to " + slideTxt + " left TF " + this.ID + " of type " + n.TFspecies[speciesID].name + " from position " + position + " by " + (position - newPosition) + " bp, but this is " + moleculeBlockingString(n, bound));
+                n.printDebugInfo(time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name
+                        + " attempted to " + slideTxt + " left"
+                        + " from position " + position + " by " + (position - newPosition) + " bp,"
+                        + " but it is " + moleculeBlockingString(n, bound));
             } else {
-                n.printDebugInfo(time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name + " " + slideTxt + " left from position " + position + " by " + (position - newPosition) + " bp");
+                n.printDebugInfo(time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name
+                        + " " + slideTxt + " left from position " + position + " by " + (position - newPosition) + " bp");
             }
         }
 
@@ -726,8 +738,8 @@ public class TF extends DBP implements Serializable {
         }
         this.initSlidingExtremes();
         if (n.isInDebugMode()) {
-            n.printDebugInfo(time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name + " hop at the same" +
-                    " position " + position);
+            n.printDebugInfo(time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name
+                    + " hopped at the same position " + position);
         }
     }
 
@@ -787,16 +799,15 @@ public class TF extends DBP implements Serializable {
 
         if (n.isInDebugMode()) {
             if (bound == ID) {
-                n.printDebugInfo(time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name + " hoped at " +
-                        "position " + this.position + " in direction " + this.directionToString());
+                n.printDebugInfo(time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name
+                        + " hopped to the position " + this.position
+                        + " in the direction " + this.directionToString());
             } else {
                 //int boundProtein = n.dna.getBoundProtein(newPosition,size);
-                String str = time + ": failed to hop TF " + this.ID + " of type " + n.TFspecies[speciesID].name + " " +
-                        "to position " + newPosition + " which is occupied or repressed, ";
+                String str = time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name
+                        + " attempted to hop to position " + newPosition + " which is occupied or repressed";
                 if (position == Constants.NONE) {
-                    str += "molecule released";
-                } else {
-                    str += "molecule stalled";
+                    str += "; this resulted in the unbinding of TF";
                 }
                 n.printDebugInfo(str);
             }

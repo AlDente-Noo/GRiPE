@@ -27,8 +27,9 @@ import utilsGUI.*;
 
 /**
  * runnable class with GUI
- * @author n.r.zabet@gen.cam.ac.uk, modified by fedor.garbuzov@gmail.com
  *
+ * @author n.r.zabet@gen.cam.ac.uk
+ * @author fedor.garbuzov@mail.ioffe.ru
  */
 @SuppressWarnings("ALL")
 public class SimulatorGUI {

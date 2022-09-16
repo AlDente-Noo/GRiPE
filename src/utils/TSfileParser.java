@@ -22,7 +22,7 @@ public class TSfileParser {
 		TSGid = 0;
 		try {
 			reader = new BufferedReader(new FileReader(filename));
-			String text = null;
+			String text;
 			while ((text = reader.readLine()) != null) {
 				text = text.trim();
 				if (!text.isEmpty()) {
@@ -49,9 +49,9 @@ public class TSfileParser {
 	public TargetSite extractTargetSite(Cell n, int targetSiteID, String str) {
 		TargetSite bufferTS = new TargetSite(n, targetSiteID, str, "", Constants.NONE, Constants.NONE);
 		if (bufferTS.region.start != Constants.NONE && bufferTS.region.end != Constants.NONE) {
-			n.printDebugInfo("target site " + bufferTS + " loaded");
+			n.printDebugInfo("Target site " + bufferTS + " loaded");
 		} else {
-			n.printDebugInfo("error on parsing target site " + bufferTS);
+			n.printDebugInfo("Error on parsing target site " + bufferTS);
 			bufferTS = null;
 		}
 		return bufferTS;

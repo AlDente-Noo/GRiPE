@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
- * This class specifies Remodeller which closes or opens chromatin (DNA).
+ * Remodeller closes and opens chromatin (DNA).
  * Closing and opening of DNA (repression or derepression) is invoked by repressors (TFs).
  *
  * @author fedor.garbuzov@mail.ioffe.ru
@@ -51,34 +51,36 @@ public class Remodeller implements Serializable {
                 n.dbp[re.proteinID].repressesDNA = true;
                 n.dbp[re.proteinID].updateRepressionRate(n);
                 if (n.isInDebugMode()) {
-                    n.printDebugInfo(re.time + ": TF " + re.proteinID + " of type " + n.TFspecies[speciesID].name +
-                            " started repression from position " + re.boundaryLeft + " to " + re.boundaryRight);
+                    n.printDebugInfo(re.time + ": TF " + re.proteinID + " of type " + n.TFspecies[speciesID].name
+                            + " started repression from position " + re.boundaryLeft + " to " + re.boundaryRight);
                 }
                 n.eventQueue.TFBindingEventQueue.updateProteinBindingPropensities(n);
                 n.TFspecies[speciesID].countTFRepressionEvents++;
                 n.dna.repressedLength.add(new Pair<>(re.time, n.dna.currentRepressedLength));
             } else if (n.isInDebugMode()) {
-                n.printDebugInfo(re.time + ": TF " + re.proteinID + " of type " + n.TFspecies[speciesID].name + " at " +
-                        "position " + n.dbp[re.proteinID].getPosition() + " attempted to start repression but is " +
-                        "repressed.");
+                n.printDebugInfo(re.time + ": TF " + re.proteinID + " of type " + n.TFspecies[speciesID].name
+                        + " at position " + n.dbp[re.proteinID].getPosition()
+                        + " attempted to start repression but is repressed.");
             }
         } else {
             assert (re.nextAction == Constants.EVENT_TF_DEREPRESSION);
-            // FG: this prevents changing repression status if this derepression event was scheduled at the last unbinding
+            // this prevents changing repression status if this derepression event was scheduled on the unbinding
             if (re.scheduleNextEvent) {
                 n.dbp[re.proteinID].repressesDNA = false;
             }
-            // FG: update repression rate
+            // update repression rate
             n.dbp[re.proteinID].updateRepressionRate(n);
 
-            n.dna.derepress(n, re.boundaryLeft, re.boundaryRight, re.proteinID);
+            // the status message is shown before actual derepressing (DNA.derepress function) because
+            // during derepressing new messages can be shown which should be after this one
+            if (n.isInDebugMode()) {
+                n.printDebugInfo(re.time + ": TF " + re.proteinID + " of type " + n.TFspecies[speciesID].name
+                        + " ended repression from position " + re.boundaryLeft + " to " + re.boundaryRight);
+            }
+
+            n.dna.derepress(n, re.boundaryLeft, re.boundaryRight, re.proteinID, re.time);
             n.TFspecies[speciesID].countTFDerepressionEvents++;
             n.dna.repressedLength.add(new Pair<>(re.time, n.dna.currentRepressedLength));
-
-            if (n.isInDebugMode()) {
-                n.printDebugInfo(re.time + ": TF " + re.proteinID + " of type " + n.TFspecies[speciesID].name + " " +
-                        "ended repression from position " + re.boundaryLeft + " to " + re.boundaryRight);
-            }
 
             n.eventQueue.TFBindingEventQueue.updateProteinBindingPropensities(n);
         }

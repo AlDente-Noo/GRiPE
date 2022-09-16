@@ -378,7 +378,7 @@ public class TFfileParser {
             }
 
         } else {
-            n.printDebugInfo("could not load TF csv file!");
+            n.printDebugInfo("Could not load the TF csv file");
         }
 
     }

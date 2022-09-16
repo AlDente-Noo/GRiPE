@@ -7,8 +7,8 @@ import java.io.Serializable;
 /**
  * class that contains the list of binding events (3D diffusion)
  *
- * @author n.r.zabet@gen.cam.ac.uk
- * @author fedor.garbuzov@mail.ioffe.ru
+ * @author n.r.zabet@gen.cam.ac.uk (original contributor)
+ * @author fedor.garbuzov@mail.ioffe.ru (modified the code)
  */
 public class TFBindingEventQueue implements Serializable {
 
@@ -98,7 +98,7 @@ public class TFBindingEventQueue implements Serializable {
      */
     public void updateProteinBindingPropensities(Cell n) {
         if (n.isInDebugMode()) {
-            n.printDebugInfo("Full update of propensities for TF binding");
+            n.printDebugInfo("Full update of TF binding propensities");
         }
         this.proteinBindingPropensitySum = 0;
         for (int i = 0; i < proteinBindingPropensity.length; i++) {
