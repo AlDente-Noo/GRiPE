@@ -381,7 +381,8 @@ public class CellUtils {
      * converts waiting time into binding energy
      */
     public static double computeBindingEnergy(double specificWaitingTime, double TFwaitingTime) {
-        return Math.log(TFwaitingTime / specificWaitingTime);
+        // FG: TFwaitingTime = specificWaitingTime * exp(-bindingEnergy)
+        return -Math.log(TFwaitingTime / specificWaitingTime);
     }
 
 

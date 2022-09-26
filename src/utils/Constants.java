@@ -17,6 +17,7 @@ public class Constants {
 	
 	// FG
 	public static final int MAX_STRAND_LEN_TO_PRINT_STRAND_STATE_ARRAYS = 50;
+	public static final int UPDATE_REPRESSION_SCORES_EVERY = 100;
 	
 	// default parameters file
 	public static final String DEFAULT_PARAMS_FILE = "system.ini";

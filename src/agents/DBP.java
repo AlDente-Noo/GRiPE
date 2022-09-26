@@ -116,14 +116,14 @@ public abstract class DBP implements Serializable {
         return this.position;
     }
 
-    /**
+    /** FG
      * returns true if TF is currently repressing DNA
      */
     public boolean isRepressingDNA() {
         return repressesDNA;
     }
 
-    /**
+    /** FG
      * returns true if TF is repressed by another TF
      */
     public boolean isRepressed(Cell n) {
@@ -263,19 +263,19 @@ public abstract class DBP implements Serializable {
      * sets the move rate of the molecule
      */
     public void setMoveRate(Cell n) {
-        moveRate = n.dna.TFavgMoveRate[speciesID][position][direction];
+        this.moveRate = n.TFspecies[speciesID].calcMoveRate(n.dna.TFavgMoveRate[speciesID][position][direction]);
     }
 
-    /**
-     * returns repressionRate, which is either rate of repression event if TF is not repressing DNA
+    /** FG
+     * Return repressionRate, which is either rate of repression event if TF is not repressing DNA
      * or rate of 'derepression' event if TF is repressing DNA
      */
     public double getRepressionEventRate() {
         return this.repressionEventRate;
     }
 
-    /**
-     * sets the repressionRate variable to the proper value
+    /** FG
+     * Set the repressionRate variable to the proper value
      */
     public void updateRepressionRate(Cell n) {
         if (this.position == Constants.NONE) {

@@ -58,7 +58,7 @@ public class TFfileParser {
 
             int id; // the id of the TF species
             String name; // the id of the TF species
-            byte[] dbd; // the sequence regonise at DNA binding domain
+            byte[] dbd; // the sequence recognise at DNA binding domain
             int copyNumber; // number of molecules of this species
             double es; // specific binding energy per nucleotide
             String bufferDBD;
@@ -378,7 +378,7 @@ public class TFfileParser {
             }
 
         } else {
-            n.printDebugInfo("Could not load the TF csv file");
+            n.printDebugInfo("Could not load the TF csv file: '" + filename + "'");
         }
 
     }

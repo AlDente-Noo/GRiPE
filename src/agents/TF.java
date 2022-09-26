@@ -265,13 +265,6 @@ public class TF extends DBP implements Serializable {
         this.timeOfLastPositionChange = time;
     }
 
-    public void setMoveRate(Cell n) {
-        moveRate = n.dna.TFavgMoveRate[speciesID][position][direction];
-        if (n.TFspecies[speciesID].isTwoStateRandomWalk) {
-            moveRate = Math.min(moveRate, n.TFspecies[speciesID].maxMoveRate);
-        }
-    }
-
     /**
      * once a TF moves if it releases a cooperativity site then update the move rate
      */

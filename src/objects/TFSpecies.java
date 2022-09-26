@@ -90,7 +90,7 @@ public class TFSpecies implements Serializable {
     public boolean isTwoStateRandomWalk;
     public boolean isImmobile;
     public double specificEnergyThreshold;
-    public double maxMoveRate;
+    public final double maxMoveRate;
 
     //public double moveRateThreshold;
 
@@ -163,6 +163,7 @@ public class TFSpecies implements Serializable {
         this.countTFforcedJumpsEvents = 0;
         this.countTFHopsOutside = 0;
         this.countTFRepressionEvents = 0;
+        this.countTFDerepressionEvents = 0;
 
         this.isCooperative = false;
         hasDNAbasedCooperativity = false;
@@ -260,6 +261,7 @@ public class TFSpecies implements Serializable {
         this.countTFforcedJumpsEvents = 0;
         this.countTFHopsOutside = 0;
         this.countTFRepressionEvents = 0;
+        this.countTFDerepressionEvents = 0;
 
         this.isCooperative = true;
         TFcoop = new ArrayList<TFcooperativity>();
@@ -277,7 +279,22 @@ public class TFSpecies implements Serializable {
     }
 
     public boolean isRepressor() {
-        return this.repressionRate > 0.0;
+        return this.repressionRate > Constants.DOUBLE_ZERO
+                && (this.repressionLeftSize > 0 || this.repressionRightSize > 0);
+    }
+
+    /** FG
+     * Calculate TF movement rate (which is reciprocal to the on-site waiting time)
+     * @param specificMoveRate rate calculated from sequence-specific TF-DNA interaction (e.g. from PWM-score)
+     * @return movement rate, which equals minimum of specificMoveRate and maxMoveRate if random walk is two-state
+     * and specificMoveRate otherwise
+     */
+    public double calcMoveRate(double specificMoveRate) {
+        double moveRate = specificMoveRate;
+        if (this.isTwoStateRandomWalk) {
+            moveRate = Math.min(moveRate, this.maxMoveRate);
+        }
+        return moveRate;
     }
 
     /**

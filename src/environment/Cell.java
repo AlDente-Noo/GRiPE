@@ -443,7 +443,7 @@ public class Cell implements Serializable {
                 tsg = TSfileParser.tsg;
             }
         } else {
-            this.printDebugInfo("The file '" + this.ip.TF_COOPERATIVITY_FILE.value + "' is not parsed");
+            this.printDebugInfo("The TF cooperativity file '" + this.ip.TF_COOPERATIVITY_FILE.value + "' is not parsed");
         }
 
         // if could not load them then generate TF species randomly
@@ -1129,7 +1129,7 @@ public class Cell implements Serializable {
             }
         }
 
-        // FG: print the key arrays, which describe DNA-TFs state, if they are not too big
+        // FG: print the dna state arrays, if they are not too big
         int strandLength = this.dna.strand.length;
         if (this.isInDebugMode() && strandLength < Constants.MAX_STRAND_LEN_TO_PRINT_STRAND_STATE_ARRAYS) {
             StringBuilder arrayPos      = new StringBuilder("position: ");
@@ -1330,25 +1330,21 @@ public class Cell implements Serializable {
         }
     }
 
-    /**
-     * prints the repressed lengths to a file
+    /** FG
+     * Print the repressed data to the file
      */
     public void printRepressedLengths(String path, String filename) {
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(path + filename));
-            StringBuilder strBuf = new StringBuilder();
-
-            out.write("\"time\", \"repressedLength\" \n");
-
-            for (int i = 0; i < this.dna.repressedLength.size(); i++) {
-                strBuf.delete(0, strBuf.length());
-                strBuf.append(this.dna.repressedLength.get(i).getVal1());
-                strBuf.append(", ");
-                strBuf.append(this.dna.repressedLength.get(i).getVal2());
-                out.write(strBuf.toString());
+            // header
+            out.write("\"time\", \"repressedLength\", \"repressedRepScore\", \"repressedActScore\" \n");
+            // data
+            for (int i = 0; i < this.dna.repressionData.size(); i++) {
+                RepressionData repData = this.dna.repressionData.get(i);
+                out.write(String.format("%f, %d, %g, %g", repData.getTime(), repData.getRepressedLength(),
+                        repData.getRepressedRepScore(), repData.getRepressedActScore()));
                 out.newLine();
             }
-
             out.close();
         } catch (IOException e) {
             e.printStackTrace();

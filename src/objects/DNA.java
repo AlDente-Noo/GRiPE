@@ -1,10 +1,7 @@
 package objects;
 
 import environment.Cell;
-import utils.CellUtils;
-import utils.Constants;
-import utils.Pair;
-import utils.Utils;
+import utils.*;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -65,10 +62,11 @@ public class DNA implements Serializable {
     public HashMap<Integer, String> TFposName;
     public int[] collisionsCount;
     public long collisionsCountTotal;
-    double TFSpecificWaitingTime;
 
     public Integer currentRepressedLength;
-    public ArrayList<Pair<Double, Integer>> repressedLength; // FG: time, length
+    public ArrayList<RepressionData> repressionData; // FG: time, length, repressed repressor score, repressed act. len
+    public double repressedRepScore; // FG: sum of the repressed repressor sites scores
+    public double repressedActScore; // FG: sum of the repressed repressor sites scores
 
     public DNA() {
         strand = new byte[0];
@@ -98,7 +96,9 @@ public class DNA implements Serializable {
         isRandom = true;
 
         currentRepressedLength = 0;
-        repressedLength = new ArrayList<Pair<Double, Integer>>();
+        repressionData = new ArrayList<>();
+        repressedRepScore = 0.0;
+        repressedActScore = 0.0;
     }
 
 
@@ -127,7 +127,9 @@ public class DNA implements Serializable {
         setOccupancyAndClosenessVectorsFree();
 
         currentRepressedLength = 0;
-        repressedLength = new ArrayList<Pair<Double, Integer>>();
+        repressionData = new ArrayList<>();
+        repressedRepScore = 0.0;
+        repressedActScore = 0.0;
     }
 
     /**
@@ -367,7 +369,7 @@ public class DNA implements Serializable {
 
             this.TFdirections = TFdirections;
             isTargetSite = new int[TFspecies.length][strand.length][TFdirections];
-            this.TFSpecificWaitingTime = TFSpecificWaitingTime;
+            //this.TFSpecificWaitingTime = TFSpecificWaitingTime;
             firstReached = new double[TFspecies.length][strand.length][TFdirections];
 
             this.collisionsCount = new int[strand.length];
@@ -643,15 +645,12 @@ public class DNA implements Serializable {
                     }
                     for (int k = j; k < max; k++) {
                         if (k < strand.length - TFsize[i] + 1) {
+                            double tfWaitingTime = 1.0 / TFavgMoveRate[i][j][dir];
                             if (printBindingEnergy) {
-                                bufferTFaffinity[i][k][dir] += CellUtils.computeBindingEnergy(tfs[i].specificWaitingTime,
-                                        1.0 / TFavgMoveRate[i][j][dir]);
-                                //System.out.println(bufferTFaffinity[i][k][dir]+"; "+tfs[i].specificWaitingTime+";
-                                // "+ TFavgMoveRate[i][j][dir]);
+                                bufferTFaffinity[i][k][dir] +=
+                                        CellUtils.computeBindingEnergy(tfs[i].specificWaitingTime, tfWaitingTime);
                             } else {
-                                bufferTFaffinity[i][k][dir] += 1.0 / TFavgMoveRate[i][j][dir];
-                                //System.out.println(bufferTFaffinity[i][k][dir]+"; "+tfs[i].specificWaitingTime+";
-                                // "+ TFavgMoveRate[i][j][dir]);
+                                bufferTFaffinity[i][k][dir] += tfWaitingTime;
                             }
                         }
 
@@ -731,7 +730,9 @@ public class DNA implements Serializable {
                         affinity = 0;
                         steps = 0;
                         for (int k = i; k < Math.min(i + wigStepSize, end); k++) {
-                            if ((wigThreshold >= 0 && bufferTFaffinity[j][k][dir] > cutoff[j][dir] && !printBindingEnergy) || (wigThreshold >= 0 && printBindingEnergy) || (wigThreshold <= 0 && bufferTFaffinity[j][k][dir] > avg[j][dir])) {
+                            if ((wigThreshold >= 0 && bufferTFaffinity[j][k][dir] > cutoff[j][dir] && !printBindingEnergy)
+                                    || (wigThreshold >= 0 && printBindingEnergy)
+                                    || (wigThreshold <= 0 && bufferTFaffinity[j][k][dir] > avg[j][dir])) {
                                 affinity += bufferTFaffinity[j][k][dir];
                             }
 
@@ -980,14 +981,14 @@ public class DNA implements Serializable {
         }
     }
 
-    /**
+    /** FG
      * recomputes the TF affinity landscape when a molecule binds from the DNA
      */
     private void recomputeTFAffinityLandscapeOnBinding(int position, int size) {
         recomputeTFAffinityLandscapeOnRepression(position, position + size - 1);
     }
 
-    /**
+    /** FG
      * recomputes the TF affinity landscape when a molecule represses the DNA region
      */
     private void recomputeTFAffinityLandscapeOnRepression(int boundaryLeft, int boundaryRight) {
@@ -997,7 +998,7 @@ public class DNA implements Serializable {
         }
     }
 
-    /**
+    /** FG
      * recomputes the TF affinity landscape when the DNA region is derepressed
      */
     private void recomputeTFAffinityLandscapeOnDerepression(Cell n, int boundaryLeft, int boundaryRight, int proteinID,
@@ -1038,7 +1039,7 @@ public class DNA implements Serializable {
                     for (int speciesID_ = 0; speciesID_ < TFsize.length; speciesID_++) {
                         closeRegionInAffinityLandscape(boundaryLeft_, boundaryRight_, speciesID_);
                     }
-                    this.repressDNA(boundaryLeft_, boundaryRight_ - 1);
+                    this.repressDNA(boundaryLeft_, boundaryRight_ - 1, n);
                     if (n.isInDebugMode()) {
                         n.printDebugInfo(time + ": TF " + boundMoleculeID + " of type " + n.TFspecies[speciesID].name +
                                 " continued repression from position " + boundaryLeft_ + " to " + (boundaryRight_ - 1));
@@ -1097,49 +1098,96 @@ public class DNA implements Serializable {
 
 
     /** FG
-     * Mark bps between boundaries as repressed
-     * @param boundaryLeft inclusive
+     * Mark open bps between given boundaries as repressed
+     * @param boundaryLeft  inclusive
      * @param boundaryRight inclusive
+     * @param n             cell
      */
-    public void repressDNA(int boundaryLeft, int boundaryRight) {
-        for (int bpIdx = boundaryLeft; bpIdx <= boundaryRight; bpIdx++) {
-            if (this.closed[bpIdx] == Constants.BP_IS_OPEN) {
-                this.closed[bpIdx] = Constants.BP_IS_REPRESSED;
-                this.currentRepressedLength++;
+    public void repressDNA(int boundaryLeft, int boundaryRight, Cell n) {
+        for (int pos = boundaryLeft; pos <= boundaryRight; pos++) {
+            if (this.closed[pos] == Constants.BP_IS_OPEN) {
+                this.closed[pos] = Constants.BP_IS_REPRESSED;
+                if (n.ip.OUTPUT_REPRESSED_LENGTHS.value) {
+                    this.currentRepressedLength++;
+                    modifyRepressionScore(n, pos, true);
+                }
+            }
+        }
+    }
+
+    public void modifyRepressionScore(Cell n, int pos, boolean increase) {
+        for (int speciesID = 0; speciesID < n.TFspecies.length; speciesID++) {
+            for (int dir = 0; dir < this.TFdirections; dir++) {
+                double moveRate = n.TFspecies[speciesID].calcMoveRate(n.dna.TFavgMoveRate[speciesID][pos][dir]);
+                double scoreIncrement = increase ? (1.0 / moveRate) : (-1.0 / moveRate);
+                if (n.TFspecies[speciesID].isRepressor()) {
+                    this.repressedRepScore += scoreIncrement;
+                } else {
+                    this.repressedActScore += scoreIncrement;
+                }
             }
         }
     }
 
     /** FG
-     * Mark bps between boundaries as repressed and recompute affinity landscape
-     * @param boundaryLeft inclusive
+     * Mark open bps between given boundaries as repressed and recompute affinity landscape
+     * @param boundaryLeft  inclusive
      * @param boundaryRight inclusive
+     * @param n             cell
      */
-    public void repress(int boundaryLeft, int boundaryRight) {
-        repressDNA(boundaryLeft, boundaryRight);
+    public void repress(int boundaryLeft, int boundaryRight, Cell n) {
+        repressDNA(boundaryLeft, boundaryRight, n);
         this.recomputeTFAffinityLandscapeOnRepression(boundaryLeft, boundaryRight);
     }
 
+
+    /** FG
+     * Update bp index so that it does not go outside the strand
+     * @param left bp strand index
+     * @return max of 0 (leftmost bp strand index) and left
+     */
     public int updateLeftBoundary(int left) {
         return Math.max(0, left);
     }
 
+    /** FG
+     * Update bp index so that it does not go outside the strand
+     * @param right bp strand index
+     * @return min of strand length (rightmost bp strand index) and right
+     */
     public int updateRightBoundary(int right) {
         return Math.min(this.strand.length - 1, right);
     }
 
-    public void derepressDNA(int boundaryLeft, int boundaryRight) {
-        for (int bpIdx = boundaryLeft; bpIdx <= boundaryRight; bpIdx++) {
-            if (this.closed[bpIdx] == Constants.BP_IS_REPRESSED) {
-                this.closed[bpIdx] = Constants.BP_IS_OPEN;
-                this.currentRepressedLength--;
+    /** FG
+     * Mark the repressed bps between given boundaries as open
+     * @param boundaryLeft  inclusive
+     * @param boundaryRight inclusive
+     * @param n             cell
+     */
+    public void derepressDNA(int boundaryLeft, int boundaryRight, Cell n) {
+        for (int pos = boundaryLeft; pos <= boundaryRight; pos++) {
+            if (this.closed[pos] == Constants.BP_IS_REPRESSED) {
+                this.closed[pos] = Constants.BP_IS_OPEN;
+                if (n.ip.OUTPUT_REPRESSED_LENGTHS.value) {
+                    this.currentRepressedLength--;
+                    modifyRepressionScore(n, pos, false);
+                }
             }
         }
-        assert (this.currentRepressedLength >= 0);
+        assert (this.currentRepressedLength >= 0
+                && this.repressedRepScore >= -Constants.DOUBLE_ZERO * Constants.UPDATE_REPRESSION_SCORES_EVERY
+                && this.repressedActScore >= -Constants.DOUBLE_ZERO * Constants.UPDATE_REPRESSION_SCORES_EVERY);
     }
 
+    /** FG
+     * Mark the repressed bps between given boundaries as open and recompute affinity landscape
+     * @param boundaryLeft  inclusive
+     * @param boundaryRight inclusive
+     * @param n             cell
+     */
     public void derepress(Cell n, int boundaryLeft, int boundaryRight, int proteinID, double time) {
-        derepressDNA(boundaryLeft, boundaryRight);
+        derepressDNA(boundaryLeft, boundaryRight, n);
         this.recomputeTFAffinityLandscapeOnDerepression(n, boundaryLeft, boundaryRight, proteinID, time);
     }
 

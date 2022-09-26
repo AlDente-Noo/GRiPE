@@ -4,9 +4,9 @@ import environment.Cell;
 import event.RepressionEvent;
 import utils.Constants;
 import utils.Pair;
+import utils.RepressionData;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 /**
  * Remodeller closes and opens chromatin (DNA).
@@ -17,7 +17,8 @@ import java.util.ArrayList;
 public class Remodeller implements Serializable {
 
     private static final long serialVersionUID = 7085739298818754958L;
-    protected double derepressionRate; // the rate at which the DNA is opened once repressor is unbound
+    protected final double derepressionRate; // the rate at which the DNA is opened once repressor is unbound
+    private double totalRepressionAndDerepressionEvents;
 
     /**
      * constructor
@@ -26,6 +27,7 @@ public class Remodeller implements Serializable {
      */
     public Remodeller(double derepressionRate) {
         this.derepressionRate = derepressionRate;
+        this.totalRepressionAndDerepressionEvents = 0;
     }
 
     public boolean derepressionIsInTheRegionOfMolecule(Cell n, RepressionEvent re) {
@@ -46,7 +48,7 @@ public class Remodeller implements Serializable {
             assert !n.dbp[re.proteinID].isRepressingDNA();
             if (!n.dbp[re.proteinID].isRepressed(n)) {
                 // close chromatin
-                n.dna.repress(re.boundaryLeft, re.boundaryRight);
+                n.dna.repress(re.boundaryLeft, re.boundaryRight, n);
                 // update repression state
                 n.dbp[re.proteinID].repressesDNA = true;
                 n.dbp[re.proteinID].updateRepressionRate(n);
@@ -56,7 +58,7 @@ public class Remodeller implements Serializable {
                 }
                 n.eventQueue.TFBindingEventQueue.updateProteinBindingPropensities(n);
                 n.TFspecies[speciesID].countTFRepressionEvents++;
-                n.dna.repressedLength.add(new Pair<>(re.time, n.dna.currentRepressedLength));
+                totalRepressionAndDerepressionEvents++;
             } else if (n.isInDebugMode()) {
                 n.printDebugInfo(re.time + ": TF " + re.proteinID + " of type " + n.TFspecies[speciesID].name
                         + " at position " + n.dbp[re.proteinID].getPosition()
@@ -79,10 +81,27 @@ public class Remodeller implements Serializable {
             }
 
             n.dna.derepress(n, re.boundaryLeft, re.boundaryRight, re.proteinID, re.time);
-            n.TFspecies[speciesID].countTFDerepressionEvents++;
-            n.dna.repressedLength.add(new Pair<>(re.time, n.dna.currentRepressedLength));
 
             n.eventQueue.TFBindingEventQueue.updateProteinBindingPropensities(n);
+            n.TFspecies[speciesID].countTFDerepressionEvents++;
+            totalRepressionAndDerepressionEvents++;
+        }
+
+        if (n.ip.OUTPUT_REPRESSED_LENGTHS.value) {
+            // completely recalculate repression data to prevent accumulation of the rounding error
+            if (totalRepressionAndDerepressionEvents % Constants.UPDATE_REPRESSION_SCORES_EVERY == 0) {
+                n.dna.repressedRepScore = 0.0;
+                n.dna.repressedActScore = 0.0;
+                for (int pos = 0; pos < n.dna.strand.length; pos++) {
+                    if (n.dna.closed[pos] == Constants.BP_IS_REPRESSED) {
+                        n.dna.modifyRepressionScore(n, pos, true);
+                    }
+                }
+            }
+            // save repression data
+            n.dna.repressionData.add(new RepressionData(re.time, n.dna.currentRepressedLength,
+                    n.dna.repressedRepScore, n.dna.repressedActScore));
         }
     }
+
 }
