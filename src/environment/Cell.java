@@ -381,7 +381,7 @@ public class Cell implements Serializable {
                 this.ip.TF_PREBOUND_TO_HIGHEST_AFFINITY.value, this.ip.TF_IS_IMMOBILE.value, dna.subsequence,
                 this.ip.IS_BIASED_RANDOM_WALK.value, this.ip.IS_TWO_STATE_RANDOM_WALK.value, this.ip.TF_SPECIFIC_ENERGY_THRESHOLD.value,
                 this.ip.TF_REPRESSION_RATE.value, this.ip.TF_DEREPRESSION_ATTENUATION_FACTOR.value, this.ip.TF_REPR_LEN_LEFT.value,
-                this.ip.TF_REPR_LEN_RIGHT.value);
+                this.ip.TF_REPR_LEN_RIGHT.value, this.ip.TF_TAU.value);
         if (TFparser.parsed) {
             // load TF species
             if (TFparser.data != null && !TFparser.data.isEmpty()) {
@@ -479,7 +479,7 @@ public class Cell implements Serializable {
                                 this.ip.IS_BIASED_RANDOM_WALK.value,
                                 this.ip.IS_TWO_STATE_RANDOM_WALK.value, this.ip.TF_SPECIFIC_ENERGY_THRESHOLD.value,
                                 this.ip.TF_REPRESSION_RATE.value, this.ip.TF_DEREPRESSION_ATTENUATION_FACTOR.value,
-                                this.ip.TF_REPR_LEN_LEFT.value, this.ip.TF_REPR_LEN_RIGHT.value);
+                                this.ip.TF_REPR_LEN_LEFT.value, this.ip.TF_REPR_LEN_RIGHT.value, this.ip.TF_TAU.value);
                         moleculesCopyNumber += TFspecies[i].copyNumber;
                         tsg.addGroup(this, pos, i);
                         i++;

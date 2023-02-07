@@ -31,7 +31,7 @@ public class TFfileParser {
                         boolean defaultPreboundToHighestAffinity, boolean defaultIsImmobile, DNAregion dnaRegion,
                         boolean deafultIsBiasedRandomWalk, boolean defaultIsTwoStateRandomWalk, double defaultSpecificEnergyThreshold,
                         double defaultRepressionRate, double defaultDerepressionAttenuationFactor, int defaultReprLenLeft,
-                        int defaultReprLenRight) {
+                        int defaultReprLenRight, double defaultTau) {
         parsed = false;
         data = new ArrayList<TFSpecies>();
 
@@ -88,12 +88,11 @@ public class TFfileParser {
             boolean isBiasedRandomWalk;
             boolean isTwoStateRandomWalk;
             double specificEnergyThreshold;
-
             double repressionRate;
             double derepressionAttenuationFactor;
             int reprLenLeft;
             int reprLenRight;
-
+            double tau;
             for (ArrayList<String> buffer : csv.data) {
                 //init params
                 name = "";
@@ -127,7 +126,7 @@ public class TFfileParser {
                 derepressionAttenuationFactor = defaultDerepressionAttenuationFactor;
                 reprLenLeft = defaultReprLenLeft;
                 reprLenRight = defaultReprLenRight;
-
+                tau = defaultTau;
                 //NAME
                 if (csv.header.containsKey(Constants.PARSER_TF_CSV_FILE_HEADER[0])) {
                     cellContent = buffer.get(csv.header.get(Constants.PARSER_TF_CSV_FILE_HEADER[0]));
@@ -362,7 +361,12 @@ public class TFfileParser {
                 } else {
                     n.printDebugInfo("TF file " + filename + " misses specific PWM threshold at line: " + buffer);
                 }
-
+                if (csv.header.containsKey(Constants.PARSER_TF_CSV_FILE_HEADER[30])) {
+                    cellContent = buffer.get(csv.header.get(Constants.PARSER_TF_CSV_FILE_HEADER[30]));
+                    tau = Utils.parseDouble(cellContent, tau);
+                } else {
+                    n.printDebugInfo("TF file " + filename + " misses tau: " + buffer);
+                }
                 if (copyNumber > 0) {
                     data.add(new TFSpecies(dnaRegion, id, name, bufferDBD, copyNumber, es, sizeLeft, sizeRight,
                             assocRate, bufferDNAregion, isCognate, unBindingProbability, slideLeftProbability,
@@ -371,7 +375,7 @@ public class TFfileParser {
                             collisionUnbindingProbability, affinityLandscapeRoughness, preboundProportion,
                             preboundToHighestAffinity, isImmobile, isBiasedRandomWalk, isTwoStateRandomWalk,
                             specificEnergyThreshold,
-                            repressionRate, derepressionAttenuationFactor, reprLenLeft, reprLenRight, n));
+                            repressionRate, derepressionAttenuationFactor, reprLenLeft, reprLenRight, n, tau));
                     id++;
                 }
 

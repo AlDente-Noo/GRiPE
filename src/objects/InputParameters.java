@@ -102,6 +102,8 @@ public class InputParameters  implements Serializable{
 	public Parameter<Boolean> IS_TWO_STATE_RANDOM_WALK;
 	public Parameter<Double> TF_SPECIFIC_ENERGY_THRESHOLD; // FG
 
+	public Parameter<Double> TF_TAU;
+
 	public InputParameters(String parametersFile){
 		BufferedReader br ;
 		InputStream in;
@@ -235,6 +237,8 @@ public class InputParameters  implements Serializable{
 		this.IS_BIASED_RANDOM_WALK = new Parameter<Boolean>("", "", "", "", false);
 		this.IS_TWO_STATE_RANDOM_WALK = new Parameter<Boolean>("", "", "", "", false);
 		this.TF_SPECIFIC_ENERGY_THRESHOLD = new Parameter<Double>("", "", "", "", 0.0);
+		this.TF_TAU = new Parameter<Double>("", "", "", "", 0.0);
+
 	}
 
 	/**
@@ -959,6 +963,11 @@ public class InputParameters  implements Serializable{
 			if(!label.isEmpty()){this.TF_SPECIFIC_ENERGY_THRESHOLD.label = label;}
 			if(!description.isEmpty()){this.TF_SPECIFIC_ENERGY_THRESHOLD.description = description;}
 			if(!category.isEmpty()){this.TF_SPECIFIC_ENERGY_THRESHOLD.category = category;}
+		} else if(name.equals("TF_TAU")){
+			this.TF_TAU.value = Utils.parseDouble(value, 0.0);
+			if(!label.isEmpty()){this.TF_TAU.label = label;}
+			if(!description.isEmpty()){this.TF_TAU.description = description;}
+			if(!category.isEmpty()){this.TF_TAU.category = category;}
 		} else{
 			System.out.println(name+" is not recognised.");
 		}

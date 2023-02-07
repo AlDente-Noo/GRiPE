@@ -8,6 +8,7 @@ import utils.Utils;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 /**
  * class that contains the description of TF species
@@ -91,7 +92,7 @@ public class TFSpecies implements Serializable {
     public boolean isImmobile;
     public double specificEnergyThreshold;
     public final double maxMoveRate;
-
+    public double tau;
     //public double moveRateThreshold;
 
     /**
@@ -106,7 +107,7 @@ public class TFSpecies implements Serializable {
                      double preboundProportion, boolean preboundToHighestAffinity, boolean isImmobile,
                      boolean isBiasedRandomWalk, boolean isTwoStateRandomWalk,
                      double specificEnergyThreshold, double repressionRate,
-                     double repressionAttenuationFactor, int repressionLenLeft, int repressionLenRight) {
+                     double repressionAttenuationFactor, int repressionLenLeft, int repressionLenRight, double tau) {
         this.id = id;
         name = "TF" + id;
         this.es = es;
@@ -181,6 +182,7 @@ public class TFSpecies implements Serializable {
         this.dbdFile = "";
         this.specificEnergyThreshold = specificEnergyThreshold;
         maxMoveRate = CellUtils.computeAvgMoveRate(specificWaitingTime, specificEnergyThreshold);
+        this.tau = tau;
     }
 
 
@@ -196,7 +198,7 @@ public class TFSpecies implements Serializable {
                      double preboundProportion, boolean preboundToHighestAffinity, boolean isImmobile,
                      boolean isBiasedRandomWalk, boolean isTwoStateRandomWalk,
                      double specificEnergyThreshold, double repressionRate,
-                     double repressionAttenuationFactor, int repressionLenLeft, int repressionLenRight, Cell n) {
+                     double repressionAttenuationFactor, int repressionLenLeft, int repressionLenRight, Cell n, double tau) {
         this.id = id;
         this.name = name;
         this.isCognate = false;
@@ -292,8 +294,10 @@ public class TFSpecies implements Serializable {
     public double calcMoveRate(double specificMoveRate) {
         double moveRate = specificMoveRate;
         if (this.isTwoStateRandomWalk) {
-            moveRate = Math.min(moveRate, this.maxMoveRate);
+            System.out.println("Random walk is active!!");
+            moveRate = Math.min(moveRate, this.maxMoveRate) + this.tau;
         }
+        System.out.println("tau is" + this.tau);
         return moveRate;
     }
 

@@ -19,6 +19,7 @@ public abstract class DBP implements Serializable {
     public int ID;  // the ID of the TF
     public int size; // = sizeTotal from TFSpecies
     public int speciesID; //the ID of the species to which this TF belongs
+    public int TAU;
     public boolean hasDNAbasedCooperativity;
     public boolean hasDirectCooperativity;
     public ProteinEvent pe;
