@@ -535,6 +535,8 @@ public class InputParameters  implements Serializable{
 			out.write("IS_TWO_STATE_RANDOM_WALK = "+this.IS_TWO_STATE_RANDOM_WALK.value+";\n\n");
 			out.write("#"+this.TF_SPECIFIC_ENERGY_THRESHOLD.description+"\n");
 			out.write("TF_SPECIFIC_ENERGY_THRESHOLD = "+this.TF_SPECIFIC_ENERGY_THRESHOLD.value+";\n\n");
+			out.write("#"+this.TF_TAU.description+"\n");
+			out.write("TF_TAU = "+this.TF_TAU.value+";\n\n");
 
 			out.close();
 

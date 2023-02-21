@@ -339,7 +339,7 @@ public class DNA implements Serializable {
     /**
      * compute the affinity landscape for a list of TF species
      */
-    public void computeTFaffinityLandscape(Cell n, Random generator, TFSpecies[] TFspecies, double TFSpecificWaitingTime,
+    public void computeTFaffinityLandscape(Cell n, Random generator, TFSpecies[] TFspecies, //double TFSpecificWaitingTime,
                                            int TFdirections, int DNAsectorSize, boolean printFinalOccupancy)
     {
         if (TFspecies != null && TFspecies.length > 0) {

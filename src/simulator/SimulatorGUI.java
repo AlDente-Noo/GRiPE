@@ -534,6 +534,7 @@ public class SimulatorGUI {
 		ip.IS_TWO_STATE_RANDOM_WALK.value= TFRandomWalkParameters.IS_TWO_STATE_RANDOM_WALK.getValue();	
 
 		ip.TF_SPECIFIC_ENERGY_THRESHOLD.value = TFRandomWalkParameters.TF_SPECIFIC_ENERGY_THRESHOLD.getValue();
+		ip.TF_TAU.value = TFRandomWalkParameters.TF_TAU.getValue();
 	}
 	
 	/**
@@ -630,6 +631,7 @@ public class SimulatorGUI {
 		TFRandomWalkParameters.IS_TWO_STATE_RANDOM_WALK.setValue(ip.IS_TWO_STATE_RANDOM_WALK.value);
 
 		TFRandomWalkParameters.TF_SPECIFIC_ENERGY_THRESHOLD.setValue(ip.TF_SPECIFIC_ENERGY_THRESHOLD.value);
+		TFRandomWalkParameters.TF_TAU.setValue(ip.TF_TAU.value);
 	}
 	
 	

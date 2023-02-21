@@ -734,7 +734,7 @@ public class Cell implements Serializable {
         createRemodeller();
 
         //compute TF affinity landscape
-        dna.computeTFaffinityLandscape(this, this.randomGenerator, TFspecies, this.ip.TF_SPECIFIC_WAITING_TIME.value,
+        dna.computeTFaffinityLandscape(this, this.randomGenerator, TFspecies, //this.ip.TF_SPECIFIC_WAITING_TIME.value,
                 this.TFreadingDirection, this.ip.DNA_SECTOR_SIZE.value, this.ip.PRINT_FINAL_OCCUPANCY.value);
 
         createMolecules();

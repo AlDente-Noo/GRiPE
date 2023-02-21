@@ -277,6 +277,8 @@ public class TFSpecies implements Serializable {
         this.isBiasedRandomWalk = isBiasedRandomWalk;
         this.isTwoStateRandomWalk = isTwoStateRandomWalk;
         this.specificEnergyThreshold = specificEnergyThreshold;
+        this.tau = tau;
+
         maxMoveRate = CellUtils.computeAvgMoveRate(specificWaitingTime, specificEnergyThreshold);
     }
 
@@ -477,8 +479,9 @@ public class TFSpecies implements Serializable {
         str.append(", ").append(this.repressionRate).append(", ").append(this.repressionAttenuationFactor).append(", "
         ).append(this.repressionLeftSize).append(", ").append(this.repressionRightSize);
 
-        // FG: \"PREBOUNDTOHIGHESTAFFINITY\"
+        // FG: \"SPECIFICENERGYTHRESHOLD\"
         str.append(", ").append(this.specificEnergyThreshold);
+        str.append(", ").append(this.tau);
 
         if (!reduced) {
             //"eventsBindingTotal\", \"eventsUnbindingTotal\", \"eventsSlideLeftTotal\", \"eventsSlideRightTotal\",

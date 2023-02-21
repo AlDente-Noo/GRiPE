@@ -365,7 +365,7 @@ public class TFfileParser {
                     cellContent = buffer.get(csv.header.get(Constants.PARSER_TF_CSV_FILE_HEADER[30]));
                     tau = Utils.parseDouble(cellContent, tau);
                 } else {
-                    n.printDebugInfo("TF file " + filename + " misses tau: " + buffer);
+                    n.printDebugInfo("TF file " + filename + " misses tau at line: " + buffer);
                 }
                 if (copyNumber > 0) {
                     data.add(new TFSpecies(dnaRegion, id, name, bufferDBD, copyNumber, es, sizeLeft, sizeRight,

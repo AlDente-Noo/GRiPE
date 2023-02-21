@@ -45,6 +45,7 @@ public class TFRandomWalkParameters extends JPanel{
 	public LabelledCheckBox IS_TWO_STATE_RANDOM_WALK;
 
 	public LabelledDouble TF_SPECIFIC_ENERGY_THRESHOLD;
+	public LabelledDouble TF_TAU;
 
 	
 	public TFRandomWalkParameters(InputParameters ip){
@@ -85,6 +86,8 @@ public class TFRandomWalkParameters extends JPanel{
 
 		TF_SPECIFIC_ENERGY_THRESHOLD = new LabelledDouble(ip.TF_SPECIFIC_ENERGY_THRESHOLD.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_SPECIFIC_ENERGY_THRESHOLD.description,ip.TF_SPECIFIC_ENERGY_THRESHOLD.value);
 		TF_SPECIFIC_ENERGY_THRESHOLD.setEditable(IS_TWO_STATE_RANDOM_WALK.getValue());
+		TF_TAU = new LabelledDouble(ip.TF_TAU.label,GUIconstants.TEXTAREA_WIDTH,ip.TF_TAU.description,ip.TF_TAU.value);
+		TF_TAU.setEditable(IS_TWO_STATE_RANDOM_WALK.getValue());
 
 		resetLabelsWidth();
 
@@ -92,6 +95,7 @@ public class TFRandomWalkParameters extends JPanel{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				TF_SPECIFIC_ENERGY_THRESHOLD.setEditable(IS_TWO_STATE_RANDOM_WALK.getValue());
+				TF_TAU.setEditable(IS_TWO_STATE_RANDOM_WALK.getValue());
 			}
 		});
 		
@@ -119,6 +123,7 @@ public class TFRandomWalkParameters extends JPanel{
 		componentsStack.add(IS_BIASED_RANDOM_WALK);
 		componentsStack.add(IS_TWO_STATE_RANDOM_WALK);
 		componentsStack.add(TF_SPECIFIC_ENERGY_THRESHOLD);
+		componentsStack.add(TF_TAU);
 		
 		this.add(componentsStack);
 	}
@@ -164,6 +169,9 @@ public class TFRandomWalkParameters extends JPanel{
 		if(TF_SPECIFIC_ENERGY_THRESHOLD.getLabelWidth() > max){
 			max = TF_SPECIFIC_ENERGY_THRESHOLD.getLabelWidth();
 		}
+		if(TF_TAU.getLabelWidth() > max){
+			max = TF_TAU.getLabelWidth();
+		}
 
 		//TF RANDOM WALK RANDOM PARAMATERS
 		TF_SLIDE_LEFT_PROBABILITY.setLabelWidth(max);
@@ -180,6 +188,7 @@ public class TFRandomWalkParameters extends JPanel{
 		TF_UNCORRELATED_DISPLACEMENT_SIZE.setLabelWidth(max);
 
 		TF_SPECIFIC_ENERGY_THRESHOLD.setLabelWidth(max);
+		TF_TAU.setLabelWidth(max);
 	}
 	
 }
