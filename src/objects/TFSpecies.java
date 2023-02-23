@@ -296,10 +296,8 @@ public class TFSpecies implements Serializable {
     public double calcMoveRate(double specificMoveRate) {
         double moveRate = specificMoveRate;
         if (this.isTwoStateRandomWalk) {
-            System.out.println("Random walk is active!!");
             moveRate = Math.min(moveRate, this.maxMoveRate) + this.tau;
         }
-        System.out.println("tau is" + this.tau);
         return moveRate;
     }
 
