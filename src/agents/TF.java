@@ -19,7 +19,6 @@ public class TF extends DBP implements Serializable {
     private static final long serialVersionUID = -7084470998818754958L;
     private TFcooperativity bufferCoop;
     private int boundMolecule;
-
     /**
      * empty class constructor
      */

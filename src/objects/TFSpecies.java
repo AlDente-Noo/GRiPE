@@ -293,10 +293,14 @@ public class TFSpecies implements Serializable {
      * @return movement rate, which equals minimum of specificMoveRate and maxMoveRate if random walk is two-state
      * and specificMoveRate otherwise
      */
-    public double calcMoveRate(double specificMoveRate) {
+    public double calcMoveRate(double specificMoveRate, boolean mrParam) {
         double moveRate = specificMoveRate;
         if (this.isTwoStateRandomWalk) {
-            moveRate = Math.min(moveRate, this.maxMoveRate) + this.tau;
+            //System.out.println("Random walk is active!!");
+            moveRate = Math.min(moveRate, this.maxMoveRate);
+        }
+        if (mrParam) {
+            moveRate = 1/(1/moveRate + tau);
         }
         return moveRate;
     }

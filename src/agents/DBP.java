@@ -251,7 +251,18 @@ public abstract class DBP implements Serializable {
     public void setDirection(int direction) {
         this.direction = direction;
     }
-
+    public boolean getMoveRateParam(Cell n) {
+        boolean isAboutToStay = false;
+        if (lastPosition > 0) {
+            double lastMR =   n.dna.TFavgMoveRate[speciesID][this.lastPosition][direction];
+            double currentMR = n.dna.TFavgMoveRate[speciesID][this.position][direction];
+            double maxMR = n.TFspecies[this.speciesID].maxMoveRate;
+            if ( (lastMR < maxMR && currentMR >maxMR) || (lastMR > maxMR && currentMR < maxMR)) {
+                isAboutToStay = true;
+            }
+        }
+        return isAboutToStay;
+    }
 
     /**
      * returns current move rate (total rate of random walk events)
@@ -264,7 +275,7 @@ public abstract class DBP implements Serializable {
      * sets the move rate of the molecule
      */
     public void setMoveRate(Cell n) {
-        this.moveRate = n.TFspecies[speciesID].calcMoveRate(n.dna.TFavgMoveRate[speciesID][position][direction]);
+        this.moveRate = n.TFspecies[speciesID].calcMoveRate(n.dna.TFavgMoveRate[speciesID][position][direction],getMoveRateParam(n));
     }
 
     /** FG

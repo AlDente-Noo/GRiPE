@@ -28,7 +28,7 @@ PRINT_INTERMEDIARY_RESULTS_AFTER = 0;
 PRINT_FINAL_OCCUPANCY = false;
 
 #this is true if the simulation is in debug mode (prints all actions to the status file) and false otherwise
-DEBUG_MODE = false;
+DEBUG_MODE = true;
 
 #TF species of which dynamic behaviour is followed
 OUTPUT_TF = "bcd, tll, hkb, hb, kr, kni, gt, cad";

@@ -1118,7 +1118,7 @@ public class DNA implements Serializable {
     public void modifyRepressionScore(Cell n, int pos, boolean increase) {
         for (int speciesID = 0; speciesID < n.TFspecies.length; speciesID++) {
             for (int dir = 0; dir < this.TFdirections; dir++) {
-                double moveRate = n.TFspecies[speciesID].calcMoveRate(n.dna.TFavgMoveRate[speciesID][pos][dir]);
+                double moveRate = n.TFspecies[speciesID].calcMoveRate(n.dna.TFavgMoveRate[speciesID][pos][dir], false);
                 double scoreIncrement = increase ? (1.0 / moveRate) : (-1.0 / moveRate);
                 if (n.TFspecies[speciesID].isRepressor()) {
                     this.repressedRepScore += scoreIncrement;
