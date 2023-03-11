@@ -275,7 +275,12 @@ public abstract class DBP implements Serializable {
      * sets the move rate of the molecule
      */
     public void setMoveRate(Cell n) {
-        this.moveRate = n.TFspecies[speciesID].calcMoveRate(n.dna.TFavgMoveRate[speciesID][position][direction],getMoveRateParam(n));
+        boolean flag = getMoveRateParam(n);
+        this.moveRate = n.TFspecies[speciesID].calcMoveRate(n.dna.TFavgMoveRate[speciesID][position][direction],flag);
+        if(n.isInDebugMode() && flag){
+            n.printDebugInfo(pe.time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name
+            + " is reaching the speed limit and it's moverate is going to be reset to " + this.moveRate);
+        }
     }
 
     /** FG
