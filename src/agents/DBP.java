@@ -279,7 +279,7 @@ public abstract class DBP implements Serializable {
         this.moveRate = n.TFspecies[speciesID].calcMoveRate(n.dna.TFavgMoveRate[speciesID][position][direction],flag);
         if(n.isInDebugMode() && flag){
             n.printDebugInfo(pe.time + ": TF " + this.ID + " of type " + n.TFspecies[speciesID].name
-            + " is switching between search and recognition state and it's moverate is going to be reset to " + this.moveRate);
+            + " at position " + position + " is switching between search and recognition state and it's moverate is going to be reset to " + this.moveRate);
         }
     }
 

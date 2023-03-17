@@ -13,7 +13,6 @@ figures/
 .vscode/
 biodata/
 dataproc/
-*.ipynb
 *.bkp
 backup*
 tmp*
