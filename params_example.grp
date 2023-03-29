@@ -1,7 +1,7 @@
 #SIMULATION PARAMATERS
 
 #The length of the simulation (in seconds). If lower or equal to zero and there are target sites to be reached by TFs then the simulation will stop when all target sites are reached.
-STOP_TIME = 10.0;
+STOP_TIME = 100.0;
 
 #The number of independent replicate simulations to be performed.
 ENSEMBLE_SIZE = 1;
@@ -31,7 +31,7 @@ PRINT_FINAL_OCCUPANCY = false;
 DEBUG_MODE = true;
 
 #TF species of which dynamic behaviour is followed
-OUTPUT_TF = "bcd, tll, hkb, hb, kr, kni, gt, cad";
+OUTPUT_TF = "kr";
 
 #The number of intermediary points at which the TF species dynamic behaviour is recorded.
 OUTPUT_TF_POINTS = 1000;
