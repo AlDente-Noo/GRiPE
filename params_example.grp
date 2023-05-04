@@ -1,7 +1,7 @@
 #SIMULATION PARAMATERS
 
 #The length of the simulation (in seconds). If lower or equal to zero and there are target sites to be reached by TFs then the simulation will stop when all target sites are reached.
-STOP_TIME = 100.0;
+STOP_TIME = 1000.0;
 
 #The number of independent replicate simulations to be performed.
 ENSEMBLE_SIZE = 1;
@@ -16,7 +16,7 @@ DNA_SECTOR_SIZE = 0;
 EVENT_LIST_SUBGROUP_SIZE = 0;
 
 #The folder where the result files will be saved.
-OUTPUT_FOLDER = "results_example/drosophila_kr";
+OUTPUT_FOLDER = "results_example";
 
 #The filename where the output results will be saved. Extension will be automatically added at the end. If this is blank then a random unique name will be generated
 OUTPUT_FILENAME = "drosoph_kr";
@@ -28,7 +28,7 @@ PRINT_INTERMEDIARY_RESULTS_AFTER = 0;
 PRINT_FINAL_OCCUPANCY = false;
 
 #this is true if the simulation is in debug mode (prints all actions to the status file) and false otherwise
-DEBUG_MODE = true;
+DEBUG_MODE = false;
 
 #TF species of which dynamic behaviour is followed
 OUTPUT_TF = "kr";
@@ -80,7 +80,7 @@ TS_FILE = "params_example/kr_ts.txt";
 SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE = false;
 
 #This is true if TFs read in both directions and false otherwise.
-TF_READ_IN_BOTH_DIRECTIONS = true;
+TF_READ_IN_BOTH_DIRECTIONS = false;
 
 
 
@@ -90,7 +90,7 @@ TF_READ_IN_BOTH_DIRECTIONS = true;
 DNA_SEQUENCE_FILE = "params_example/kr_sequence.fasta";
 
 #The btrack file which stores experimentally found regions of open chromatin in the DNA sequence.
-DNA_AVAILABILITY_FILE = "params_example/kr.btrack";
+DNA_AVAILABILITY_FILE = "";
 
 #derepression when repressor is unbound
 DNA_DEREPRESSION_RATE = 10.0;

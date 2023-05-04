@@ -519,7 +519,7 @@ public class TFSpecies implements Serializable {
                 "\"COLLISIONUNBINDPROBABILITY\", \"AFFINITYLANDSCAPEROUGHNESS\", \"PREBOUNDPROPORTION\", " +
                 "\"PREBOUNDTOHIGHESTAFFINITY\", \"TFISIMMOBILE\", \"ISBIASEDRANDOMWALK\", \"ISTWOSTATERANDOMWALK\", " +
                 "\"REPRESSIONRATE\", \"DEREPRESSIONATTENUATIONFACTOR\", \"REPRLENLEFT\", \"REPRLENRIGHT\", " +
-                "\"SPECIFICENERGYTHRESHOLD\"";
+                "\"SPECIFICENERGYTHRESHOLD\", \"TAU\"";
         if (!reduced) {
             str += ", \"eventsBindingTotal\", \"eventsUnbindingTotal\", \"eventsSlideLeftTotal\", " +
                     "\"eventsSlideRightTotal\", \"eventsSlideTotal\", \"eventsHoppingTotal\", \"eventsForcedJumps\", " +
