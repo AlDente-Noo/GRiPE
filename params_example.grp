@@ -37,7 +37,7 @@ OUTPUT_TF = "kr";
 OUTPUT_TF_POINTS = 1000;
 
 #This is true if the simulator will output the dynamic behaviour of the target site occupancy.
-FOLLOW_TS = false;
+FOLLOW_TS = true;
 
 #If this is true the simulator will output the affinity landscape at the end of the simulation
 OUTPUT_AFFINITY_LANDSCAPE = true;
