@@ -1,7 +1,7 @@
 #SIMULATION PARAMATERS
 
 #The length of the simulation (in seconds). If lower or equal to zero and there are target sites to be reached by TFs then the simulation will stop when all target sites are reached.
-STOP_TIME = 1000.0;
+STOP_TIME = 10.0;
 
 #The number of independent replicate simulations to be performed.
 ENSEMBLE_SIZE = 1;
@@ -68,26 +68,25 @@ WIG_THRESHOLD = 0.0;
 #TF PARAMATERS
 
 #The csv file which stores the TF data.
-TF_FILE = "params_example/tfs.csv";
+TF_FILE = "Params/tfs.csv";
 
 #The csv file which stores the TF cooperativity table data.
 TF_COOPERATIVITY_FILE = "";
 
 #A file containing the target sites.
-TS_FILE = "params_example/kr_ts.txt";
+TS_FILE = "Params/kr_ts.txt";
 
 #This is true if  sliding and hopping affects the association rate between TF molecules and DNA.
 SLIDING_AND_HOPPING_AFFECTS_TF_ASSOC_RATE = false;
 
 #This is true if TFs read in both directions and false otherwise.
-TF_READ_IN_BOTH_DIRECTIONS = false;
 
 
 
 #DNA PARAMETERS
 
 #The fasta file which stores the DNA sequence.
-DNA_SEQUENCE_FILE = "params_example/kr_sequence.fasta";
+DNA_SEQUENCE_FILE = "Params/kr_sequence.fasta";
 
 #The btrack file which stores experimentally found regions of open chromatin in the DNA sequence.
 DNA_AVAILABILITY_FILE = "";
